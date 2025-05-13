@@ -1,0 +1,1751 @@
+// Colores representativos por equipo (puede ser string o [color1, color2] para gradiente)
+export const TEAM_COLORS: Record<string, string | [string, string]> = {
+  "Boca jr": "#0033A0",
+  "Boca Jrs": "#0033A0",
+  "Boca Jr": "#0033A0",
+  Boquita: "#0033A0",
+  Boca: "#0033A0",
+  Dortmund: "#FFD600",
+  "Real Madrid": "#FFFFFF",
+  "Real madrid": "#FFFFFF",
+  Liverpool: "#D00027",
+  Newcastle: "#222222",
+  "Manchester city": "#6CABDD",
+  City: "#6CABDD",
+  "M city": "#6CABDD",
+  Napoli: "#0074B7",
+  "Inter Miami": "#FF69B4",
+  "Inter miami": "#FF69B4",
+  "River plate": "#E41B17",
+  River: "#E41B17",
+  "Porto FC": "#0050A4",
+  "Porto fC": "#0050A4",
+  "AC Milan": ["#D00027", "#222222"], // rojo/negro
+  Juventus: ["#FFFFFF", "#222222"], // blanco/negro
+  Inter: ["#0074B7", "#222222"], // azul/negro (ejemplo)
+  Palmeiras: "#1B9448", // verde
+  Palmerias: "#1B9448", // verde (typo)
+  Palmeira: "#1B9448", // verde (typo)
+  "West Ham": ["#7A263A", "#FDB913"], // rojo/amarillo
+  "West ham": ["#7A263A", "#FDB913"], // rojo/amarillo
+  // Colores de equipos para Liga 6
+  Blessed: "#1E40AF",
+  Verdolagas: "#22C55E",
+  "Red Devils": "#B91C1C",
+  // Colores de equipos para Liga 7
+  Greenworld: "#22C55E", // verde
+  "DLC Team": "#222222", // negro
+  "Vodka Juniors": "#2563EB", // azul
+  // Colores de equipos para Liga 8
+  "Ferxxo 100": "#22C55E", // verde
+  "Colsafistas FC": "#2563EB", // azul
+  "Junior FC": "#D00027", // rojo
+  // Colores de equipos para Liga 9
+  Fiorentina: "#9333EA", // morado
+  Chapecoense: "#22C55E", // verde
+  "Alianza FC": "#2563EB", // azul
+  Bayern: "#D00027", // rojo
+  Shakhtar: "#F97316", // naranja
+  // Colores de equipos para Liga 10
+  "Chelsea FC": "#1E40AF", // azul
+  "Borussia Mönchengladbach": "#222222", // negro
+  "América de Cali": "#D00027", // rojo
+  "Orlando City": "#9333EA", // morado
+  Holanda: "#F59E42", // naranja claro
+  "Panathinaikos FC": "#22C55E", // verde
+  // Colores de equipos para Liga 11
+  LUSP: "#9333EA", // morado
+  "Inter Milan": "#2563EB", // azul
+  "All Blacks": "#222222", // negro
+  Servientrega: "#22C55E", // verde
+  "San Marino": "#F97316", // naranja
+  // Colores de equipos para Liga 12
+  "N Forest": "#D00027", // rojo
+  "R Valladolid": "#9333EA", // morado
+  "LA FC": "#222222", // negro
+  "León FC": "#22C55E", // verde
+  "Al Hilal": "#2563EB", // azul
+  "H Dynamo": "#F97316", // naranja
+};
+
+// Datos de ejemplo para Liga 1
+export const LIGA_1 = {
+  tablaGeneral: [
+    { equipo: "Boca jr", puntos: 101 },
+    { equipo: "Dortmund", puntos: 86 },
+    { equipo: "Real Madrid", puntos: 84 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Dortmund", puntos: 20 },
+        { equipo: "Real Madrid", puntos: 18 },
+        { equipo: "Boca Jrs", puntos: 16 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Boca Jrs", puntos: 31 },
+        { equipo: "Dortmund", puntos: 26 },
+        { equipo: "Real Madrid", puntos: 21 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Boca Jrs", puntos: 13 },
+        { equipo: "Real madrid", puntos: 11 },
+        { equipo: "Dortmund", puntos: 10 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Boca Jrs", puntos: 20 },
+        { equipo: "Real madrid", puntos: 15 },
+        { equipo: "Dortmund", puntos: 10 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Boca Jrs", puntos: 21 },
+        { equipo: "Dortmund", puntos: 20 },
+        { equipo: "Real Madrid", puntos: 19 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Emanuel2", goles: 15 },
+    { jugador: "Lucas", goles: 12 },
+    { jugador: "Fabri", goles: 10 },
+  ],
+  goleadorLiga: { jugador: "Emanuel2", goles: 15 },
+  final: "Boca 7 - Dortmund 5",
+  ganador: "Boca Jrs",
+};
+
+// Datos de ejemplo para Liga 2
+export const LIGA_2 = {
+  tablaGeneral: [
+    { equipo: "Liverpool", puntos: 160, victorias: 76, empates: 8 },
+    { equipo: "Newcastle", puntos: 108, victorias: 51, empates: 6 },
+    { equipo: "Manchester city", puntos: 104, victorias: 49, empates: 8 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [],
+      goleadores: [],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Manchester City", puntos: 20 },
+        { equipo: "Liverpool", puntos: 23 },
+        { equipo: "Newcastle", puntos: 9 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Liverpool", puntos: 26, victorias: 12, empates: 2 },
+        { equipo: "Manchester City", puntos: 25, victorias: 12, empates: 1 },
+        { equipo: "Newcastle", puntos: 21, victorias: 10, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Liverpool", puntos: 36 },
+        { equipo: "Newcastle", puntos: 25 },
+        { equipo: "Manchester City", puntos: 7 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Liverpool", puntos: 30, victorias: 15, empates: 0 },
+        { equipo: "Manchester City", puntos: 21, victorias: 10, empates: 1 },
+        { equipo: "Newcastle", puntos: 15, victorias: 7, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Liverpool", puntos: 23, victorias: 11, empates: 1 },
+        { equipo: "Newcastle", puntos: 22, victorias: 11 },
+        { equipo: "Manchester City", puntos: 9, victorias: 4, empates: 1 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Emanuel2", goles: 23 },
+    { jugador: "Lucas", goles: 13 },
+    { jugador: "Fabri", goles: 9 },
+    { jugador: "Juan dlc", goles: 8 },
+    { jugador: "Henry", goles: 8 },
+    { jugador: "Farfan", goles: 8 },
+    { jugador: "Jhonier", goles: 6 },
+    { jugador: "Mariano", goles: 7 },
+    { jugador: "Jose Henao", goles: 5 },
+    { jugador: "Jairo", goles: 7 },
+    { jugador: "Cristian", goles: 3 },
+    { jugador: "Mora", goles: 3 },
+    { jugador: "Samir", goles: 2 },
+    { jugador: "Elias", goles: 2 },
+    { jugador: "Moises", goles: 1 },
+    { jugador: "Ronaldo", goles: 1 },
+    { jugador: "Eudes", goles: 1 },
+    { jugador: "Emanuel", goles: 1 },
+    { jugador: "Lucas B", goles: 9 },
+    { jugador: "Titi", goles: 3 },
+    { jugador: "J Galcan", goles: 2 },
+    { jugador: "momchi", goles: 1 },
+    { jugador: "Camilo L", goles: 1 },
+    { jugador: "galvan", goles: 2 },
+    { jugador: "prens", goles: 1 },
+    { jugador: "Daniel c", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Emanuel2", goles: 23 },
+  final: "Liverpool 6 - Newcastle 4",
+  ganador: "Liverpool",
+};
+
+// Datos de ejemplo para Liga 3
+export const LIGA_3 = {
+  tablaGeneral: [
+    { equipo: "Napoli", puntos: 125, victorias: 56, empates: 13 },
+    { equipo: "Inter Miami", puntos: 119, victorias: 54, empates: 10 },
+    { equipo: "River plate", puntos: 81, victorias: 36, empates: 7 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Napoli", puntos: 23, victorias: 10, empates: 3 },
+        { equipo: "Inter Miami", puntos: 17, victorias: 7, empates: 3 },
+        { equipo: "River plate", puntos: 15, victorias: 7, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Napoli", puntos: 26, victorias: 12, empates: 2 },
+        { equipo: "Inter Miami", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "River", puntos: 14, victorias: 7, empates: 0 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Inter miami", puntos: 26, victorias: 13, empates: 0 },
+        { equipo: "Napoli", puntos: 22, victorias: 10, empates: 2 },
+        { equipo: "River", puntos: 8, victorias: 3, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "River", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "Napoli", puntos: 15, victorias: 6, empates: 3 },
+        { equipo: "Inter miami", puntos: 15, victorias: 6, empates: 3 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Inter Miami", puntos: 19, victorias: 9, empates: 1 },
+        { equipo: "River", puntos: 17, victorias: 8, empates: 1 },
+        { equipo: "Napoli", puntos: 16, victorias: 7, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Napoli", puntos: 23, victorias: 11, empates: 1 },
+        { equipo: "Inter Miami", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "River", puntos: 9, victorias: 4, empates: 1 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Emanuel2", goles: 18 },
+    { jugador: "Juan dlc", goles: 14 },
+    { jugador: "Jesus A", goles: 13 },
+    { jugador: "Lucas B", goles: 12 },
+    { jugador: "Fabrizio", goles: 11 },
+    { jugador: "Eudes", goles: 8 },
+    { jugador: "Jairo G", goles: 8 },
+    { jugador: "Henry", goles: 7 },
+    { jugador: "Ronaldo", goles: 6 },
+    { jugador: "Farfan", goles: 6 },
+    { jugador: "Cristian", goles: 6 },
+    { jugador: "Camilo L", goles: 5 },
+    { jugador: "Jose Henao", goles: 5 },
+    { jugador: "Mariano", goles: 4 },
+    { jugador: "Emanuel", goles: 3 },
+    { jugador: "Samir", goles: 3 },
+    { jugador: "Mora", goles: 2 },
+    { jugador: "Elias", goles: 2 },
+    { jugador: "Monchi", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Emanuel2", goles: 18 },
+  arqueros: [
+    { arquero: "Diego", golesRecibidos: 38 },
+    { arquero: "Pipe", golesRecibidos: 40 },
+    { arquero: "Jose Manuel", golesRecibidos: 42 },
+  ],
+  mejorArquero: { arquero: "Diego", golesRecibidos: 38 },
+  final: "Napoli 7 - Inter Miami 3",
+  ganador: "Napoli",
+};
+
+// Datos de ejemplo para Liga 4
+export const LIGA_4 = {
+  tablaGeneral: [
+    { equipo: "Porto FC", puntos: 119, victorias: 56, empates: 9 },
+    { equipo: "AC Milan", puntos: 116, victorias: 52, empates: 11 },
+    { equipo: "Juventus", puntos: 100, victorias: 47, empates: 11 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Juventus", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "Porto FC", puntos: 10, victorias: 4, empates: 2 },
+        { equipo: "AC Milan", puntos: 6, victorias: 1, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "AC Milan", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "Porto FC", puntos: 16, victorias: 8, empates: 0 },
+        { equipo: "Juventus", puntos: 16, victorias: 7, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Porto FC", puntos: 24, victorias: 10, empates: 4 },
+        { equipo: "AC Milan", puntos: 15, victorias: 5, empates: 5 },
+        { equipo: "Juventus", puntos: 7, victorias: 2, empates: 3 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "AC Milan", puntos: 36, victorias: 18, empates: 0 },
+        { equipo: "Juventus", puntos: 25, victorias: 12, empates: 1 },
+        { equipo: "Porto FC", puntos: 19, victorias: 9, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Juventus", puntos: 21, victorias: 10, empates: 1 },
+        { equipo: "Porto FC", puntos: 21, victorias: 10, empates: 1 },
+        { equipo: "AC Milan", puntos: 12, victorias: 6, empates: 0 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Porto FC", puntos: 29, victorias: 14, empates: 1 },
+        { equipo: "AC Milan", puntos: 23, victorias: 11, empates: 1 },
+        { equipo: "Juventus", puntos: 18, victorias: 8, empates: 2 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Fauri", goles: 16 },
+    { jugador: "Farfan", goles: 15 },
+    { jugador: "Jairo G", goles: 15 },
+    { jugador: "Juan DLC", goles: 14 },
+    { jugador: "Esteban G", goles: 10 },
+    { jugador: "Lucas Benjumea", goles: 9 },
+    { jugador: "Camilo L", goles: 8 },
+    { jugador: "Mariano A", goles: 7 },
+    { jugador: "Kennyvel", goles: 6 },
+    { jugador: "Frank", goles: 4 },
+    { jugador: "Pingui", goles: 4 },
+    { jugador: "Henry", goles: 4 },
+    { jugador: "Emanuel2", goles: 3 },
+    { jugador: "Eudes", goles: 3 },
+    { jugador: "Daniel C", goles: 2 },
+    { jugador: "Cristian B", goles: 2 },
+    { jugador: "Sebastian P", goles: 2 },
+    { jugador: "Ema1", goles: 2 },
+    { jugador: "Titi", goles: 1 },
+    { jugador: "Mora", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Fauri", goles: 16 },
+  arqueros: [
+    { arquero: "Diego", golesRecibidos: 37 },
+    { arquero: "Pipe", golesRecibidos: 34 },
+  ],
+  mejorArquero: { arquero: "Pipe", golesRecibidos: 34 },
+  final: "Porto FC 9 - AC Milan 2",
+  ganador: "Porto FC",
+};
+
+// Datos de ejemplo para Liga 5
+export const LIGA_5 = {
+  tablaGeneral: [
+    { equipo: "Palmeiras", puntos: 142, victorias: 61, empates: 20 },
+    { equipo: "Inter", puntos: 113, victorias: 48, empates: 15 },
+    { equipo: "West Ham", puntos: 102, victorias: 41, empates: 20 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Palmeiras", puntos: 27, victorias: 12, empates: 3 },
+        { equipo: "West Ham", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "Inter", puntos: 21, victorias: 10, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Palmeiras", puntos: 21, victorias: 7, empates: 7 },
+        { equipo: "West Ham", puntos: 16, victorias: 5, empates: 6 },
+        { equipo: "Inter", puntos: 14, victorias: 6, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Palmerias", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "Inter", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "West ham", puntos: 14, victorias: 5, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Palmeira", puntos: 28, victorias: 13, empates: 2 },
+        { equipo: "Inter", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "West ham", puntos: 16, victorias: 7, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Inter", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "Palmeiras", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "West ham", puntos: 16, victorias: 7, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Palmeiras", puntos: 24, victorias: 10, empates: 4 },
+        { equipo: "Inter", puntos: 18, victorias: 6, empates: 6 },
+        { equipo: "West ham", puntos: 16, victorias: 6, empates: 4 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Pier Rizo", goles: 17 },
+    { jugador: "Jurgen", goles: 14 },
+    { jugador: "Farfan", goles: 12 },
+    { jugador: "Jefferson", goles: 11 },
+    { jugador: "Juan dlc", goles: 11 },
+    { jugador: "Kenny", goles: 11 },
+    { jugador: "Ema2", goles: 10 },
+    { jugador: "Sergio B", goles: 10 },
+    { jugador: "Esteban G", goles: 9 },
+    { jugador: "Fabri", goles: 9 },
+    { jugador: "Henry", goles: 7 },
+    { jugador: "Mariano", goles: 5 },
+    { jugador: "Ema1", goles: 5 },
+    { jugador: "Camilo L", goles: 5 },
+    { jugador: "Eude", goles: 3 },
+    { jugador: "Jairo G", goles: 3 },
+    { jugador: "Lucas B", goles: 2 },
+    { jugador: "Frank", goles: 2 },
+    { jugador: "Cristian B", goles: 2 },
+    { jugador: "Mora", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Pier Rizo", goles: 17 },
+  arqueros: [
+    { arquero: "Pipe Arquero", golesRecibidos: 61 },
+    { arquero: "Diego F", golesRecibidos: 59 },
+    { arquero: "Jose Manuel", golesRecibidos: 55 },
+  ],
+  mejorArquero: { arquero: "Jose Manuel", golesRecibidos: 55 },
+  final: "Inter 7 - Palmeiras 4",
+  ganador: "Inter",
+};
+
+// Relación de arqueros por equipo para Liga 5
+export const ARQUEROS_LIGA_5: Record<string, string> = {
+  Palmeiras: "Jose Manuel",
+  Inter: "Pipe Arquero",
+  "West Ham": "Diego F",
+};
+
+// Arqueros por equipo para Liga 6
+export const ARQUEROS_LIGA_6: Record<string, string> = {
+  Blessed: "Diego",
+  Verdolagas: "José Manuel",
+  "Red Devils": "Pipe",
+};
+
+// Datos de ejemplo para Liga 6
+export const LIGA_6 = {
+  tablaGeneral: [
+    { equipo: "Blessed", puntos: 138, victorias: 62, empates: 14 },
+    { equipo: "Verdolagas", puntos: 134, victorias: 60, empates: 14 },
+    { equipo: "Red Devils", puntos: 105, victorias: 47, empates: 11 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Verdolagas", puntos: 24, victorias: 10, empates: 4 },
+        { equipo: "Blessed", puntos: 22, victorias: 10, empates: 2 },
+        { equipo: "Red Devils", puntos: 12, victorias: 5, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Blessed", puntos: 27, victorias: 12, empates: 3 },
+        { equipo: "Red Devils", puntos: 19, victorias: 7, empates: 5 },
+        { equipo: "Verdolagas", puntos: 18, victorias: 8, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Verdolagas", puntos: 28, victorias: 13, empates: 2 },
+        { equipo: "Red Devils", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "Blessed", puntos: 8, victorias: 3, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Blessed", puntos: 31, victorias: 14, empates: 3 },
+        { equipo: "Verdolagas", puntos: 19, victorias: 8, empates: 3 },
+        { equipo: "Red Devils", puntos: 15, victorias: 7, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Blessed", puntos: 26, victorias: 12, empates: 2 },
+        { equipo: "Red Devils", puntos: 23, victorias: 11, empates: 1 },
+        { equipo: "Verdolagas", puntos: 17, victorias: 8, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Verdolagas", puntos: 28, victorias: 13, empates: 2 },
+        { equipo: "Blessed", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "Red Devils", puntos: 18, victorias: 9, empates: 0 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Farfán", goles: 22 },
+    { jugador: "Jurgen", goles: 19 },
+    { jugador: "Ema2", goles: 19 },
+    { jugador: "Juan dlc", goles: 13 },
+    { jugador: "Keni", goles: 13 },
+    { jugador: "Jefferson", goles: 11 },
+    { jugador: "Jairo Galván", goles: 11 },
+    { jugador: "Mariano", goles: 9 },
+    { jugador: "Eudes", goles: 8 },
+    { jugador: "Emanuel Celedón", goles: 6 },
+    { jugador: "Henry", goles: 7 },
+    { jugador: "Lucas", goles: 5 },
+    { jugador: "Elias", goles: 5 },
+    { jugador: "Esteban Galván", goles: 4 },
+    { jugador: "Camilo", goles: 4 },
+    { jugador: "Sergio B", goles: 4 },
+    { jugador: "Cristian", goles: 3 },
+    { jugador: "Fabri", goles: 2 },
+    { jugador: "Titi", goles: 2 },
+    { jugador: "Mora", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Farfán", goles: 22 },
+  arqueros: [
+    { arquero: "Diego", golesRecibidos: 51 },
+    { arquero: "José Manuel", golesRecibidos: 55 },
+    { arquero: "Pipe", golesRecibidos: 63 },
+  ],
+  mejorArquero: { arquero: "Diego", golesRecibidos: 51 },
+  final: "Blessed 4 - Verdolagas 4",
+  ganador: "Blessed",
+};
+
+// Arqueros por equipo para Liga 7
+export const ARQUEROS_LIGA_7: Record<string, string> = {
+  Greenworld: "José Manuel",
+  "DLC Team": "Pipe arquero",
+  "Vodka Juniors": "Diego",
+};
+
+// Datos de ejemplo para Liga 7
+export const LIGA_7 = {
+  tablaGeneral: [
+    { equipo: "Greenworld", puntos: 186, victorias: 85, empates: 16 },
+    { equipo: "DLC Team", puntos: 87, victorias: 39, empates: 9 },
+    { equipo: "Vodka Juniors", puntos: 79, victorias: 33, empates: 13 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Greenworld", puntos: 37, victorias: 18, empates: 1 },
+        { equipo: "Vodka Juniors", puntos: 18, victorias: 9, empates: 0 },
+        { equipo: "DLC Team", puntos: 11, victorias: 5, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Greenworld", puntos: 27, victorias: 11, empates: 5 },
+        { equipo: "DLC Team", puntos: 17, victorias: 7, empates: 3 },
+        { equipo: "Vodka Juniors", puntos: 14, victorias: 5, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Greenworld", puntos: 25, victorias: 12, empates: 1 },
+        { equipo: "DLC Team", puntos: 20, victorias: 9, empates: 2 },
+        { equipo: "Vodka Juniors", puntos: 7, victorias: 3, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Greenworld", puntos: 37, victorias: 17, empates: 3 },
+        { equipo: "Vodka Juniors", puntos: 13, victorias: 5, empates: 3 },
+        { equipo: "DLC Team", puntos: 10, victorias: 5, empates: 0 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Greenworld", puntos: 21, victorias: 9, empates: 3 },
+        { equipo: "DLC Team", puntos: 15, victorias: 7, empates: 1 },
+        { equipo: "Vodka Juniors", puntos: 14, victorias: 5, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Greenworld", puntos: 39, victorias: 18, empates: 3 },
+        { equipo: "DLC Team", puntos: 14, victorias: 6, empates: 2 },
+        { equipo: "Vodka Juniors", puntos: 13, victorias: 6, empates: 1 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Keni", goles: 23 },
+    { jugador: "Ema2", goles: 23 },
+    { jugador: "Farfán", goles: 18 },
+    { jugador: "Frederick", goles: 17 },
+    { jugador: "Jurgen", goles: 14 },
+    { jugador: "Cristian", goles: 9 },
+    { jugador: "Camilo", goles: 7 },
+    { jugador: "Jefferson", goles: 7 },
+    { jugador: "Juan DLC", goles: 6 },
+    { jugador: "José Viña", goles: 5 },
+    { jugador: "Henry", goles: 5 },
+    { jugador: "Galvan", goles: 4 },
+    { jugador: "Titi", goles: 3 },
+    { jugador: "Sergio", goles: 3 },
+    { jugador: "Jhonier", goles: 2 },
+    { jugador: "Frank", goles: 2 },
+    { jugador: "Pipe nuevo", goles: 2 },
+    { jugador: "Mariano", goles: 2 },
+    { jugador: "Fabri", goles: 1 },
+    { jugador: "Elias", goles: 1 },
+    { jugador: "Lucas", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Keni", goles: 23 },
+  arqueros: [
+    { arquero: "José Manuel", golesRecibidos: 28 },
+    { arquero: "Pipe arquero", golesRecibidos: 46 },
+    { arquero: "Diego", golesRecibidos: 47 },
+  ],
+  mejorArquero: { arquero: "José Manuel", golesRecibidos: 28 },
+  final: "DLC team 2 - Greenworld 11",
+  ganador: "Greenworld",
+};
+
+// Arqueros por equipo para Liga 8
+export const ARQUEROS_LIGA_8: Record<string, string> = {
+  "Ferxxo 100": "José Manuel",
+  "Colsafistas FC": "Pipe arquero",
+  "Junior FC": "Diego",
+};
+
+// Datos de ejemplo para Liga 8
+export const LIGA_8 = {
+  tablaGeneral: [
+    { equipo: "Colsafistas FC", puntos: 118, victorias: 50, empates: 19 },
+    { equipo: "Ferxxo 100", puntos: 109, victorias: 46, empates: 17 },
+    { equipo: "Junior FC", puntos: 108, victorias: 42, empates: 24 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Colsafistas FC", puntos: 30, victorias: 14, empates: 2 },
+        { equipo: "Junior FC", puntos: 17, victorias: 8, empates: 1 },
+        { equipo: "Ferxxo 100", puntos: 17, victorias: 8, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Junior FC", puntos: 25, victorias: 11, empates: 3 },
+        { equipo: "Colsafistas FC", puntos: 23, victorias: 10, empates: 3 },
+        { equipo: "Ferxxo 100", puntos: 12, victorias: 4, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Ferxxo 100", puntos: 19, victorias: 8, empates: 3 },
+        { equipo: "Junior FC", puntos: 16, victorias: 6, empates: 4 },
+        { equipo: "Colsafistas FC", puntos: 16, victorias: 7, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Ferxxo 100", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "Colsafistas FC", puntos: 19, victorias: 8, empates: 3 },
+        { equipo: "Junior FC", puntos: 17, victorias: 7, empates: 3 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Ferxxo 100", puntos: 19, victorias: 8, empates: 3 },
+        { equipo: "Colsafistas FC", puntos: 15, victorias: 6, empates: 3 },
+        { equipo: "Junior FC", puntos: 10, victorias: 2, empates: 6 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Junior FC", puntos: 23, victorias: 8, empates: 7 },
+        { equipo: "Ferxxo 100", puntos: 18, victorias: 7, empates: 4 },
+        { equipo: "Colsafistas FC", puntos: 15, victorias: 5, empates: 5 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Farfán", goles: 14 },
+    { jugador: "Jurgen", goles: 13 },
+    { jugador: "Ema2", goles: 12 },
+    { jugador: "Keni", goles: 11 },
+    { jugador: "Pipe nuevo", goles: 10 },
+    { jugador: "Juan DLC", goles: 10 },
+    { jugador: "Pingüi", goles: 8 },
+    { jugador: "J. Abuchaibe", goles: 7 },
+    { jugador: "Frederick", goles: 6 },
+    { jugador: "Mariano", goles: 6 },
+    { jugador: "Sergio Blanchard", goles: 5 },
+    { jugador: "Jefferson", goles: 5 },
+    { jugador: "Eudes", goles: 5 },
+    { jugador: "Viña", goles: 5 },
+    { jugador: "Cristian", goles: 4 },
+    { jugador: "Lucas", goles: 4 },
+    { jugador: "Ema1", goles: 3 },
+    { jugador: "Henry", goles: 1 },
+    { jugador: "Elias", goles: 1 },
+    { jugador: "Mora", goles: 1 },
+    { jugador: "Frank", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Farfán", goles: 14 },
+
+  final: "Ferxxo 100 14 - Colsafistas 3",
+  ganador: "Ferxxo 100",
+};
+
+// Arqueros por equipo para Liga 9
+export const ARQUEROS_LIGA_9: Record<string, string> = {
+  Fiorentina: "Brayan Ospina",
+  Juventus: "Camilo L",
+  Bayern: "Pipe arquero",
+  Shakhtar: "Juan Pablo",
+  Chapecoense: "Andrés Ramírez",
+  "Alianza FC": "Manuel",
+};
+
+// Datos de ejemplo para Liga 9
+export const LIGA_9 = {
+  tablaGeneral: [
+    { equipo: "Juventus", puntos: 140, victorias: 61, empates: 18 },
+    { equipo: "Fiorentina", puntos: 130, victorias: 61, empates: 8 },
+    { equipo: "Chapecoense", puntos: 119, victorias: 52, empates: 15 },
+    { equipo: "Alianza FC", puntos: 99, victorias: 38, empates: 23 },
+    { equipo: "Bayern", puntos: 97, victorias: 38, empates: 21 },
+    { equipo: "Shakhtar", puntos: 77, victorias: 31, empates: 15 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "Chapecoense", puntos: 37, victorias: 18, empates: 1 },
+        { equipo: "Juventus", puntos: 27, victorias: 12, empates: 3 },
+        { equipo: "Bayern", puntos: 23, victorias: 11, empates: 1 },
+        { equipo: "Alianza FC", puntos: 12, victorias: 4, empates: 4 },
+        { equipo: "Shakhtar", puntos: 11, victorias: 4, empates: 3 },
+        { equipo: "Fiorentina", puntos: 10, victorias: 5, empates: 0 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Juventus", puntos: 26, victorias: 11, empates: 4 },
+        { equipo: "Fiorentina", puntos: 24, victorias: 10, empates: 4 },
+        { equipo: "Alianza FC", puntos: 18, victorias: 7, empates: 4 },
+        { equipo: "Chapecoense", puntos: 16, victorias: 7, empates: 2 },
+        { equipo: "Bayern", puntos: 11, victorias: 3, empates: 5 },
+        { equipo: "Shakhtar", puntos: 7, victorias: 2, empates: 3 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Fiorentina", puntos: 26, victorias: 13, empates: 0 },
+        { equipo: "Chapecoense", puntos: 23, victorias: 10, empates: 3 },
+        { equipo: "Bayern", puntos: 22, victorias: 9, empates: 4 },
+        { equipo: "Juventus", puntos: 17, victorias: 7, empates: 3 },
+        { equipo: "Alianza FC", puntos: 13, victorias: 5, empates: 3 },
+        { equipo: "Shakhtar", puntos: 11, victorias: 4, empates: 3 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Fiorentina", puntos: 35, victorias: 17, empates: 1 },
+        { equipo: "Chapecoense", puntos: 19, victorias: 8, empates: 3 },
+        { equipo: "Shakhtar", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "Alianza FC", puntos: 16, victorias: 7, empates: 2 },
+        { equipo: "Juventus", puntos: 13, victorias: 5, empates: 3 },
+        { equipo: "Bayern", puntos: 13, victorias: 4, empates: 5 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Juventus", puntos: 24, victorias: 12, empates: 0 },
+        { equipo: "Alianza FC", puntos: 21, victorias: 8, empates: 5 },
+        { equipo: "Bayern", puntos: 19, victorias: 9, empates: 1 },
+        { equipo: "Shakhtar", puntos: 17, victorias: 8, empates: 1 },
+        { equipo: "Fiorentina", puntos: 17, victorias: 8, empates: 1 },
+        { equipo: "Chapecoense", puntos: 12, victorias: 4, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Juventus", puntos: 33, victorias: 14, empates: 5 },
+        { equipo: "Alianza FC", puntos: 19, victorias: 7, empates: 5 },
+        { equipo: "Fiorentina", puntos: 18, victorias: 8, empates: 2 },
+        { equipo: "Shakhtar", puntos: 13, victorias: 5, empates: 3 },
+        { equipo: "Chapecoense", puntos: 12, victorias: 5, empates: 2 },
+        { equipo: "Bayern", puntos: 9, victorias: 2, empates: 5 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Jose H.", goles: 25 },
+    { jugador: "Keni", goles: 24 },
+    { jugador: "Jurgen", goles: 21 },
+    { jugador: "Jeison Santa", goles: 17 },
+    { jugador: "Victor", goles: 15 },
+    { jugador: "Frederick", goles: 11 },
+    { jugador: "Galván", goles: 10 },
+    { jugador: "Luisma", goles: 10 },
+    { jugador: "Nico Yamal", goles: 9 },
+    { jugador: "Julio", goles: 9 },
+    { jugador: "Farfan", goles: 9 },
+    { jugador: "Juanda", goles: 8 },
+    { jugador: "Cristian Benjumea", goles: 7 },
+    { jugador: "Fabri", goles: 7 },
+    { jugador: "Jorge Farfán", goles: 7 },
+    { jugador: "Carlos Armenta", goles: 7 },
+    { jugador: "Sergio Blanchar", goles: 6 },
+    { jugador: "Jefferson", goles: 6 },
+    { jugador: "Mora", goles: 5 },
+    { jugador: "Hernan", goles: 5 },
+    { jugador: "Ronald", goles: 5 },
+    { jugador: "Charris", goles: 5 },
+    { jugador: "Jesús Pertuz", goles: 5 },
+    { jugador: "Cristian Trujillo", goles: 4 },
+    { jugador: "Juan DLC", goles: 4 },
+    { jugador: "Carlos R.", goles: 3 },
+    { jugador: "Eudes", goles: 3 },
+    { jugador: "Junior", goles: 3 },
+    { jugador: "Ema1", goles: 3 },
+    { jugador: "Nairent Rojas", goles: 3 },
+    { jugador: "Omar", goles: 2 },
+    { jugador: "Daniel Cuadros", goles: 2 },
+    { jugador: "Luis A.", goles: 2 },
+    { jugador: "Elias", goles: 2 },
+    { jugador: "Kevin", goles: 5 },
+    { jugador: "Frank", goles: 2 },
+    { jugador: "Jose Celedón", goles: 1 },
+    { jugador: "Samuel", goles: 1 },
+    { jugador: "José Viña", goles: 1 },
+    { jugador: "Henry", goles: 1 },
+    { jugador: "Mariano", goles: 1 },
+    { jugador: "Pingüi", goles: 1 },
+    { jugador: "Pipe nuevo", goles: 1 },
+    { jugador: "Camilo L", goles: 1 },
+    { jugador: "Lucho", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Jose H.", goles: 25 },
+  arqueros: [
+    { arquero: "Brayan Ospina", golesRecibidos: 34 },
+    { arquero: "Camilo L", golesRecibidos: 39 },
+    { arquero: "Pipe arquero", golesRecibidos: 43 },
+    { arquero: "Juan Pablo", golesRecibidos: 52 },
+    { arquero: "Andrés Ramírez", golesRecibidos: 56 },
+    { arquero: "Manuel", golesRecibidos: 56 },
+  ],
+  mejorArquero: { arquero: "Brayan Ospina", golesRecibidos: 34 },
+  semifinales: ["Juventus 5-6 Alianza FC", "Fiorentina 10-7 Chapecoense"],
+  final: "Fiorentina 9 - Alianza 8",
+  ganador: "Fiorentina",
+};
+
+// Arqueros por equipo para Liga 10
+export const ARQUEROS_LIGA_10: Record<string, string> = {
+  "Chelsea FC": "Pipe Arquero",
+  "Borussia Mönchengladbach": "Nicolás",
+  "América de Cali": "Santiago",
+  "Orlando City": "Brayan C.",
+  Holanda: "Diego",
+  "Panathinaikos FC": "Brayan Ospino",
+};
+
+// Datos de ejemplo para Liga 10
+export const LIGA_10 = {
+  tablaGeneral: [
+    { equipo: "Chelsea FC", puntos: 126, victorias: 59, empates: 8 },
+    {
+      equipo: "Borussia Mönchengladbach",
+      puntos: 118,
+      victorias: 50,
+      empates: 18,
+    },
+    { equipo: "América de Cali", puntos: 118, victorias: 49, empates: 20 },
+    { equipo: "Orlando City", puntos: 105, victorias: 45, empates: 15 },
+    { equipo: "Holanda", puntos: 89, victorias: 37, empates: 15 },
+    { equipo: "Panathinaikos FC", puntos: 63, victorias: 26, empates: 11 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        {
+          equipo: "Borussia Mönchengladbach",
+          puntos: 27,
+          victorias: 11,
+          empates: 5,
+        },
+        { equipo: "Orlando City", puntos: 24, victorias: 12, empates: 0 },
+        { equipo: "América de Cali", puntos: 17, victorias: 6, empates: 5 },
+        { equipo: "Holanda", puntos: 15, victorias: 7, empates: 1 },
+        { equipo: "Chelsea FC", puntos: 13, victorias: 6, empates: 1 },
+        { equipo: "Panathinaikos FC", puntos: 8, victorias: 2, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        {
+          equipo: "Borussia Mönchengladbach",
+          puntos: 25,
+          victorias: 11,
+          empates: 3,
+        },
+        { equipo: "Chelsea FC", puntos: 19, victorias: 8, empates: 3 },
+        { equipo: "América de Cali", puntos: 19, victorias: 7, empates: 5 },
+        { equipo: "Orlando City", puntos: 14, victorias: 6, empates: 2 },
+        { equipo: "Panathinaikos FC", puntos: 11, victorias: 4, empates: 3 },
+        { equipo: "Holanda", puntos: 4, victorias: 1, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Orlando City", puntos: 23, victorias: 9, empates: 5 },
+        { equipo: "Chelsea FC", puntos: 16, victorias: 8, empates: 0 },
+        { equipo: "América de Cali", puntos: 16, victorias: 6, empates: 4 },
+        { equipo: "Holanda", puntos: 15, victorias: 6, empates: 3 },
+        {
+          equipo: "Borussia Mönchengladbach",
+          puntos: 13,
+          victorias: 5,
+          empates: 3,
+        },
+        { equipo: "Panathinaikos FC", puntos: 13, victorias: 6, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Chelsea FC", puntos: 20, victorias: 9, empates: 2 },
+        { equipo: "Holanda", puntos: 20, victorias: 9, empates: 2 },
+        {
+          equipo: "Borussia Mönchengladbach",
+          puntos: 20,
+          victorias: 8,
+          empates: 4,
+        },
+        { equipo: "Panathinaikos FC", puntos: 15, victorias: 7, empates: 1 },
+        { equipo: "América de Cali", puntos: 15, victorias: 6, empates: 3 },
+        { equipo: "Orlando City", puntos: 6, victorias: 2, empates: 2 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        {
+          equipo: "Borussia Mönchengladbach",
+          puntos: 27,
+          victorias: 13,
+          empates: 1,
+        },
+        { equipo: "América de Cali", puntos: 22, victorias: 10, empates: 2 },
+        { equipo: "Holanda", puntos: 21, victorias: 9, empates: 3 },
+        { equipo: "Chelsea FC", puntos: 20, victorias: 10, empates: 0 },
+        { equipo: "Orlando City", puntos: 19, victorias: 9, empates: 1 },
+        { equipo: "Panathinaikos FC", puntos: 13, victorias: 6, empates: 1 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "Chelsea FC", puntos: 38, victorias: 18, empates: 2 },
+        { equipo: "América de Cali", puntos: 29, victorias: 14, empates: 1 },
+        { equipo: "Orlando City", puntos: 19, victorias: 7, empates: 5 },
+        { equipo: "Holanda", puntos: 13, victorias: 5, empates: 3 },
+        {
+          equipo: "Borussia Mönchengladbach",
+          puntos: 6,
+          victorias: 2,
+          empates: 2,
+        },
+        { equipo: "Panathinaikos FC", puntos: 3, victorias: 1, empates: 1 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Jose H", goles: 31 },
+    { jugador: "Jeison Santa", goles: 16 },
+    { jugador: "Víctor", goles: 16 },
+    { jugador: "Keni", goles: 16 },
+    { jugador: "Juan DLC", goles: 14 },
+    { jugador: "Frederick", goles: 13 },
+    { jugador: "Jurgen", goles: 13 },
+    { jugador: "Omar Peralta", goles: 8 },
+    { jugador: "Yassir", goles: 8 },
+    { jugador: "Farfan", goles: 8 },
+    { jugador: "Julio", goles: 8 },
+    { jugador: "Galván", goles: 7 },
+    { jugador: "Luisma", goles: 7 },
+    { jugador: "Kevin", goles: 6 },
+    { jugador: "Fabri", goles: 6 },
+    { jugador: "Jesús Pertuz", goles: 5 },
+    { jugador: "Juanda", goles: 4 },
+    { jugador: "Cristian", goles: 4 },
+    { jugador: "Ronald", goles: 4 },
+    { jugador: "Jefferson", goles: 4 },
+    { jugador: "Hernan", goles: 3 },
+    { jugador: "Luis V", goles: 3 },
+    { jugador: "Ema1", goles: 3 },
+    { jugador: "Charris", goles: 3 },
+    { jugador: "Henry", goles: 3 },
+    { jugador: "Mario", goles: 3 },
+    { jugador: "Jaime", goles: 3 },
+    { jugador: "Eudes", goles: 3 },
+    { jugador: "Nico Yamal", goles: 3 },
+    { jugador: "Trespa", goles: 3 },
+    { jugador: "Daniel Cuadros", goles: 3 },
+    { jugador: "Carlos Romero", goles: 3 },
+    { jugador: "Carlos Armenta", goles: 3 },
+    { jugador: "Ronald", goles: 2 },
+    { jugador: "Jose Viña", goles: 2 },
+    { jugador: "Mariano", goles: 2 },
+    { jugador: "Cristian T", goles: 1 },
+    { jugador: "Narent", goles: 1 },
+    { jugador: "Elias L", goles: 1 },
+    { jugador: "Jhonnier", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Jose H", goles: 31 },
+  arqueros: [
+    { arquero: "Nicolás", golesRecibidos: 33 },
+    { arquero: "Brayan Ospino", golesRecibidos: 41 },
+    { arquero: "Brayan C.", golesRecibidos: 44 },
+    { arquero: "Pipe Arquero", golesRecibidos: 48 },
+    { arquero: "Santiago", golesRecibidos: 54 },
+    { arquero: "Diego", golesRecibidos: 57 },
+  ],
+  mejorArquero: { arquero: "Nicolás", golesRecibidos: 33 },
+  semifinales: [
+    "Chelsea FC 10 - 11 Orlando City",
+    "Borussia Mönchengladbach 3 - 6 América de Cali",
+  ],
+  final: "Orlando City 7-5 América de Cali",
+  ganador: "Orlando City",
+};
+
+// Arqueros por equipo para Liga 11
+export const ARQUEROS_LIGA_11: Record<string, string> = {
+  Liverpool: "Brayan Cadena",
+  LUSP: "Brayan Ospino",
+  "Inter Milan": "Nicolas Baute",
+  "All Blacks": "Pipe Arquero",
+  Servientrega: "Santiago",
+  "San Marino": "Luis Ángel",
+};
+
+// Datos de ejemplo para Liga 11
+export const LIGA_11 = {
+  tablaGeneral: [
+    { equipo: "Liverpool", puntos: 138, victorias: 60, empates: 18 },
+    { equipo: "LUSP", puntos: 128, victorias: 51, empates: 26 },
+    { equipo: "Inter Milan", puntos: 112, victorias: 47, empates: 18 },
+    { equipo: "All Blacks", puntos: 102, victorias: 42, empates: 18 },
+    { equipo: "Servientrega", puntos: 86, victorias: 29, empates: 28 },
+    { equipo: "San Marino", puntos: 69, victorias: 26, empates: 17 },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        { equipo: "LUSP", puntos: 26, victorias: 12, empates: 2 },
+        { equipo: "Liverpool", puntos: 26, victorias: 11, empates: 4 },
+        { equipo: "Servientrega", puntos: 21, victorias: 8, empates: 5 },
+        { equipo: "All Blacks", puntos: 14, victorias: 6, empates: 2 },
+        { equipo: "Inter Milan", puntos: 14, victorias: 6, empates: 2 },
+        { equipo: "San Marino", puntos: 5, victorias: 1, empates: 3 },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "Liverpool", puntos: 25, victorias: 11, empates: 3 },
+        { equipo: "Inter Milan", puntos: 21, victorias: 9, empates: 3 },
+        { equipo: "All Blacks", puntos: 20, victorias: 7, empates: 6 },
+        { equipo: "LUSP", puntos: 12, victorias: 5, empates: 2 },
+        { equipo: "San Marino", puntos: 12, victorias: 4, empates: 4 },
+        { equipo: "Servientrega", puntos: 9, victorias: 2, empates: 5 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Liverpool", puntos: 22, victorias: 9, empates: 4 },
+        { equipo: "Inter Milan", puntos: 22, victorias: 9, empates: 4 },
+        { equipo: "LUSP", puntos: 17, victorias: 7, empates: 3 },
+        { equipo: "Servientrega", puntos: 13, victorias: 5, empates: 3 },
+        { equipo: "All Blacks", puntos: 12, victorias: 5, empates: 2 },
+        { equipo: "San Marino", puntos: 12, victorias: 4, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        { equipo: "Inter Milan", puntos: 24, victorias: 11, empates: 2 },
+        { equipo: "All Blacks", puntos: 22, victorias: 10, empates: 2 },
+        { equipo: "San Marino", puntos: 18, victorias: 9, empates: 0 },
+        { equipo: "LUSP", puntos: 18, victorias: 6, empates: 6 },
+        { equipo: "Liverpool", puntos: 16, victorias: 7, empates: 2 },
+        { equipo: "Servientrega", puntos: 14, victorias: 4, empates: 6 },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        { equipo: "Liverpool", puntos: 33, victorias: 15, empates: 3 },
+        { equipo: "LUSP", puntos: 26, victorias: 10, empates: 6 },
+        { equipo: "All Blacks", puntos: 20, victorias: 9, empates: 2 },
+        { equipo: "San Marino", puntos: 13, victorias: 5, empates: 3 },
+        { equipo: "Inter Milan", puntos: 12, victorias: 4, empates: 4 },
+        { equipo: "Servientrega", puntos: 12, victorias: 4, empates: 4 },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        { equipo: "LUSP", puntos: 29, victorias: 11, empates: 7 },
+        { equipo: "Inter Milan", puntos: 19, victorias: 8, empates: 3 },
+        { equipo: "Servientrega", puntos: 17, victorias: 6, empates: 5 },
+        { equipo: "Liverpool", puntos: 16, victorias: 7, empates: 2 },
+        { equipo: "All Blacks", puntos: 14, victorias: 5, empates: 4 },
+        { equipo: "San Marino", puntos: 9, victorias: 3, empates: 3 },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Jose H", goles: 26 },
+    { jugador: "Victor L", goles: 16 },
+    { jugador: "Jurgen", goles: 14 },
+    { jugador: "Jeison Santa", goles: 13 },
+    { jugador: "Mario Orozco", goles: 11 },
+    { jugador: "Víctor C", goles: 11 },
+    { jugador: "Keni Contreras", goles: 11 },
+    { jugador: "Pingui", goles: 10 },
+    { jugador: "Farfán", goles: 10 },
+    { jugador: "Santiago C", goles: 8 },
+    { jugador: "Carlos Armenta", goles: 8 },
+    { jugador: "Ronald", goles: 8 },
+    { jugador: "Henry", goles: 7 },
+    { jugador: "Mariano Amaris", goles: 7 },
+    { jugador: "Jairo G", goles: 7 },
+    { jugador: "Cristian T", goles: 5 },
+    { jugador: "Juan DLC", goles: 5 },
+    { jugador: "Fabricio R", goles: 5 },
+    { jugador: "Carlos Romero", goles: 5 },
+    { jugador: "Juan Sebastian", goles: 4 },
+    { jugador: "Esteban G", goles: 4 },
+    { jugador: "Yassir", goles: 4 },
+    { jugador: "Jose Viña", goles: 4 },
+    { jugador: "Jefferson", goles: 4 },
+    { jugador: "Omar P", goles: 3 },
+    { jugador: "Pipe nuevo", goles: 3 },
+    { jugador: "Ema1", goles: 3 },
+    { jugador: "Samir", goles: 3 },
+    { jugador: "Charris", goles: 3 },
+    { jugador: "Elias", goles: 3 },
+    { jugador: "Hernan", goles: 3 },
+    { jugador: "Kevin", goles: 2 },
+    { jugador: "Narent R", goles: 2 },
+    { jugador: "Eudes P", goles: 2 },
+    { jugador: "Santiago Arquero", goles: 2 },
+    { jugador: "Cristian B", goles: 2 },
+    { jugador: "Nico Yamal", goles: 1 },
+    { jugador: "Frederick", goles: 1 },
+    { jugador: "Sergio Blanchar", goles: 1 },
+    { jugador: "Hernán M", goles: 1 },
+    { jugador: "Jesús P", goles: 1 },
+    { jugador: "Daniel C", goles: 1 },
+    { jugador: "Brayan ospino", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Jose H", goles: 26 },
+  arqueros: [
+    { arquero: "Brayan Ospino", golesRecibidos: 29 },
+    { arquero: "Brayan Cadena", golesRecibidos: 38 },
+    { arquero: "Santiago", golesRecibidos: 42 },
+    { arquero: "Nicolas Baute", golesRecibidos: 43 },
+    { arquero: "Pipe Arquero", golesRecibidos: 50 },
+    { arquero: "Luis Ángel", golesRecibidos: 53 },
+  ],
+  mejorArquero: { arquero: "Brayan Ospino", golesRecibidos: 29 },
+  semifinales: ["Liverpool 11 - All Blacks 9", "LUSP 5 - Inter Milan 1"],
+  final: "LUSP 9-5 Liverpool FC",
+  ganador: "LUSP",
+};
+
+// Arqueros por equipo para Liga 12
+export const ARQUEROS_LIGA_12: Record<string, string> = {
+  "N Forest": "Jean Carlos",
+  "R Valladolid": "Santiago S",
+  "LA FC": "Camilo L",
+  "León FC": "Leonardo O",
+  "Al Hilal": "Brayan O",
+  "H Dynamo": "Andres Felipe",
+};
+
+// Datos de ejemplo para Liga 12
+export const LIGA_12 = {
+  tablaGeneral: [
+    {
+      equipo: "N Forest",
+      puntos: 125,
+      victorias: 59,
+      empates: 9,
+      derrotas: 0,
+      pj: 68,
+      porcentajeVictorias: 86.8,
+    },
+    {
+      equipo: "R Valladolid",
+      puntos: 124,
+      victorias: 54,
+      empates: 16,
+      derrotas: 0,
+      pj: 70,
+      porcentajeVictorias: 77.1,
+    },
+    {
+      equipo: "LA FC",
+      puntos: 123,
+      victorias: 54,
+      empates: 15,
+      derrotas: 0,
+      pj: 69,
+      porcentajeVictorias: 78.3,
+    },
+    {
+      equipo: "León FC",
+      puntos: 120,
+      victorias: 53,
+      empates: 14,
+      derrotas: 0,
+      pj: 67,
+      porcentajeVictorias: 79.1,
+    },
+    {
+      equipo: "Al Hilal",
+      puntos: 117,
+      victorias: 51,
+      empates: 15,
+      derrotas: 0,
+      pj: 66,
+      porcentajeVictorias: 77.3,
+    },
+    {
+      equipo: "H Dynamo",
+      puntos: 82,
+      victorias: 35,
+      empates: 12,
+      derrotas: 0,
+      pj: 47,
+      porcentajeVictorias: 74.5,
+    },
+  ],
+  jornadas: [
+    {
+      nombre: "Jornada 1",
+      resultados: [
+        {
+          equipo: "N Forest",
+          pj: 13,
+          v: 12,
+          e: 1,
+          d: 0,
+          puntos: 25,
+          porcentajeVictorias: 92.3,
+        },
+        {
+          equipo: "León FC",
+          pj: 10,
+          v: 8,
+          e: 2,
+          d: 0,
+          puntos: 18,
+          porcentajeVictorias: 80.0,
+        },
+        {
+          equipo: "R Valladolid",
+          pj: 11,
+          v: 7,
+          e: 4,
+          d: 0,
+          puntos: 18,
+          porcentajeVictorias: 63.6,
+        },
+        {
+          equipo: "Al Hilal",
+          pj: 9,
+          v: 8,
+          e: 1,
+          d: 0,
+          puntos: 17,
+          porcentajeVictorias: 88.9,
+        },
+        {
+          equipo: "LA FC",
+          pj: 10,
+          v: 7,
+          e: 3,
+          d: 0,
+          puntos: 17,
+          porcentajeVictorias: 70.0,
+        },
+        {
+          equipo: "H Dynamo",
+          pj: 7,
+          v: 4,
+          e: 3,
+          d: 0,
+          puntos: 11,
+          porcentajeVictorias: 57.1,
+        },
+      ],
+    },
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        {
+          equipo: "R Valladolid",
+          pj: 18,
+          v: 16,
+          e: 2,
+          d: 0,
+          puntos: 34,
+          porcentajeVictorias: 88.9,
+        },
+        {
+          equipo: "León FC",
+          pj: 11,
+          v: 9,
+          e: 2,
+          d: 0,
+          puntos: 20,
+          porcentajeVictorias: 81.8,
+        },
+        {
+          equipo: "H Dynamo",
+          pj: 10,
+          v: 9,
+          e: 1,
+          d: 0,
+          puntos: 19,
+          porcentajeVictorias: 90.0,
+        },
+        {
+          equipo: "Al Hilal",
+          pj: 9,
+          v: 8,
+          e: 1,
+          d: 0,
+          puntos: 17,
+          porcentajeVictorias: 88.9,
+        },
+        {
+          equipo: "LA FC",
+          pj: 10,
+          v: 7,
+          e: 3,
+          d: 0,
+          puntos: 17,
+          porcentajeVictorias: 70.0,
+        },
+        {
+          equipo: "N Forest",
+          pj: 8,
+          v: 7,
+          e: 1,
+          d: 0,
+          puntos: 15,
+          porcentajeVictorias: 87.5,
+        },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        {
+          equipo: "León FC",
+          pj: 14,
+          v: 12,
+          e: 2,
+          d: 0,
+          puntos: 26,
+          porcentajeVictorias: 85.7,
+        },
+        {
+          equipo: "H Dynamo",
+          pj: 13,
+          v: 12,
+          e: 1,
+          d: 0,
+          puntos: 25,
+          porcentajeVictorias: 92.3,
+        },
+        {
+          equipo: "LA FC",
+          pj: 12,
+          v: 9,
+          e: 3,
+          d: 0,
+          puntos: 21,
+          porcentajeVictorias: 75.0,
+        },
+        {
+          equipo: "Al Hilal",
+          pj: 10,
+          v: 8,
+          e: 2,
+          d: 0,
+          puntos: 18,
+          porcentajeVictorias: 80.0,
+        },
+        {
+          equipo: "N Forest",
+          pj: 10,
+          v: 7,
+          e: 3,
+          d: 0,
+          puntos: 17,
+          porcentajeVictorias: 70.0,
+        },
+        {
+          equipo: "R Valladolid",
+          pj: 10,
+          v: 7,
+          e: 3,
+          d: 0,
+          puntos: 17,
+          porcentajeVictorias: 70.0,
+        },
+      ],
+    },
+    {
+      nombre: "Jornada 4",
+      resultados: [
+        {
+          equipo: "N Forest",
+          pj: 18,
+          v: 17,
+          e: 1,
+          d: 0,
+          puntos: 35,
+          porcentajeVictorias: 94.4,
+        },
+        {
+          equipo: "Al Hilal",
+          pj: 16,
+          v: 11,
+          e: 5,
+          d: 0,
+          puntos: 27,
+          porcentajeVictorias: 68.8,
+        },
+        {
+          equipo: "LA FC",
+          pj: 12,
+          v: 11,
+          e: 1,
+          d: 0,
+          puntos: 23,
+          porcentajeVictorias: 91.7,
+        },
+        {
+          equipo: "León FC",
+          pj: 10,
+          v: 5,
+          e: 5,
+          d: 0,
+          puntos: 15,
+          porcentajeVictorias: 50.0,
+        },
+        {
+          equipo: "R Valladolid",
+          pj: 6,
+          v: 4,
+          e: 2,
+          d: 0,
+          puntos: 10,
+          porcentajeVictorias: 66.7,
+        },
+        {
+          equipo: "H Dynamo",
+          pj: 5,
+          v: 3,
+          e: 2,
+          d: 0,
+          puntos: 8,
+          porcentajeVictorias: 60.0,
+        },
+      ],
+    },
+    {
+      nombre: "Jornada 5",
+      resultados: [
+        {
+          equipo: "LA FC",
+          pj: 15,
+          v: 12,
+          e: 3,
+          d: 0,
+          puntos: 27,
+          porcentajeVictorias: 80.0,
+        },
+        {
+          equipo: "Al Hilal",
+          pj: 14,
+          v: 11,
+          e: 3,
+          d: 0,
+          puntos: 25,
+          porcentajeVictorias: 78.6,
+        },
+        {
+          equipo: "León FC",
+          pj: 12,
+          v: 11,
+          e: 1,
+          d: 0,
+          puntos: 23,
+          porcentajeVictorias: 91.7,
+        },
+        {
+          equipo: "R Valladolid",
+          pj: 11,
+          v: 10,
+          e: 1,
+          d: 0,
+          puntos: 21,
+          porcentajeVictorias: 90.9,
+        },
+        {
+          equipo: "N Forest",
+          pj: 9,
+          v: 9,
+          e: 0,
+          d: 0,
+          puntos: 18,
+          porcentajeVictorias: 100.0,
+        },
+        {
+          equipo: "H Dynamo",
+          pj: 4,
+          v: 3,
+          e: 1,
+          d: 0,
+          puntos: 7,
+          porcentajeVictorias: 75.0,
+        },
+      ],
+    },
+    {
+      nombre: "Jornada 6",
+      resultados: [
+        {
+          equipo: "R Valladolid",
+          pj: 14,
+          v: 10,
+          e: 4,
+          d: 0,
+          puntos: 24,
+          porcentajeVictorias: 71.4,
+        },
+        {
+          equipo: "León FC",
+          pj: 10,
+          v: 8,
+          e: 2,
+          d: 0,
+          puntos: 18,
+          porcentajeVictorias: 80.0,
+        },
+        {
+          equipo: "LA FC",
+          pj: 10,
+          v: 8,
+          e: 2,
+          d: 0,
+          puntos: 18,
+          porcentajeVictorias: 80.0,
+        },
+        {
+          equipo: "N Forest",
+          pj: 9,
+          v: 6,
+          e: 3,
+          d: 0,
+          puntos: 15,
+          porcentajeVictorias: 66.7,
+        },
+        {
+          equipo: "Al Hilal",
+          pj: 8,
+          v: 5,
+          e: 3,
+          d: 0,
+          puntos: 13,
+          porcentajeVictorias: 62.5,
+        },
+        {
+          equipo: "H Dynamo",
+          pj: 8,
+          v: 4,
+          e: 4,
+          d: 0,
+          puntos: 12,
+          porcentajeVictorias: 50.0,
+        },
+      ],
+    },
+  ],
+  goleadoresTotales: [
+    { jugador: "Jurgen H", goles: 28 },
+    { jugador: "José H", goles: 24 },
+    { jugador: "Santiago C", goles: 16 },
+    { jugador: "Farfán", goles: 16 },
+    { jugador: "Jairo G", goles: 15 },
+    { jugador: "Ronald R", goles: 14 },
+    { jugador: "Toto", goles: 13 },
+    { jugador: "Mario Orozco", goles: 12 },
+    { jugador: "Jeison S", goles: 11 },
+    { jugador: "Juan Dlc", goles: 10 },
+    { jugador: "Carlos Armenta", goles: 10 },
+    { jugador: "Juan Dybala", goles: 9 },
+    { jugador: "Fabricio", goles: 9 },
+    { jugador: "Pingui", goles: 8 },
+    { jugador: "Esteban G", goles: 8 },
+    { jugador: "Hernán M", goles: 7 },
+    { jugador: "Jefferson", goles: 7 },
+    { jugador: "Nico Yamal", goles: 7 },
+    { jugador: "Cristian T", goles: 7 },
+    { jugador: "Victor L", goles: 6 },
+    { jugador: "Cristian B", goles: 6 },
+    { jugador: "Emanuel C", goles: 6 },
+    { jugador: "Yassir", goles: 6 },
+    { jugador: "Carlos R", goles: 6 },
+    { jugador: "Jose Viña", goles: 5 },
+    { jugador: "Keni C", goles: 5 },
+    { jugador: "Jhonnier Dlc", goles: 4 },
+    { jugador: "Kevin P", goles: 4 },
+    { jugador: "Jesús P", goles: 3 },
+    { jugador: "Mariano A", goles: 3 },
+    { jugador: "Elías", goles: 2 },
+    { jugador: "Frederick", goles: 2 },
+    { jugador: "Narent", goles: 2 },
+    { jugador: "Breiner Corzo", goles: 2 },
+    { jugador: "Víctor C", goles: 2 },
+    { jugador: "Charris", goles: 1 },
+    { jugador: "Eudes P", goles: 1 },
+    { jugador: "Oscar P", goles: 1 },
+    { jugador: "Sergio B", goles: 1 },
+    { jugador: "Titi", goles: 1 },
+  ],
+  goleadorLiga: { jugador: "Jurgen H", goles: 28 },
+  arqueros: [
+    { arquero: "Brayan O", golesRecibidos: 46 },
+    { arquero: "Camilo L", golesRecibidos: 48 },
+    { arquero: "Leonardo O", golesRecibidos: 49 },
+    { arquero: "Santiago S", golesRecibidos: 49 },
+    { arquero: "Jean Carlos", golesRecibidos: 53 },
+    { arquero: "Andres Felipe", golesRecibidos: 56 },
+  ],
+  mejorArquero: { arquero: "Brayan O", golesRecibidos: 46 },
+  semifinales: ["N Forest 4-6 León FC", "R Valladolid 5-3 LA FC"],
+  final: "R Valladolid 11 - 4 León FC",
+  ganador: "R Valladolid",
+};
+
+export const ARQUEROS_POR_LIGA: Record<number, Record<string, string>> = {
+  5: ARQUEROS_LIGA_5,
+  6: ARQUEROS_LIGA_6,
+  7: ARQUEROS_LIGA_7,
+  8: ARQUEROS_LIGA_8,
+  9: ARQUEROS_LIGA_9,
+  10: ARQUEROS_LIGA_10,
+  11: ARQUEROS_LIGA_11,
+  12: ARQUEROS_LIGA_12,
+};
