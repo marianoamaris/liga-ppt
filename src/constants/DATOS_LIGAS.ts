@@ -11,6 +11,7 @@ export const TEAM_COLORS: Record<string, string | [string, string]> = {
   Liverpool: "#D00027",
   Newcastle: "#222222",
   "Manchester city": "#6CABDD",
+  "Manchester City": "#6CABDD",
   City: "#6CABDD",
   "M city": "#6CABDD",
   Napoli: "#0074B7",
