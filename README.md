@@ -54,7 +54,7 @@ Una plataforma web para:
 
 1. Clona el repositorio:
    ```sh
-   git clone <url-del-repo>
+   git clone <https://github.com/marianoamaris/liga-ppt>
    cd liga-ppt
    ```
 2. Instala dependencias:
