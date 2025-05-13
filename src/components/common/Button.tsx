@@ -1,19 +1,18 @@
 import React from "react";
 
-type ButtonProps = {
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode;
-  onClick?: () => void;
   className?: string;
 };
 
 export const Button: React.FC<ButtonProps> = ({
   children,
-  onClick,
   className = "",
+  ...props
 }) => (
   <button
-    onClick={onClick}
     className={`px-4 py-2 rounded-lg font-medium transition ${className}`}
+    {...props}
   >
     {children}
   </button>

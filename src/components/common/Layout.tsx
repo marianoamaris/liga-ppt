@@ -1,5 +1,5 @@
 import React from "react";
-import { Sidebar } from "./Sidebard";
+import { Sidebar } from "./Sidebar";
 import { SIDEBAR_ITEMS } from "../../constants/theme";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 
