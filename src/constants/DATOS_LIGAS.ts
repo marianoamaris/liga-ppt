@@ -118,12 +118,6 @@ export const LIGA_1 = {
       ],
     },
   ],
-  goleadoresTotales: [
-    { jugador: "Emanuel Navarro", goles: 15 },
-    { jugador: "Lucas Benjumea", goles: 12 },
-    { jugador: "Fabricio Rizo", goles: 10 },
-  ],
-  goleadorLiga: { jugador: "Emanuel Navarro", goles: 15 },
   final: "Boca 7 - Dortmund 5",
   ganador: "Boca Jrs",
 };
@@ -360,7 +354,7 @@ export const LIGA_4 = {
     },
   ],
   goleadoresTotales: [
-    { jugador: "Fauri", goles: 16 },
+    { jugador: "Fabricio Rizo", goles: 16 },
     { jugador: "Farfan", goles: 15 },
     { jugador: "Jairo Galván", goles: 15 },
     { jugador: "Juan de la cruz", goles: 14 },
@@ -381,7 +375,7 @@ export const LIGA_4 = {
     { jugador: "Titi", goles: 1 },
     { jugador: "Juan Mora", goles: 1 },
   ],
-  goleadorLiga: { jugador: "Fauri", goles: 16 },
+  goleadorLiga: { jugador: "Fabricio Rizo", goles: 16 },
   arqueros: [
     { arquero: "Diego Fel", golesRecibidos: 37 },
     { arquero: "Andres Felipe", golesRecibidos: 34 },
@@ -755,7 +749,7 @@ export const LIGA_8 = {
     { jugador: "Andres Felipe nuevo", goles: 10 },
     { jugador: "Juan de la cruz", goles: 10 },
     { jugador: "Pingüi", goles: 8 },
-    { jugador: "J. Abuchaibe", goles: 7 },
+    { jugador: "Jesus Abuchaibe", goles: 7 },
     { jugador: "Frederick", goles: 6 },
     { jugador: "Mariano Amaris", goles: 6 },
     { jugador: "Sergio Blanchard", goles: 5 },
@@ -909,7 +903,7 @@ export const LIGA_9 = {
     { jugador: "Pingüi", goles: 1 },
     { jugador: "Andres Felipe nuevo", goles: 1 },
     { jugador: "Camilo Laborde", goles: 1 },
-    { jugador: "Lucho", goles: 1 },
+    { jugador: "Luis Laborde", goles: 1 },
   ],
   goleadorLiga: { jugador: "Jose Hernandez", goles: 25 },
   arqueros: [
