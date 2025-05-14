@@ -12,6 +12,8 @@ export interface UsuarioLiga {
   posicion: Posicion;
 }
 
+// Requisitos para ser fundador -> haber jugado todas las ligas
+
 export const USUARIOS_LIGA: UsuarioLiga[] = [
   {
     name: "Mariano Amaris",
@@ -43,8 +45,8 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     esFundador: true,
     ligasGanadas: 3,
     esAdmin: true,
-    golesTotales: 99,
-    posicion: "delantero",
+    golesTotales: 15,
+    posicion: "defensa",
   },
 
   {
@@ -84,11 +86,22 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     name: "Eudes Pavajeau",
     username: "epavajeau",
     avatar: null,
-    ligasJugadas: 10,
+    ligasJugadas: 12,
     esFundador: false,
     ligasGanadas: 3,
     esAdmin: true,
     golesTotales: 37,
+    posicion: "delantero",
+  },
+  {
+    name: "Fabricio Rizo",
+    username: "frizo",
+    avatar: null,
+    ligasJugadas: 13,
+    esFundador: true,
+    ligasGanadas: 0,
+    esAdmin: false,
+    golesTotales: 80,
     posicion: "delantero",
   },
 ];
