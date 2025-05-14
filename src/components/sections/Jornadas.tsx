@@ -46,8 +46,9 @@ export const Jornadas: React.FC<JornadasProps> = ({
         <div className="mb-1 font-semibold text-gray-800">{jornada.nombre}</div>
         {jornada.resultados.length > 0 ? (
           <ul>
-            {jornada.resultados.map((res: any) => (
+            {jornada.resultados.map((res: any, index: number) => (
               <li key={res.equipo} className="flex items-center text-sm mb-0.5">
+                <span className="w-6 font-bold text-gray-500">{index + 1}</span>
                 <TeamCircle equipo={res.equipo} TEAM_COLORS={TEAM_COLORS} />
                 <span className="mr-2">{res.equipo}</span>
                 <span className="ml-auto font-bold">{res.puntos} pts</span>

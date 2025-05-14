@@ -673,7 +673,7 @@ export const LIGA_7 = {
     { arquero: "Diego Fel", golesRecibidos: 47 },
   ],
   mejorArquero: { arquero: "José Manuel", golesRecibidos: 28 },
-  final: "DLC team 2 - Greenworld 11",
+  final: "DLC Team 2 - Greenworld 11",
   ganador: "Greenworld",
 };
 
@@ -766,7 +766,7 @@ export const LIGA_8 = {
   ],
   goleadorLiga: { jugador: "Andres Felipe Farfán", goles: 14 },
 
-  final: "Ferxxo 100 14 - Colsafistas 3",
+  final: "Ferxxo 100 14 - Colsafistas FC 3",
   ganador: "Ferxxo 100",
 };
 
@@ -915,15 +915,15 @@ export const LIGA_9 = {
     { arquero: "Manuel", golesRecibidos: 56 },
   ],
   mejorArquero: { arquero: "Brayan Ospina", golesRecibidos: 34 },
-  semifinales: ["Juventus 5-6 Alianza FC", "Fiorentina 10-7 Chapecoense"],
-  final: "Fiorentina 9 - Alianza 8",
+  semifinales: ["Juventus 5 - Alianza FC 6", "Fiorentina 10 - 7 Chapecoense"],
+  final: "Fiorentina 9 - Alianza FC 8",
   ganador: "Fiorentina",
 };
 
 // Arqueros por equipo para Liga 10
 export const ARQUEROS_LIGA_10: Record<string, string> = {
   "Chelsea FC": "Andres Felipe Arquero",
-  "Borussia Mönchengladbach": "Nicolás",
+  "Borussia Mönchengladbach": "Nicolás Baute",
   "América de Cali": "Santiago",
   "Orlando City": "Brayan Cadena",
   Holanda: "Diego Fel",
@@ -1086,19 +1086,19 @@ export const LIGA_10 = {
   ],
   goleadorLiga: { jugador: "Jose Hernandez", goles: 31 },
   arqueros: [
-    { arquero: "Nicolás", golesRecibidos: 33 },
+    { arquero: "Nicolás Baute", golesRecibidos: 33 },
     { arquero: "Brayan Ospino", golesRecibidos: 41 },
     { arquero: "Brayan Cadena", golesRecibidos: 44 },
     { arquero: "Andres Felipe Arquero", golesRecibidos: 48 },
     { arquero: "Santiago", golesRecibidos: 54 },
     { arquero: "Diego Fel", golesRecibidos: 57 },
   ],
-  mejorArquero: { arquero: "Nicolás", golesRecibidos: 33 },
+  mejorArquero: { arquero: "Nicolás Baute", golesRecibidos: 33 },
   semifinales: [
-    "Chelsea FC 10 - 11 Orlando City",
-    "Borussia Mönchengladbach 3 - 6 América de Cali",
+    "Chelsea FC 10 - Orlando City 11",
+    "Borussia Mönchengladbach 3 - América de Cali 6",
   ],
-  final: "Orlando City 7-5 América de Cali",
+  final: "Orlando City 7 - América de Cali 5",
   ganador: "Orlando City",
 };
 
@@ -1246,7 +1246,7 @@ export const LIGA_11 = {
   ],
   mejorArquero: { arquero: "Brayan Ospino", golesRecibidos: 29 },
   semifinales: ["Liverpool 11 - All Blacks 9", "LUSP 5 - Inter Milan 1"],
-  final: "LUSP 9-5 Liverpool FC",
+  final: "LUSP 9 - Liverpool 5",
   ganador: "LUSP",
 };
 
@@ -1726,8 +1726,8 @@ export const LIGA_12 = {
     { arquero: "Andres Felipe", golesRecibidos: 56 },
   ],
   mejorArquero: { arquero: "Brayan Ospina", golesRecibidos: 46 },
-  semifinales: ["N Forest 4-6 León FC", "R Valladolid 5-3 LA FC"],
-  final: "R Valladolid 11 - 4 León FC",
+  semifinales: ["N Forest 4 - León FC 6", "R Valladolid 5 - LA FC 3"],
+  final: "R Valladolid 11 - León FC 4",
   ganador: "R Valladolid",
 };
 

@@ -14,7 +14,8 @@ function TeamCircle({
   equipo: string;
   TEAM_COLORS: Record<string, string | [string, string]>;
 }) {
-  const color = TEAM_COLORS[equipo];
+  const normalized = equipo?.trim();
+  const color = TEAM_COLORS[normalized] || TEAM_COLORS[equipo] || "#D1D5DB";
   if (Array.isArray(color)) {
     return (
       <span
@@ -38,6 +39,15 @@ function TeamCircle({
   );
 }
 
+// Helper para extraer nombre y score de un string tipo "Napoli 7" o "Inter Miami 3"
+function parseTeamAndScore(str: string) {
+  const match = str.match(/^(.*)\s(\d+)$/);
+  if (match) {
+    return { name: match[1], score: match[2] };
+  }
+  return { name: str, score: "" };
+}
+
 export const BracketSection: React.FC<BracketSectionProps> = ({
   semifinales,
   final,
@@ -49,18 +59,66 @@ export const BracketSection: React.FC<BracketSectionProps> = ({
     {semifinales && semifinales.length > 0 && (
       <div className="mb-2">
         <div className="font-semibold text-gray-600 mb-1">Semifinales</div>
-        <ul className="list-disc pl-6">
-          {semifinales.map((sf, idx) => (
-            <li key={idx} className="mb-1 text-gray-700">
-              {sf}
-            </li>
-          ))}
+        <ul className=" pl-6">
+          {semifinales.map((sf, idx) => {
+            if (!sf || typeof sf !== "string" || !sf.includes(" - ")) {
+              return (
+                <li key={idx} className="mb-1 text-gray-700">
+                  {sf}
+                </li>
+              );
+            }
+            const [team1Raw, team2Raw] = sf.split(" - ");
+            if (!team1Raw || !team2Raw) {
+              return (
+                <li key={idx} className="mb-1 text-gray-700">
+                  {sf}
+                </li>
+              );
+            }
+            const team1 = parseTeamAndScore(team1Raw.trim());
+            const team2 = parseTeamAndScore(team2Raw.trim());
+            return (
+              <li key={idx} className="mb-1 text-gray-700">
+                <div className="flex items-center">
+                  <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
+                  <span className="mr-2">{team1.name}</span>
+                  <span className="font-bold">{team1.score}</span>
+                  <span className="mx-2">-</span>
+                  <span className="font-bold">{team2.score}</span>
+                  <span>{team2.name}</span>
+                  <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
     )}
     <div className="mb-2">
       <div className="font-semibold text-gray-600 mb-1">Final</div>
-      <div className="mb-2 text-gray-800">{final}</div>
+      {(() => {
+        if (!final || typeof final !== "string" || !final.includes(" - "))
+          return <div className="mb-2 text-gray-800">{final}</div>;
+        const [team1Raw, team2Raw] = final.split(" - ");
+        if (!team1Raw || !team2Raw)
+          return <div className="mb-2 text-gray-800">{final}</div>;
+        const team1 = parseTeamAndScore(team1Raw.trim());
+        const team2 = parseTeamAndScore(team2Raw.trim());
+        return (
+          <div className="mb-2 text-gray-800">
+            <div className="flex items-center">
+              <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
+              <span className="mr-2">{team1.name}</span>
+              <span className="font-bold">{team1.score}</span>
+              <span className="mx-2">-</span>
+              <span className="font-bold">{team2.score}</span>
+              <span className="ml-2">{team2.name}</span>
+              <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
+            </div>
+          </div>
+        );
+      })()}
       <div className="flex items-center font-bold text-blue-700">
         <TeamCircle equipo={ganador} TEAM_COLORS={TEAM_COLORS} />
         Ganador: {ganador}

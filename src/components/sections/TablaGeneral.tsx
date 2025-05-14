@@ -50,6 +50,7 @@ export const TablaGeneral: React.FC<TablaGeneralProps> = ({
     <table className="min-w-full text-sm text-left">
       <thead>
         <tr className="font-bold text-gray-500 border-b">
+          <th className="py-1 pr-2">#</th>
           <th className="py-1 pr-4">Equipo</th>
           <th className="px-2 py-1">PJ</th>
           <th className="px-2 py-1">V</th>
@@ -60,7 +61,7 @@ export const TablaGeneral: React.FC<TablaGeneralProps> = ({
         </tr>
       </thead>
       <tbody>
-        {tablaGeneral.map((row: any) => {
+        {tablaGeneral.map((row: any, index: number) => {
           let stats = {
             partidosJugados: "-",
             derrotas: "-",
@@ -89,6 +90,7 @@ export const TablaGeneral: React.FC<TablaGeneralProps> = ({
           }
           return (
             <tr key={row.equipo} className="border-b last:border-b-0">
+              <td className="py-1 pr-2 font-bold text-gray-500">{index + 1}</td>
               <td className="flex items-center py-1 pr-4">
                 <TeamCircle equipo={row.equipo} TEAM_COLORS={TEAM_COLORS} />
                 <span className="font-medium">{row.equipo}</span>
