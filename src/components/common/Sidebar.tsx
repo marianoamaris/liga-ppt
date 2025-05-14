@@ -1,12 +1,13 @@
 import React from "react";
 import { GiSoccerKick, GiWhistle } from "react-icons/gi";
-import { FaRankingStar } from "react-icons/fa6";
+import { FaRankingStar, FaMedal } from "react-icons/fa6";
 import { SIDEBAR_ITEMS, THEME } from "../../constants/theme";
 
 const ICONS: Record<string, React.ReactNode> = {
   GiSoccerKick: <GiSoccerKick size={22} className="mr-2" />,
   FaRankingStar: <FaRankingStar size={22} className="mr-2" />,
   GiWhistle: <GiWhistle size={22} className="mr-2" />,
+  FaMedal: <FaMedal size={22} className="mr-2" />,
 };
 
 interface SidebarProps {
@@ -37,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <li
           key={item.id}
           onClick={() => onItemClick(item.path)}
-          className={`flex items-center transition-colors p-2 rounded-lg cursor-pointer
+          className={`flex items-center transition-colors p-2 rounded-lg  cursor-pointer
             ${
               selectedPath === item.path
                 ? THEME.colors.selected

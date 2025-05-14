@@ -7,7 +7,7 @@ export const THEME = {
     primary: "bg-gradient-to-b from-black via-gray-900 to-gray-800", // sidebar fondo
     secondary: "bg-gray-800", // para cards y acentos
     accent: "bg-white", // para botones o detalles
-    hover: "bg-gray-700", // hover en sidebar
+    hover: "bg-gray-500", // hover en sidebar
     selected: "bg-gray-200 text-black font-bold", // item seleccionado
     text: {
       primary: "text-white",
@@ -39,5 +39,11 @@ export const SIDEBAR_ITEMS = [
     label: "Historia",
     path: "/historia",
     icon: "GiWhistle",
+  },
+  {
+    id: "logros",
+    label: "Logros",
+    path: "/logros",
+    icon: "FaMedal",
   },
 ] as const;
