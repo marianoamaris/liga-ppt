@@ -106,7 +106,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Emanuel Navarro",
-    username: "",
+    username: "enavarro",
     avatar: null,
     ligasJugadas: 11,
     esFundador: false,
@@ -138,8 +138,8 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     posicion: "defensa",
   },
   {
-    name: "Andres Felipe Farfán",
-    username: "",
+    name: "Andres Farfán",
+    username: "afarfan",
     avatar: null,
     ligasJugadas: 11,
     esFundador: false,
@@ -194,7 +194,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Frank Ramirez",
-    username: "",
+    username: "framirez",
     avatar: null,
     ligasJugadas: 7,
     esFundador: false,
@@ -206,7 +206,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
 
   {
     name: "Ronaldo",
-    username: "",
+    username: "ronaldo",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -218,7 +218,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
 
   {
     name: "Emanuel Celedón",
-    username: "",
+    username: "eceledon",
     avatar: null,
     ligasJugadas: 8,
     esFundador: false,
@@ -228,8 +228,8 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     posicion: "mediocampista",
   },
   {
-    name: "Edward Brito",
-    username: "",
+    name: "Edward Brito (Titi)",
+    username: "ebrito",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -239,8 +239,8 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     posicion: "mediocampista",
   },
   {
-    name: "Monchi",
-    username: "",
+    name: "José Maestre (Monchi)",
+    username: "jmaestre",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -251,7 +251,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Daniel Cuadros",
-    username: "",
+    username: "dcuadros",
     avatar: null,
     ligasJugadas: 5,
     esFundador: false,
@@ -262,7 +262,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Esteban Galván",
-    username: "",
+    username: "egalvan",
     avatar: null,
     ligasJugadas: 6,
     esFundador: false,
@@ -273,40 +273,40 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Camilo Laborde",
-    username: "",
+    username: "claborde",
     avatar: null,
     ligasJugadas: 6,
     esFundador: false,
-    ligasGanadas: 0,
+    ligasGanadas: 2,
     esAdmin: false,
     golesTotales: 24,
     posicion: "arquero",
   },
   {
     name: "Sebastian Perez",
-    username: "",
+    username: "sperez",
     avatar: null,
-    ligasJugadas: 1,
+    ligasJugadas: 2,
     esFundador: false,
-    ligasGanadas: 0,
+    ligasGanadas: 2,
     esAdmin: false,
     golesTotales: 2,
     posicion: "delantero",
   },
   {
     name: "Keni Contreras",
-    username: "",
+    username: "kcontreras",
     avatar: null,
     ligasJugadas: 7,
     esFundador: false,
-    ligasGanadas: 0,
+    ligasGanadas: 4,
     esAdmin: false,
     golesTotales: 106,
     posicion: "delantero",
   },
   {
     name: "Pier Rizo",
-    username: "",
+    username: "prizo",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -317,7 +317,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Jurgen Hassler",
-    username: "",
+    username: "jhassler",
     avatar: null,
     ligasJugadas: 5,
     esFundador: false,
@@ -328,7 +328,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Jefferson Almanza",
-    username: "",
+    username: "jalmanza",
     avatar: null,
     ligasJugadas: 5,
     esFundador: false,
@@ -339,7 +339,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Sergio Blanchar",
-    username: "",
+    username: "sblanchar",
     avatar: null,
     ligasJugadas: 4,
     esFundador: false,
@@ -350,7 +350,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Frederick",
-    username: "",
+    username: "frederick",
     avatar: null,
     ligasJugadas: 3,
     esFundador: false,
@@ -361,7 +361,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Jeison Santa",
-    username: "",
+    username: "jsanta",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -372,7 +372,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Victor Lopez",
-    username: "",
+    username: "vlopez",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -383,7 +383,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Luisma",
-    username: "",
+    username: "luisma",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
@@ -394,7 +394,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Nicolas Yamal",
-    username: "",
+    username: "nyamal",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -405,7 +405,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Julio",
-    username: "",
+    username: "julio",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
@@ -416,7 +416,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Juanda",
-    username: "",
+    username: "juanda",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
@@ -427,7 +427,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Jorge Farfán",
-    username: "",
+    username: "jfarfan",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
@@ -438,7 +438,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Carlos Armenta",
-    username: "",
+    username: "carmenta",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -449,18 +449,18 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Junior",
-    username: "",
+    username: "junior",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
     ligasGanadas: 0,
     esAdmin: false,
     golesTotales: 3,
-    posicion: "defensa",
+    posicion: "mediocampista",
   },
   {
     name: "Omar Peralta",
-    username: "",
+    username: "operalta",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -471,7 +471,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "José Viña",
-    username: "",
+    username: "jviña",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
@@ -482,7 +482,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Ronald Rojas",
-    username: "",
+    username: "rrojas",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -493,7 +493,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Charris",
-    username: "",
+    username: "charris",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -504,7 +504,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Cristian Trujillo",
-    username: "",
+    username: "ctrujillo",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -515,7 +515,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Yassir",
-    username: "",
+    username: "ydoe",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
@@ -527,7 +527,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
 
   {
     name: "Narent Rojas",
-    username: "",
+    username: "nrojas",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,
@@ -538,7 +538,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Santiago Sanchez",
-    username: "",
+    username: "ssanchez",
     avatar: null,
     ligasJugadas: 2,
     esFundador: false,
@@ -549,7 +549,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
   },
   {
     name: "Brayan ospino",
-    username: "",
+    username: "bospino",
     avatar: null,
     ligasJugadas: 1,
     esFundador: false,

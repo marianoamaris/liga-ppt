@@ -1,12 +1,24 @@
 import React, { useState } from "react";
-import type { Posicion } from "../../constants/USUARIOS_LIGA";
-import { USUARIOS_LIGA } from "../../constants/USUARIOS_LIGA";
-import { SidebarTabs } from "../common/SidebarTabs";
-import { UserCard } from "../common/UserCard";
+import type { Posicion } from "../../../constants/USUARIOS_LIGA";
+import { USUARIOS_LIGA } from "../../../constants/USUARIOS_LIGA";
+import { SidebarTabs } from "../../common/SidebarTabs";
+import { UserCard } from "../../common/UserCard";
+import MvpFinalComponent from "./components/MvpFinalComponent";
+import MvpLigaComponent from "./components/MvpLigaComponent";
+import GuanteDeOroComponent from "./components/GuanteDeOroComponent";
+import BotaDeOroComponent from "./components/BotaDeOroComponent";
+import MasGanadoresComponent from "./components/MasGanadoresComponent";
+import HistoricoGoleadoresComponent from "./components/HistoricoGoleadoresComponent";
 
 const TABS = [
   { id: "jugadores", label: "Jugadores" },
   { id: "admins", label: "Admins" },
+  { id: "goleadores", label: "Top Goleadores Histórico" },
+  { id: "ganadores", label: "Los más ganadores" },
+  { id: "bota", label: "Bota de oro" },
+  { id: "guante", label: "Guante de oro" },
+  { id: "mvp", label: "MVP de la liga" },
+  { id: "mvp_final", label: "MVP de la final" },
 ];
 
 const POSICIONES: { id: "todas" | Posicion; label: string }[] = [
@@ -21,11 +33,19 @@ export const Historia: React.FC = () => {
   const [tab, setTab] = useState("jugadores");
   const [posicion, setPosicion] = useState<"todas" | Posicion>("todas");
 
-  // Filtrado de jugadores por posición
-  const jugadoresFiltrados =
-    posicion === "todas"
-      ? USUARIOS_LIGA
-      : USUARIOS_LIGA.filter((u) => u.posicion === posicion);
+  const usuariosFiltrados = USUARIOS_LIGA.filter((u) => {
+    if (tab === "jugadores") {
+      if (posicion === "todas") return true;
+      return (
+        u.posicion &&
+        u.posicion.trim().toLowerCase() === posicion.trim().toLowerCase()
+      );
+    }
+    if (tab === "admins") {
+      return u.esAdmin;
+    }
+    return false;
+  });
 
   return (
     <div className="flex gap-8 p-3">
@@ -37,7 +57,6 @@ export const Historia: React.FC = () => {
       <div className="flex-1">
         {tab === "jugadores" && (
           <>
-            {/* Subfiltro de posiciones */}
             <div className="flex gap-2 mb-4">
               {POSICIONES.map((p) => (
                 <button
@@ -56,19 +75,25 @@ export const Historia: React.FC = () => {
               ))}
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {jugadoresFiltrados.map((user) => (
-                <UserCard key={user.username} user={user} />
+              {usuariosFiltrados.map((user, index) => (
+                <UserCard key={index} user={user} />
               ))}
             </div>
           </>
         )}
         {tab === "admins" && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {USUARIOS_LIGA.filter((user) => user.esAdmin).map((user) => (
+            {usuariosFiltrados.map((user) => (
               <UserCard key={user.username} user={user} />
             ))}
           </div>
         )}
+        {tab === "goleadores" && <HistoricoGoleadoresComponent />}
+        {tab === "ganadores" && <MasGanadoresComponent />}
+        {tab === "bota" && <BotaDeOroComponent />}
+        {tab === "guante" && <GuanteDeOroComponent />}
+        {tab === "mvp" && <MvpLigaComponent />}
+        {tab === "mvp_final" && <MvpFinalComponent />}
       </div>
     </div>
   );

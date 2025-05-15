@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Info } from "./components/sections/Info";
 import { Clasificacion } from "./components/sections/Clasificacion";
-import { Historia } from "./components/sections/Historia";
+import { Historia } from "./components/sections/Historia/Historia";
 import { SignIn } from "./components/Auth/SignIn";
 import { Home } from "./pages/Home";
 import { Layout } from "./components/common/Layout";
