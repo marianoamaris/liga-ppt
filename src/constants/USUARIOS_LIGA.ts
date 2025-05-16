@@ -558,4 +558,15 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     golesTotales: 1,
     posicion: "arquero",
   },
+  {
+    name: "Oscar Perez",
+    username: "operez",
+    avatar: null,
+    ligasJugadas: 3,
+    esFundador: false,
+    ligasGanadas: 0,
+    esAdmin: false,
+    golesTotales: 2,
+    posicion: "delantero",
+  },
 ];
