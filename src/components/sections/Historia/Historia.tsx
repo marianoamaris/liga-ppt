@@ -33,6 +33,20 @@ export const Historia: React.FC = () => {
   const [tab, setTab] = useState("jugadores");
   const [posicion, setPosicion] = useState<"todas" | Posicion>("todas");
 
+  // Conteo total de jugadores por posición
+  const conteoPorPosicion = USUARIOS_LIGA.reduce(
+    (acc, u) => {
+      acc[u.posicion] = (acc[u.posicion] || 0) + 1;
+      return acc;
+    },
+    {
+      arquero: 0,
+      defensa: 0,
+      mediocampista: 0,
+      delantero: 0,
+    }
+  );
+
   const usuariosFiltrados = USUARIOS_LIGA.filter((u) => {
     if (tab === "jugadores") {
       if (posicion === "todas") return true;
@@ -57,22 +71,76 @@ export const Historia: React.FC = () => {
       <div className="flex-1">
         {tab === "jugadores" && (
           <>
-            <div className="flex gap-2 mb-4">
-              {POSICIONES.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setPosicion(p.id)}
-                  className={`px-3 py-1 rounded-full font-semibold border transition text-xs
-                    ${
-                      posicion === p.id
-                        ? "bg-blue-700 text-white border-blue-700"
-                        : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
-                    }
-                  `}
+            <div className="flex items-center gap-8 mb-6">
+              {/* Filtros de posición */}
+              <div className="flex gap-2">
+                {POSICIONES.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setPosicion(p.id)}
+                    className={`px-3 py-1 rounded-full font-semibold border transition text-xs
+                      ${
+                        posicion === p.id
+                          ? "bg-blue-700 text-white border-blue-700"
+                          : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+                      }
+                    `}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              {/* Conteo total de jugadores por posición con tooltips y mayor tamaño */}
+              <div className="flex items-center gap-6 ml-6">
+                <div
+                  className="relative flex flex-col items-center cursor-pointer group"
+                  title="Arqueros"
                 >
-                  {p.label}
-                </button>
-              ))}
+                  <span className="text-2xl">🧤</span>
+                  <span className="text-lg font-bold text-gray-700">
+                    {conteoPorPosicion.arquero}
+                  </span>
+                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
+                    Arqueros
+                  </span>
+                </div>
+                <div
+                  className="relative flex flex-col items-center cursor-pointer group"
+                  title="Defensas"
+                >
+                  <span className="text-2xl">🛡️</span>
+                  <span className="text-lg font-bold text-gray-700">
+                    {conteoPorPosicion.defensa}
+                  </span>
+                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
+                    Defensas
+                  </span>
+                </div>
+                <div
+                  className="relative flex flex-col items-center cursor-pointer group"
+                  title="Mediocampistas"
+                >
+                  <span className="text-2xl">🎽</span>
+                  <span className="text-lg font-bold text-gray-700">
+                    {conteoPorPosicion.mediocampista}
+                  </span>
+                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
+                    Mediocampistas
+                  </span>
+                </div>
+                <div
+                  className="relative flex flex-col items-center cursor-pointer group"
+                  title="Delanteros"
+                >
+                  <span className="text-2xl">🥅</span>
+                  <span className="text-lg font-bold text-gray-700">
+                    {conteoPorPosicion.delantero}
+                  </span>
+                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
+                    Delanteros
+                  </span>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {usuariosFiltrados.map((user, index) => (

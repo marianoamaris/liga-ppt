@@ -18,7 +18,7 @@ export const SidebarTabs: React.FC<SidebarTabsProps> = ({
       <button
         key={t.id}
         onClick={() => setTabSeleccionada(t.id)}
-        className={`px-4 py-2 rounded-lg font-semibold text-left transition border-l-4
+        className={`px-4 py-2 cursor-pointer rounded-lg font-semibold text-left transition border-l-4
           ${
             tabSeleccionada === t.id
               ? "bg-gray-900 text-white border-l-blue-500 shadow-lg"
