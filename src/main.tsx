@@ -16,6 +16,6 @@ if (typeof document !== "undefined") {
     document.createElement("link");
   favicon.setAttribute("rel", "icon");
   favicon.setAttribute("type", "image/png");
-  favicon.setAttribute("href", "/src/assets/ligaPPT-escudo.png");
+  favicon.setAttribute("href", "/ligaPPT-escudo.png");
   document.head.appendChild(favicon);
 }

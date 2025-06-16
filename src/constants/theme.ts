@@ -1,6 +1,6 @@
 export const THEME = {
   logo: {
-    escudo: "/src/assets/ligaPPT-escudo.png",
+    escudo: "/ligaPPT-escudo.png",
   },
   colors: {
     // Sidebar: degradado de negro a gris oscuro
