@@ -24,15 +24,15 @@ export const GoleadoresList: React.FC<GoleadoresListProps> = ({
         let bg = "";
         let text = "";
         if (i === 0) {
-          medal = <span className="mr-2 text-2xl">🥇</span>;
+          medal = <span className="mr-2 text-xl md:text-2xl">🥇</span>;
           bg = "bg-yellow-100 border-yellow-400";
           text = "text-yellow-700 font-bold";
         } else if (i === 1) {
-          medal = <span className="mr-2 text-2xl">🥈</span>;
+          medal = <span className="mr-2 text-xl md:text-2xl">🥈</span>;
           bg = "bg-gray-200 border-gray-400";
           text = "text-gray-700 font-semibold";
         } else if (i === 2) {
-          medal = <span className="mr-2 text-2xl">🥉</span>;
+          medal = <span className="mr-2 text-xl md:text-2xl">🥉</span>;
           bg = "bg-orange-300 border-orange-400";
           text = "text-orange-900 font-semibold";
         }
@@ -47,7 +47,7 @@ export const GoleadoresList: React.FC<GoleadoresListProps> = ({
             {medal}
             <FaFutbol className="mr-2 text-green-600" />
             <span className={`flex-1 ${text}`}>{g.jugador}</span>
-            <span className="ml-2 text-lg font-bold text-gray-800">
+            <span className="ml-2 text-base md:text-lg font-bold text-gray-800">
               {g.goles}
             </span>
             <span className="ml-1 text-xs text-gray-500">

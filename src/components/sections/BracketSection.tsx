@@ -57,7 +57,7 @@ export const BracketSection: React.FC<BracketSectionProps> = ({
   <div className="mb-6">
     <h3 className="mb-2 font-semibold text-gray-700">Bracket</h3>
     {semifinales && semifinales.length > 0 && (
-      <div className="mb-2">
+      <div className="mb-2 text-sm md:text-base">
         <div className="font-semibold text-gray-600 mb-1">Semifinales</div>
         <ul className=" pl-6">
           {semifinales.map((sf, idx) => {
@@ -86,7 +86,7 @@ export const BracketSection: React.FC<BracketSectionProps> = ({
                   <span className="font-bold">{team1.score}</span>
                   <span className="mx-2">-</span>
                   <span className="font-bold">{team2.score}</span>
-                  <span>{team2.name}</span>
+                  <span className="mx-2">{team2.name}</span>
                   <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
                 </div>
               </li>
@@ -106,20 +106,20 @@ export const BracketSection: React.FC<BracketSectionProps> = ({
         const team1 = parseTeamAndScore(team1Raw.trim());
         const team2 = parseTeamAndScore(team2Raw.trim());
         return (
-          <div className="mb-2 text-gray-800">
+          <div className="mb-2 text-gray-800 text-sm md:text-base">
             <div className="flex items-center">
               <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
               <span className="mr-2">{team1.name}</span>
               <span className="font-bold">{team1.score}</span>
               <span className="mx-2">-</span>
               <span className="font-bold">{team2.score}</span>
-              <span className="ml-2">{team2.name}</span>
+              <span className="mx-2">{team2.name}</span>
               <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
             </div>
           </div>
         );
       })()}
-      <div className="flex items-center font-bold text-blue-700">
+      <div className="flex items-center font-bold text-blue-700 text-sm md:text-base">
         <TeamCircle equipo={ganador} TEAM_COLORS={TEAM_COLORS} />
         Ganador: {ganador}
       </div>

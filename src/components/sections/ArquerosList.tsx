@@ -31,7 +31,7 @@ export const ArquerosList: React.FC<ArquerosListProps> = ({
         goles)
       </div>
     )}
-    <div className="mb-2 text-xs text-gray-500">
+    <div className="mb-2 text-[10px] md:text-xs text-gray-500">
       Promedio = Goles recibidos / Partidos jugados
     </div>
     <ul className="pl-0 space-y-2">
@@ -40,17 +40,17 @@ export const ArquerosList: React.FC<ArquerosListProps> = ({
         let bg = "";
         let text = "";
         if (i === 0) {
-          medal = <span className="mr-2 text-2xl">🥇</span>;
+          medal = <span className="mr-2 text-xl md:text-2xl">🥇</span>;
           bg = "bg-yellow-100 border-yellow-400";
-          text = "text-yellow-700 font-bold";
+          text = "text-yellow-700 font-bold text-xs md:text-base";
         } else if (i === 1) {
-          medal = <span className="mr-2 text-2xl">🥈</span>;
+          medal = <span className="mr-2 text-xl md:text-2xl">🥈</span>;
           bg = "bg-gray-200 border-gray-400";
-          text = "text-gray-700 font-semibold";
+          text = "text-gray-700 font-semibold text-xs md:text-base";
         } else if (i === 2) {
-          medal = <span className="mr-2 text-2xl">🥉</span>;
+          medal = <span className="mr-2 text-xl md:text-2xl">🥉</span>;
           bg = "bg-orange-300 border-orange-400";
-          text = "text-orange-900 font-semibold";
+          text = "text-orange-900 font-semibold text-xs md:text-base";
         }
         // Buscar el equipo correspondiente al arquero usando el mapeo de arqueros por liga
         const equipo = Object.keys(arquerosEquipoMap).find(
@@ -84,14 +84,16 @@ export const ArquerosList: React.FC<ArquerosListProps> = ({
             {medal}
             <GiGloves className="mr-2 text-blue-700" />
             <span className={`flex-1 ${text}`}>{a.arquero}</span>
-            <span className="ml-2 text-lg font-bold text-gray-800">
+            <span className="ml-2 text-base md:text-lg font-bold text-gray-800">
               {a.golesRecibidos}
             </span>
-            <span className="ml-1 text-xs text-gray-500">goles</span>
-            <span className="ml-4 text-xs font-semibold text-gray-600">
+            <span className="ml-1 text-[10px] md:text-xs text-gray-500">
+              goles
+            </span>
+            <span className="ml-4 text-[10px] md:text-xs font-semibold text-gray-600">
               PJ: {partidosJugados ?? "-"}
             </span>
-            <span className="ml-4 text-xs font-semibold text-gray-600">
+            <span className="ml-4 text-[10px] md:text-xs font-semibold text-gray-600">
               Prom: {promedio}
             </span>
           </li>

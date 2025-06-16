@@ -24,6 +24,7 @@ import { Jornadas } from "./Jornadas";
 import { GoleadoresList } from "./GoleadoresList";
 import { ArquerosList } from "./ArquerosList";
 import { BracketSection } from "./BracketSection";
+import { IoIosArrowBack } from "react-icons/io";
 
 const TOTAL_LIGAS = 13;
 const ligas = Array.from({ length: TOTAL_LIGAS }, (_, i) => i + 1);
@@ -62,86 +63,109 @@ export const Clasificacion: React.FC = () => {
     ? getArquerosMap(datosLiga.arqueros)
     : undefined;
 
-  return (
-    <div className="flex h-full max-h-full gap-8">
-      <LigaSidebar
-        ligas={ligas}
-        ligaSeleccionada={ligaSeleccionada}
-        setLigaSeleccionada={setLigaSeleccionada}
-        TOTAL_LIGAS={TOTAL_LIGAS}
-      />
-      <div className="flex-1 h-full max-h-full pb-4 pr-2 overflow-y-auto">
-        <Tabs
-          tabs={tabs}
-          tabSeleccionada={tabSeleccionada}
-          setTabSeleccionada={(id) => setTabSeleccionada(id as TabId)}
+  const content = (
+    <div className="flex-1 h-full max-h-full pb-4 pr-2 overflow-y-auto">
+      {ligaSeleccionada !== TOTAL_LIGAS && (
+        <IoIosArrowBack
+          onClick={() => setLigaSeleccionada(TOTAL_LIGAS)}
+          className="cursor-pointer mb-2 block md:hidden"
+          size={24}
         />
-        <Card className="text-gray-900 bg-white">
-          <h2 className="mb-4 text-xl font-bold">
-            Clasificación Liga #{ligaSeleccionada}
-          </h2>
-          {datosLiga ? (
-            <>
-              {tabSeleccionada === "clasificacion" && (
-                <>
-                  <div className="mb-6">
-                    <h3 className="mb-2 font-semibold text-gray-700">
-                      Tabla General
-                    </h3>
-                    <TablaGeneral
-                      tablaGeneral={datosLiga.tablaGeneral}
-                      TEAM_COLORS={TEAM_COLORS}
-                      getEquipoStats={getEquipoStats}
-                      arquerosMap={arquerosMap}
-                      arquerosEquipoMap={arquerosEquipoMap}
-                    />
-                  </div>
-                  <div className="mb-6">
-                    <h3 className="mb-2 font-semibold text-gray-700">
-                      Jornadas
-                    </h3>
-                    <Jornadas
-                      jornadas={datosLiga.jornadas}
-                      TEAM_COLORS={TEAM_COLORS}
-                    />
-                  </div>
-                </>
-              )}
-              {tabSeleccionada === "goleadores" &&
-                datosLiga.goleadoresTotales && (
-                  <GoleadoresList
-                    goleadoresTotales={datosLiga.goleadoresTotales}
-                    goleadorLiga={datosLiga.goleadorLiga}
+      )}
+      <Tabs
+        tabs={tabs}
+        tabSeleccionada={tabSeleccionada}
+        setTabSeleccionada={(id) => setTabSeleccionada(id as TabId)}
+      />
+      <Card className="text-gray-900 bg-white">
+        <h2 className="mb-4 text-xl font-bold">
+          Clasificación Liga #{ligaSeleccionada}
+        </h2>
+        {datosLiga ? (
+          <>
+            {tabSeleccionada === "clasificacion" && (
+              <>
+                <div className="mb-6">
+                  <h3 className="mb-2 font-semibold text-gray-700">
+                    Tabla General
+                  </h3>
+                  <TablaGeneral
+                    tablaGeneral={datosLiga.tablaGeneral}
+                    TEAM_COLORS={TEAM_COLORS}
+                    getEquipoStats={getEquipoStats}
+                    arquerosMap={arquerosMap}
+                    arquerosEquipoMap={arquerosEquipoMap}
                   />
-                )}
-              {tabSeleccionada === "arqueros" && datosLiga.arqueros && (
-                <ArquerosList
-                  arqueros={datosLiga.arqueros}
-                  mejorArquero={datosLiga.mejorArquero}
-                  tablaGeneral={datosLiga.tablaGeneral}
-                  arquerosEquipoMap={arquerosEquipoMap}
-                  TEAM_COLORS={TEAM_COLORS}
+                </div>
+                <div className="mb-6">
+                  <h3 className="mb-2 font-semibold text-gray-700">Jornadas</h3>
+                  <Jornadas
+                    jornadas={datosLiga.jornadas}
+                    TEAM_COLORS={TEAM_COLORS}
+                  />
+                </div>
+              </>
+            )}
+            {tabSeleccionada === "goleadores" &&
+              datosLiga.goleadoresTotales && (
+                <GoleadoresList
+                  goleadoresTotales={datosLiga.goleadoresTotales}
+                  goleadorLiga={datosLiga.goleadorLiga}
                 />
               )}
-              {tabSeleccionada === "bracket" && (
-                <BracketSection
-                  semifinales={datosLiga.semifinales}
-                  final={datosLiga.final}
-                  ganador={datosLiga.ganador}
-                  TEAM_COLORS={TEAM_COLORS}
-                />
-              )}
-            </>
-          ) : (
-            <div className="text-gray-600">
-              <p>
-                Aquí se mostrará el progreso y la clasificación de la Liga #
-                {ligaSeleccionada}.
-              </p>
-            </div>
-          )}
-        </Card>
-      </div>
+            {tabSeleccionada === "arqueros" && datosLiga.arqueros && (
+              <ArquerosList
+                arqueros={datosLiga.arqueros}
+                mejorArquero={datosLiga.mejorArquero}
+                tablaGeneral={datosLiga.tablaGeneral}
+                arquerosEquipoMap={arquerosEquipoMap}
+                TEAM_COLORS={TEAM_COLORS}
+              />
+            )}
+            {tabSeleccionada === "bracket" && (
+              <BracketSection
+                semifinales={datosLiga.semifinales}
+                final={datosLiga.final}
+                ganador={datosLiga.ganador}
+                TEAM_COLORS={TEAM_COLORS}
+              />
+            )}
+          </>
+        ) : (
+          <div className="text-gray-600">
+            <p>
+              Aquí se mostrará el progreso y la clasificación de la Liga #
+              {ligaSeleccionada}.
+            </p>
+          </div>
+        )}
+      </Card>
     </div>
+  );
+
+  return (
+    <>
+      <div className="flex md:hidden h-full max-h-full gap-8">
+        {ligaSeleccionada !== TOTAL_LIGAS ? (
+          content
+        ) : (
+          <LigaSidebar
+            ligas={ligas}
+            ligaSeleccionada={ligaSeleccionada}
+            setLigaSeleccionada={setLigaSeleccionada}
+            TOTAL_LIGAS={TOTAL_LIGAS}
+          />
+        )}
+      </div>
+      <div className="hidden md:flex h-full max-h-full gap-8">
+        <LigaSidebar
+          ligas={ligas}
+          ligaSeleccionada={ligaSeleccionada}
+          setLigaSeleccionada={setLigaSeleccionada}
+          TOTAL_LIGAS={TOTAL_LIGAS}
+        />
+        {content}
+      </div>
+    </>
   );
 };

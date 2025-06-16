@@ -13,13 +13,13 @@ export const Tabs: React.FC<TabsProps> = ({
   tabSeleccionada,
   setTabSeleccionada,
 }) => (
-  <div className="flex gap-2 mb-6">
+  <div className="flex gap-0 md:gap-2 mb-6">
     {tabs.map(({ id, label }) => (
       <button
         key={id}
         onClick={() => setTabSeleccionada(id)}
         className={`
-          px-4 py-2 cursor-pointer rounded-t-lg font-semibold transition border-b-2 focus:outline-none
+          px-2 md:px-4 py-1 md:py-2 cursor-pointer rounded-t-lg font-semibold transition border-b-2 focus:outline-none
           ${
             tabSeleccionada === id
               ? "border-blue-600 bg-white text-blue-700"

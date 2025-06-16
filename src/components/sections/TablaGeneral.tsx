@@ -47,7 +47,7 @@ export const TablaGeneral: React.FC<TablaGeneralProps> = ({
   arquerosEquipoMap,
 }) => (
   <div className="overflow-x-auto">
-    <table className="min-w-full text-sm text-left">
+    <table className="min-w-full text-xs md:text-sm text-left">
       <thead>
         <tr className="font-bold text-gray-500 border-b">
           <th className="py-1 pr-2">#</th>
@@ -56,7 +56,7 @@ export const TablaGeneral: React.FC<TablaGeneralProps> = ({
           <th className="px-2 py-1">V</th>
           <th className="px-2 py-1">E</th>
           <th className="px-2 py-1">D</th>
-          <th className="px-2 py-1">%V</th>
+          <th className="px-2 py-1 hidden md:block">%V</th>
           <th className="px-2 py-1 text-right">Puntos</th>
         </tr>
       </thead>
@@ -99,7 +99,7 @@ export const TablaGeneral: React.FC<TablaGeneralProps> = ({
               <td className="px-2 py-1">{row.victorias ?? "-"}</td>
               <td className="px-2 py-1">{row.empates ?? "-"}</td>
               <td className="px-2 py-1 text-red-500">{stats.derrotas}</td>
-              <td className="px-2 py-1 text-green-600">
+              <td className="px-2 py-1 text-green-600 hidden md:block">
                 {stats.porcentajeVictoria}%
               </td>
               <td className="px-2 py-1 font-bold text-right">{row.puntos}</td>

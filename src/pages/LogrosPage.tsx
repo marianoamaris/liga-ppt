@@ -228,10 +228,9 @@ export const LogrosPage: React.FC = () => {
             Récords
           </h3>
           <select
-            className="px-3 py-1 text-sm font-semibold text-blue-700 transition bg-white border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 hover:border-blue-700"
+            className="px-3 w-full md:w-3xs py-1 text-sm font-semibold text-blue-700 transition bg-white border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 hover:border-blue-700"
             value={selectedRecord}
             onChange={(e) => setSelectedRecord(e.target.value as RecordId)}
-            style={{ minWidth: 220 }}
           >
             {RECORDS.map((r) => (
               <option key={r.id} value={r.id}>
@@ -243,7 +242,7 @@ export const LogrosPage: React.FC = () => {
         {/* Podio visual para usuarios o equipos */}
         {data.type === "user" && data.podium.length > 0 ? (
           <>
-            <div className="flex items-end justify-center gap-4 py-6">
+            <div className="flex flex-wrap items-end justify-center gap-4 py-6">
               {/* 1er lugar */}
               <div className="flex flex-col items-center">
                 <span className="mb-1 text-xl">🏆</span>
@@ -316,7 +315,7 @@ export const LogrosPage: React.FC = () => {
         ) : null}
         {data.type === "equipo" && data.podium.length > 0 ? (
           <>
-            <div className="flex items-end justify-center gap-4 py-6">
+            <div className="flex flex-wrap items-end justify-center gap-4 py-6">
               {/* 1er lugar */}
               <div className="flex flex-col items-center">
                 <span className="mb-1 text-xl">🏆</span>
