@@ -24,11 +24,15 @@ interface SidebarProps {
   onItemClick: (path: string) => void;
   selectedPath: string;
   onSignInClick?: () => void;
+  className?: string;
+  mobile?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onItemClick,
   selectedPath,
+  mobile,
+  className,
 }) => {
   const [expanded, setExpanded] = useState<boolean>(true);
 
@@ -44,10 +48,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <nav
       className={`${THEME.colors.primary} ${THEME.colors.text.primary} ${
         expanded ? "w-60" : "w-20"
-      } min-h-screen p-3 flex flex-col justify-between transition-all duration-200`}
+      } ${className}`}
       style={{ background: "linear-gradient(to bottom, #000 60%, #222 100%)" }}
     >
-      <div className="flex flex-col items-center">
+      <div className="hidden md:flex flex-col items-center">
         {/* <button
           onClick={onSignInClick}
           className={`w-full mb-6 px-2 py-2 rounded-lg font-semibold bg-gray-400 text-white hover:bg-gray-500 cursor-pointer shadow transition text-center ${
@@ -92,13 +96,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </li>
         ))}
       </ul>
-      <div className="flex flex-col items-center mt-8 mb-2">
-        <img
-          src={THEME.logo.escudo}
-          alt="Escudo Liga PPT"
-          className="object-cover w-12 h-12 bg-white rounded-full shadow-lg"
-        />
-      </div>
+      {!mobile && (
+        <div className="flex flex-col items-center mt-8 mb-2">
+          <img
+            src={THEME.logo.escudo}
+            alt="Escudo Liga PPT"
+            className="object-cover w-12 h-12 bg-white rounded-full shadow-lg"
+          />
+        </div>
+      )}
     </nav>
   );
 };

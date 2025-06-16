@@ -13,7 +13,7 @@ export const LigaSidebar: React.FC<LigaSidebarProps> = ({
   setLigaSeleccionada,
   TOTAL_LIGAS,
 }) => (
-  <div className="flex h-full max-h-full flex-col gap-2 overflow-y-auto min-w-[120px] pb-4">
+  <div className="flex md:h-full md:max-h-full flex-col gap-2 overflow-y-auto min-w-full md:min-w-[120px] pb-4">
     {ligas.map((liga) => (
       <button
         key={liga}

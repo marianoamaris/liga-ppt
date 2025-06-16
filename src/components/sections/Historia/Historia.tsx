@@ -62,7 +62,7 @@ export const Historia: React.FC = () => {
   });
 
   return (
-    <div className="flex gap-8 p-3">
+    <div className="flex lg:flex-row flex-col gap-8 p-3">
       <SidebarTabs
         tabs={TABS}
         tabSeleccionada={tab}
@@ -71,9 +71,9 @@ export const Historia: React.FC = () => {
       <div className="flex-1">
         {tab === "jugadores" && (
           <>
-            <div className="flex items-center gap-8 mb-6">
+            <div className="flex flex-wrap items-center gap-8 mb-6">
               {/* Filtros de posición */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {POSICIONES.map((p) => (
                   <button
                     key={p.id}

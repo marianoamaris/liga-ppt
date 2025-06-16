@@ -47,7 +47,10 @@ export const Jornadas: React.FC<JornadasProps> = ({
         {jornada.resultados.length > 0 ? (
           <ul>
             {jornada.resultados.map((res: any, index: number) => (
-              <li key={res.equipo} className="flex items-center text-sm mb-0.5">
+              <li
+                key={res.equipo}
+                className="flex items-center text-xs md:text-sm mb-0.5"
+              >
                 <span className="w-6 font-bold text-gray-500">{index + 1}</span>
                 <TeamCircle equipo={res.equipo} TEAM_COLORS={TEAM_COLORS} />
                 <span className="mr-2">{res.equipo}</span>
@@ -66,7 +69,7 @@ export const Jornadas: React.FC<JornadasProps> = ({
             ))}
           </ul>
         ) : (
-          <div className="mb-2 text-sm italic text-gray-400">
+          <div className="mb-2 text-xs md:text-sm italic text-gray-400">
             Sin datos de resultados
           </div>
         )}
