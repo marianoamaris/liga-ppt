@@ -41,7 +41,7 @@ export const Jornadas: React.FC<JornadasProps> = ({
   TEAM_COLORS,
 }) => (
   <div className="space-y-4">
-    {jornadas.map((jornada: any, idx: number) => (
+    {jornadas.map((jornada: any) => (
       <div key={jornada.nombre} className="p-3 bg-gray-100 rounded">
         <div className="mb-1 font-semibold text-gray-800">{jornada.nombre}</div>
         {jornada.resultados.length > 0 ? (

@@ -5,7 +5,7 @@ interface HeaderProps {
   setShowSignIn: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ setShowSignIn }) => (
+export const Header: React.FC<HeaderProps> = () => (
   <header
     className="relative flex items-center justify-center h-20 shadow-md"
     style={{ background: "linear-gradient(to bottom, #000 60%, #222 100%)" }}

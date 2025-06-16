@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Card } from "../components/common/Card";
-import { FaMedal } from "react-icons/fa6";
 import { USUARIOS_LIGA } from "../constants/USUARIOS_LIGA";
 import { UserCard } from "../components/common/UserCard";
 
@@ -21,7 +20,6 @@ export const LogrosPage: React.FC = () => {
   const [selectedRecord, setSelectedRecord] =
     useState<RecordId>("mas_goles_liga");
 
-  // Datos de ejemplo para cada récord (completados para visualización)
   const recordsData = {
     mas_goles_liga: {
       podium: [

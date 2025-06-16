@@ -19,7 +19,6 @@ export const ArquerosList: React.FC<ArquerosListProps> = ({
   mejorArquero,
   tablaGeneral,
   arquerosEquipoMap,
-  TEAM_COLORS,
 }) => (
   <div className="mb-6">
     <h3 className="mb-2 font-semibold text-gray-700">
