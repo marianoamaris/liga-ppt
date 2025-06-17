@@ -9,6 +9,7 @@ import GuanteDeOroComponent from "./components/GuanteDeOroComponent";
 import BotaDeOroComponent from "./components/BotaDeOroComponent";
 import MasGanadoresComponent from "./components/MasGanadoresComponent";
 import HistoricoGoleadoresComponent from "./components/HistoricoGoleadoresComponent";
+import SearchInput from "../../common/SearchInput";
 
 const TABS = [
   { id: "jugadores", label: "Jugadores" },
@@ -32,7 +33,7 @@ const POSICIONES: { id: "todas" | Posicion; label: string }[] = [
 export const Historia: React.FC = () => {
   const [tab, setTab] = useState("jugadores");
   const [posicion, setPosicion] = useState<"todas" | Posicion>("todas");
-
+  const [search, setSearch] = useState<string>("");
   // Conteo total de jugadores por posición
   const conteoPorPosicion = USUARIOS_LIGA.reduce(
     (acc, u) => {
@@ -48,6 +49,11 @@ export const Historia: React.FC = () => {
   );
 
   const usuariosFiltrados = USUARIOS_LIGA.filter((u) => {
+    // First apply search filter if there's a search term
+    if (search && !u.name.toLowerCase().includes(search.toLowerCase())) {
+      return false;
+    }
+
     if (tab === "jugadores") {
       if (posicion === "todas") return true;
       return (
@@ -67,17 +73,21 @@ export const Historia: React.FC = () => {
         tabs={TABS}
         tabSeleccionada={tab}
         setTabSeleccionada={setTab}
+        setSearch={setSearch}
       />
       <div className="flex-1">
         {tab === "jugadores" && (
           <>
-            <div className="flex flex-wrap items-center gap-8 mb-6">
+            <div className="flex flex-wrap items-center mb-4 justify-between gap-4">
               {/* Filtros de posición */}
               <div className="flex gap-2 flex-wrap">
                 {POSICIONES.map((p) => (
                   <button
                     key={p.id}
-                    onClick={() => setPosicion(p.id)}
+                    onClick={() => {
+                      setPosicion(p.id);
+                      setSearch("");
+                    }}
                     className={`px-3 py-1 rounded-full font-semibold border transition text-xs
                       ${
                         posicion === p.id
@@ -91,7 +101,7 @@ export const Historia: React.FC = () => {
                 ))}
               </div>
               {/* Conteo total de jugadores por posición con tooltips y mayor tamaño */}
-              <div className="flex items-center gap-6 ml-6">
+              <div className="flex items-center gap-6">
                 <div
                   className="relative flex flex-col items-center cursor-pointer group"
                   title="Arqueros"
@@ -142,10 +152,26 @@ export const Historia: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {usuariosFiltrados.map((user, index) => (
-                <UserCard key={index} user={user} />
-              ))}
+            <SearchInput
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <div
+              className={
+                !usuariosFiltrados.length
+                  ? ""
+                  : "grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              }
+            >
+              {!usuariosFiltrados.length ? (
+                <span className="text-center text-gray-500 text-sm md:text-base">
+                  No hay jugadores para mostrar
+                </span>
+              ) : (
+                usuariosFiltrados.map((user, index) => (
+                  <UserCard key={index} user={user} />
+                ))
+              )}
             </div>
           </>
         )}
