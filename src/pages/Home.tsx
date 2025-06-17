@@ -22,7 +22,7 @@ export const Home: React.FC = () => {
           <img
             src="/PPT.png"
             alt="Logo Liga PPT"
-            className="w-40 h-40 shadow-xl "
+            className="w-40 h-40 shadow-xl object-contain"
           />
           <div className="mb-2 text-3xl font-bold text-white">
             ¡Bienvenido a la Liga PPT!
@@ -39,7 +39,7 @@ export const Home: React.FC = () => {
               <div className="mb-1 text-xs text-white/70">
                 Falta para la jornada 6/6:
               </div>
-              <div className="px-6 py-2 font-mono text-3xl font-extrabold text-white bg-black border-2 shadow rounded-xl border-white/20">
+              <div className="px-6 py-2 font-mono text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-white bg-black border-2 shadow rounded-xl border-white/20">
                 {countdown}
               </div>
             </div>
@@ -69,16 +69,18 @@ export const Home: React.FC = () => {
       </Card>
       {/* Info en vivo de premios individuales y tablas */}
       <div className="flex flex-col items-center w-full max-w-5xl mb-8">
-        <div className="flex items-center justify-center gap-2 mb-4 text-lg font-bold text-center text-blue-900">
-          Sigue la información en vivo de los datos a premios individuales
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-4 text-lg font-bold text-center text-blue-900">
+          <span>
+            Sigue la información en vivo de los datos a premios individuales
+          </span>
           <span className="flex items-center gap-2 px-2 py-0.5 text-xs font-bold uppercase bg-black text-white rounded-md border border-black ml-2">
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             DATOS EN VIVO
           </span>
         </div>
-        <div className="flex flex-col items-start justify-center w-full gap-4 md:flex-row">
+        <div className="flex flex-col items-start justify-center w-full gap-4 lg:flex-row">
           {/* Tabla de equipos */}
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-full lg:min-w-[180px]">
             <div className="mb-2 text-sm font-bold text-center text-gray-800">
               Tabla de equipos
             </div>
@@ -146,10 +148,10 @@ export const Home: React.FC = () => {
             </table>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-row gap-4">
+          <div className="flex flex-col gap-4 w-full lg:w-auto">
+            <div className="flex flex-col lg:flex-row gap-4">
               {/* Tabla de goleadores */}
-              <div className="flex-1 min-w-[160px]">
+              <div className="flex-1 min-w-full lg:min-w-[160px]">
                 <div className="mb-2 text-sm font-bold text-center text-gray-800">
                   Top 5 Goleadores
                 </div>
@@ -199,7 +201,7 @@ export const Home: React.FC = () => {
                 </table>
               </div>
               {/* Tabla de arqueros */}
-              <div className="flex-1 min-w-[160px]">
+              <div className="flex-1 min-w-full lg:min-w-[160px]">
                 <div className="mb-2 text-sm font-bold text-center text-gray-800">
                   Top 5 Arqueros (menos goles recibidos)
                 </div>
