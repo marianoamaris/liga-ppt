@@ -23,6 +23,12 @@ export const THEME = {
 
 export const SIDEBAR_ITEMS = [
   {
+    id: "home",
+    label: "Inicio",
+    path: "/",
+    icon: "FaHome",
+  },
+  {
     id: "info",
     label: "Información",
     path: "/info",

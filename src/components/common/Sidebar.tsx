@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GiSoccerKick, GiWhistle } from "react-icons/gi";
+import { FaHome } from "react-icons/fa";
 import {
   FaRankingStar,
   FaMedal,
@@ -13,6 +14,7 @@ const ICONS: Record<
   string,
   React.ComponentType<{ className?: string; size?: number }>
 > = {
+  FaHome,
   GiSoccerKick,
   FaRankingStar,
   GiWhistle,
@@ -51,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       } ${className}`}
       style={{ background: "linear-gradient(to bottom, #000 60%, #222 100%)" }}
     >
-      <div className="hidden md:flex flex-col items-center">
+      <div className="flex-col items-center hidden md:flex">
         {/* <button
           onClick={onSignInClick}
           className={`w-full mb-6 px-2 py-2 rounded-lg font-semibold bg-gray-400 text-white hover:bg-gray-500 cursor-pointer shadow transition text-center ${
@@ -72,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {expanded ? <FaChevronLeft /> : <FaChevronRight />}
         </button>
       </div>
-      <ul className="flex flex-col flex-1 space-y-2">
+      <ul className="flex flex-col justify-center flex-1 space-y-2">
         {SIDEBAR_ITEMS.map((item) => (
           <li
             key={item.id}
