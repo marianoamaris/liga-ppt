@@ -5,6 +5,7 @@ interface SidebarTabsProps {
   tabSeleccionada: string;
   setTabSeleccionada: (id: string) => void;
   className?: string;
+  setSearch?: (search: string) => void;
 }
 
 export const SidebarTabs: React.FC<SidebarTabsProps> = ({
@@ -12,12 +13,16 @@ export const SidebarTabs: React.FC<SidebarTabsProps> = ({
   tabSeleccionada,
   setTabSeleccionada,
   className = "",
+  setSearch,
 }) => (
   <aside className={`min-w-[160px] flex flex-col gap-2 pt-2 ${className}`}>
     {tabs.map((t) => (
       <button
         key={t.id}
-        onClick={() => setTabSeleccionada(t.id)}
+        onClick={() => {
+          setTabSeleccionada(t.id);
+          setSearch?.("");
+        }}
         className={`px-4 py-2 cursor-pointer rounded-lg font-semibold text-left transition border-l-4
           ${
             tabSeleccionada === t.id
