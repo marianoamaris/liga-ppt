@@ -1,6 +1,6 @@
 export const MAS_GANADORES = [
   { nombre: "Emanuel Navarro (Goat)", titulos: 6, ligas: [2, 3, 4, 5, 6, 7] },
-  { nombre: "Cristian Benjumea", titulos: 5, ligas: [1, 3, 7, 8, 12] },
+  { nombre: "Cristian Benjumea", titulos: 5, ligas: [1, 2, 7, 8, 12] },
   { nombre: "Mariano Amaris", titulos: 4, ligas: [1, 3, 4, 11] },
   { nombre: "Keni Contreras", titulos: 4, ligas: [5, 7, 8, 11] },
   { nombre: "Pipe Castillejo", titulos: 4, ligas: [3, 4, 5, 8] },

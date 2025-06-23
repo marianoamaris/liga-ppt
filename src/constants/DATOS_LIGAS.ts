@@ -184,24 +184,23 @@ export const LIGA_2 = {
   goleadoresTotales: [
     { jugador: "Emanuel Navarro", goles: 23 },
     { jugador: "Lucas Benjumea", goles: 13 },
+    { jugador: "Jairo Galván", goles: 11 },
     { jugador: "Fabricio Rizo", goles: 9 },
     { jugador: "Juan de la Cruz", goles: 8 },
     { jugador: "Henry Hernandez", goles: 8 },
     { jugador: "Andres Felipe Farfán", goles: 8 },
-    { jugador: "Jhonnier de la Cruz", goles: 6 },
     { jugador: "Mariano Amaris", goles: 7 },
+    { jugador: "Jhonnier de la Cruz", goles: 6 },
     { jugador: "Jose Henao", goles: 5 },
-    { jugador: "Jairo Galván", goles: 11 },
     { jugador: "Cristian Benjumea", goles: 3 },
     { jugador: "Juan Mora", goles: 3 },
+    { jugador: "Edward Brito", goles: 3 },
     { jugador: "Frank Ramirez", goles: 2 },
     { jugador: "Elias Lacera", goles: 2 },
     { jugador: "Moises", goles: 1 },
     { jugador: "Ronaldo", goles: 1 },
     { jugador: "Eudes Pavajeau", goles: 1 },
     { jugador: "Emanuel Celedón", goles: 1 },
-    { jugador: "Lucas Benjumea", goles: 9 },
-    { jugador: "Edward Brito", goles: 3 },
     { jugador: "Monchi", goles: 1 },
     { jugador: "Camilo Laborde", goles: 1 },
     { jugador: "prens", goles: 1 },
@@ -471,9 +470,9 @@ export const LIGA_5 = {
   ],
   goleadorLiga: { jugador: "Pier Rizo", goles: 17 },
   arqueros: [
-    { arquero: "Andres Felipe Arquero", golesRecibidos: 61 },
-    { arquero: "Diego Fel", golesRecibidos: 59 },
     { arquero: "Jose Manuel", golesRecibidos: 55 },
+    { arquero: "Diego Fel", golesRecibidos: 59 },
+    { arquero: "Andres Felipe Arquero", golesRecibidos: 61 },
   ],
   mejorArquero: { arquero: "Jose Manuel", golesRecibidos: 55 },
   final: "Inter 7 - Palmeiras 4",
@@ -580,7 +579,7 @@ export const LIGA_6 = {
     { arquero: "Andres Felipe", golesRecibidos: 63 },
   ],
   mejorArquero: { arquero: "Diego Fel", golesRecibidos: 51 },
-  final: "Blessed 4 - Verdolagas 4",
+  final: "Blessed 4 - Verdolagas 6",
   ganador: "Blessed",
 };
 
@@ -771,7 +770,7 @@ export const LIGA_8 = {
   ],
   goleadorLiga: { jugador: "Andres Felipe Farfán", goles: 14 },
 
-  final: "Ferxxo 100 14 - Colsafistas FC 3",
+  final: "Ferxxo 100 14 - Colsafistas FC 5",
   ganador: "Ferxxo 100",
 };
 
