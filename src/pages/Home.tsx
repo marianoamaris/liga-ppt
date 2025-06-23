@@ -2,6 +2,7 @@ import React from "react";
 import { Card } from "../components/common/Card";
 import { FaRankingStar, FaMedal, FaGavel, FaBullhorn } from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
+import { FaRegEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { NEXT_MATCH_DATE, useCountdown } from "../utils/utilities";
 import { PlayoffsBracket } from "../components/sections/PlayoffsBracket";
@@ -175,6 +176,23 @@ export const Home: React.FC = () => {
               }}
             >
               Ver anuncios &rarr;
+            </span>
+          </div>
+          <div
+            className="flex flex-col items-start p-4 rounded-2xl shadow-md bg-pink-50 hover:scale-[1.03] transition-transform cursor-pointer"
+            onClick={() => navigate("/contacto")}
+          >
+            <FaRegEnvelope className="mb-2 text-pink-600" size={36} />
+            <div className="mb-1 text-base font-bold text-pink-700">
+              Contacto
+            </div>
+            <div className="mb-2 text-xs text-gray-700">
+              ¿Tienes dudas, sugerencias o quieres saber más sobre la Liga PPT?
+              Escríbenos a nuestro correo oficial y te responderemos lo antes
+              posible.
+            </div>
+            <span className="text-xs font-semibold text-pink-600 cursor-pointer hover:underline">
+              contacto@ligappt.com
             </span>
           </div>
         </div>
