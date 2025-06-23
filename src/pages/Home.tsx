@@ -23,11 +23,11 @@ export const Home: React.FC = () => {
             ¡Bienvenido a la Liga PPT!
           </div>
           <div className="max-w-2xl mb-4 text-base text-center text-white/90">
-            La <b>Liga PPT</b> es una liga de fútbol 6 aficionado donde la
-            pasión, la competencia sana y la amistad se viven cada semana. Aquí
-            podrás seguir el avance de la liga, consultar estadísticas,
-            historia, logros y el reglamento oficial. ¡Tanto si eres jugador,
-            fan o curioso, esta plataforma es para ti!
+            La <b>Liga PPT</b> es una liga de fútbol 6 aficionado en{" "}
+            <b>Valledupar</b>, donde la pasión, la competencia sana y la amistad
+            se viven cada semana. Aquí podrás seguir el avance de la liga,
+            consultar estadísticas, historia, logros y el reglamento oficial.
+            ¡Tanto si eres jugador, fan o curioso, esta plataforma es para ti!
           </div>
           <div className="flex flex-col items-center justify-center w-full gap-8 mt-2 md:flex-row">
             <div className="flex flex-col items-center justify-center">
