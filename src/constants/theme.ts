@@ -58,4 +58,10 @@ export const SIDEBAR_ITEMS = [
     path: "/reglamento",
     icon: "FaGavel",
   },
+  {
+    id: "anuncios",
+    label: "Anuncios",
+    path: "/anuncios",
+    icon: "FaBullhorn",
+  },
 ] as const;

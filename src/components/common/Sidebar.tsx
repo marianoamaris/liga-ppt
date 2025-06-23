@@ -7,6 +7,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaGavel,
+  FaBullhorn,
 } from "react-icons/fa6";
 import { SIDEBAR_ITEMS, THEME } from "../../constants/theme";
 
@@ -20,6 +21,7 @@ const ICONS: Record<
   GiWhistle,
   FaMedal,
   FaGavel,
+  FaBullhorn,
 };
 
 interface SidebarProps {
@@ -99,13 +101,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </ul>
       {!mobile && (
-        <div className="flex flex-col items-center mt-8 mb-2">
+        // <div className="flex items-center justify-center p-6 bg-black">
+        <div className="flex justify-center">
           <img
-            src={THEME.logo.escudo}
-            alt="Escudo Liga PPT"
-            className="object-cover w-12 h-12 bg-white rounded-full shadow-lg"
+            src="/PPT.png"
+            alt="Logo Liga PPT"
+            className="object-contain w-24 h-24"
           />
         </div>
+
+        // </div>
       )}
     </nav>
   );

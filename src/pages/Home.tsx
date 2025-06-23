@@ -1,15 +1,10 @@
 import React from "react";
 import { Card } from "../components/common/Card";
-import { FaRankingStar, FaMedal, FaGavel } from "react-icons/fa6";
+import { FaRankingStar, FaMedal, FaGavel, FaBullhorn } from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import {
-  getPosColor,
-  getTopColor,
-  NEXT_MATCH_DATE,
-  useCountdown,
-} from "../utils/utilities";
-import { ARQUEROS, EQUIPOS_FULL, GOLEADORES } from "../constants_HOME/HOME";
+import { NEXT_MATCH_DATE, useCountdown } from "../utils/utilities";
+import { PlayoffsBracket } from "../components/sections/PlayoffsBracket";
 
 export const Home: React.FC = () => {
   const countdown = useCountdown(NEXT_MATCH_DATE);
@@ -22,7 +17,7 @@ export const Home: React.FC = () => {
           <img
             src="/PPT.png"
             alt="Logo Liga PPT"
-            className="w-40 h-40 shadow-xl object-contain"
+            className="object-contain w-40 h-40 shadow-xl"
           />
           <div className="mb-2 text-3xl font-bold text-white">
             ¡Bienvenido a la Liga PPT!
@@ -37,9 +32,9 @@ export const Home: React.FC = () => {
           <div className="flex flex-col items-center justify-center w-full gap-8 mt-2 md:flex-row">
             <div className="flex flex-col items-center justify-center">
               <div className="mb-1 text-xs text-white/70">
-                Falta para la jornada 6/6:
+                Falta para playoffs:
               </div>
-              <div className="px-6 py-2 font-mono text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-white bg-black border-2 shadow rounded-xl border-white/20">
+              <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 shadow sm:text-xl md:text-2xl lg:text-3xl rounded-xl border-white/20">
                 {countdown}
               </div>
             </div>
@@ -49,7 +44,7 @@ export const Home: React.FC = () => {
                   Liga <b className="text-white">#13</b>
                 </span>
                 <span className="text-white/80">
-                  Jornada <b className="text-white">5/6</b>
+                  Jornada <b className="text-white">6/6</b>
                 </span>
                 <span className="text-white/80">
                   Equipos: <b className="text-white">9</b>
@@ -59,216 +54,14 @@ export const Home: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 text-sm text-center text-white/90">
-                <b>Próxima jornada:</b> Jueves 19 de junio de 2025
-                <br />
-                <b>Playoffs:</b> Domingo 22 de junio
+                <b>Playoffs:</b> Miércoles 25 de junio
               </div>
             </div>
           </div>
         </div>
       </Card>
       {/* Info en vivo de premios individuales y tablas */}
-      <div className="flex flex-col items-center w-full max-w-5xl mb-8">
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-4 text-lg font-bold text-center text-blue-900">
-          <span>
-            Sigue la información en vivo de los datos a premios individuales
-          </span>
-          <span className="flex items-center gap-2 px-2 py-0.5 text-xs font-bold uppercase bg-black text-white rounded-md border border-black ml-2">
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            DATOS EN VIVO
-          </span>
-        </div>
-        <div className="flex flex-col items-start justify-center w-full gap-4 lg:flex-row">
-          {/* Tabla de equipos */}
-          <div className="flex-1 min-w-full lg:min-w-[180px]">
-            <div className="mb-2 text-sm font-bold text-center text-gray-800">
-              Tabla de equipos
-            </div>
-            <table className="w-full overflow-hidden text-xs bg-white border shadow-lg rounded-2xl">
-              <thead>
-                <tr className="h-8 text-gray-700 bg-gray-50">
-                  <th className="px-2 py-1">P</th>
-                  <th className="px-2 py-1">C</th>
-                  <th className="px-2 py-1 text-left">Equipo</th>
-                  <th className="px-2 py-1">PJ</th>
-                  <th className="px-2 py-1">V</th>
-                  <th className="px-2 py-1">E</th>
-                  <th className="px-2 py-1">D</th>
-                  <th className="px-2 py-1">%V</th>
-                  <th className="px-2 py-1">PTS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {EQUIPOS_FULL.map((eq, i) => (
-                  <tr key={eq.nombre} className="h-8 border-b last:border-b-0">
-                    <td
-                      className={`px-2 py-1 text-base font-bold text-center align-middle ${getPosColor(
-                        i
-                      )}`}
-                    >
-                      {i + 1}
-                    </td>
-                    <td className="px-2 py-1 text-center align-middle">
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: 14,
-                          height: 14,
-                          background: eq.color,
-                          borderRadius: "50%",
-                          border: "1px solid #888",
-                          verticalAlign: "middle",
-                        }}
-                      />
-                    </td>
-                    <td className="px-2 py-1 font-semibold text-left align-middle">
-                      {eq.nombre}
-                    </td>
-                    <td className="px-2 py-1 font-mono italic text-center align-middle">
-                      {eq.pj}
-                    </td>
-                    <td className="px-2 py-1 font-mono italic text-center align-middle">
-                      {eq.v}
-                    </td>
-                    <td className="px-2 py-1 font-mono italic text-center align-middle">
-                      {eq.e}
-                    </td>
-                    <td className="px-2 py-1 font-mono italic text-center align-middle">
-                      {eq.d}
-                    </td>
-                    <td className="px-2 py-1 font-mono italic text-center align-middle">
-                      {eq.perc}
-                    </td>
-                    <td className="px-2 py-1 font-bold text-center text-black align-middle">
-                      {eq.pts}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="flex flex-col gap-4 w-full lg:w-auto">
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Tabla de goleadores */}
-              <div className="flex-1 min-w-full lg:min-w-[160px]">
-                <div className="mb-2 text-sm font-bold text-center text-gray-800">
-                  Top 5 Goleadores
-                </div>
-                <table className="w-full overflow-hidden text-xs bg-white border shadow-lg rounded-2xl">
-                  <thead>
-                    <tr className="h-8 text-gray-700 bg-gray-50">
-                      <th className="px-2 py-1">#</th>
-                      <th className="px-2 py-1 text-left">Jugador</th>
-                      <th className="px-2 py-1 text-center">C</th>
-                      <th className="px-2 py-1">Goles</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {GOLEADORES.map((g, i) => (
-                      <tr
-                        key={g.nombre}
-                        className={`border-b last:border-b-0 ${getTopColor(
-                          i
-                        )} h-8`}
-                      >
-                        <td className="px-2 py-1 text-base font-bold text-center align-middle">
-                          {i + 1}
-                        </td>
-                        <td className="px-2 py-1 font-semibold align-middle">
-                          {g.nombre}
-                        </td>
-                        <td className="px-2 py-1 text-center align-middle">
-                          <span
-                            style={{
-                              display: "inline-block",
-                              width: 14,
-                              height: 14,
-                              background: g.color,
-                              borderRadius: "50%",
-                              border: "1px solid #888",
-
-                              verticalAlign: "middle",
-                            }}
-                          ></span>
-                        </td>
-                        <td className="px-2 py-1 text-base font-bold text-center text-gray-800 align-middle">
-                          {g.goles}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {/* Tabla de arqueros */}
-              <div className="flex-1 min-w-full lg:min-w-[160px]">
-                <div className="mb-2 text-sm font-bold text-center text-gray-800">
-                  Top 5 Arqueros (menos goles recibidos)
-                </div>
-                <table className="w-full overflow-hidden text-xs bg-white border shadow-lg rounded-2xl">
-                  <thead>
-                    <tr className="h-8 text-gray-700 bg-gray-50">
-                      <th className="px-2 py-1">#</th>
-                      <th className="px-2 py-1 text-left">Arquero</th>
-                      <th className="px-2 py-1 text-center">C</th>
-                      <th className="px-2 py-1">Goles Rec.</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ARQUEROS.map((a, i) => (
-                      <tr
-                        key={a.nombre}
-                        className={`border-b last:border-b-0 ${getTopColor(
-                          i
-                        )} h-8`}
-                      >
-                        <td className="px-2 py-1 text-base font-bold text-center align-middle">
-                          {i + 1}
-                        </td>
-                        <td className="px-2 py-1 font-semibold align-middle">
-                          {a.nombre}
-                        </td>
-                        <td className="px-2 py-1 text-center align-middle">
-                          <span
-                            style={{
-                              display: "inline-block",
-                              width: 14,
-                              height: 14,
-                              background: a.color,
-                              border: "1px solid #888",
-
-                              borderRadius: "50%",
-                              verticalAlign: "middle",
-                            }}
-                          ></span>
-                        </td>
-                        <td className="px-2 py-1 text-base font-bold text-center text-gray-800 align-middle">
-                          {a.derrotas}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* Card de noticias de traspasos */}
-            <div className="flex justify-center w-full max-w-5xl mb-8">
-              <div className="flex flex-col items-center w-full p-4 text-white bg-black border border-black shadow-lg rounded-xl">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-2xl text-red-600">🚫</span>
-                  <span className="text-base font-bold tracking-wide uppercase">
-                    Traspasos deshabilitados
-                  </span>
-                </div>
-                <div className="text-sm text-center text-white/90">
-                  Los traspasos están cerrados porque el mercado se cierra
-                  después de la jornada 3.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PlayoffsBracket />
 
       {/* Módulos principales */}
       <Card className="w-full max-w-5xl p-2 mb-8 bg-white">
@@ -360,6 +153,28 @@ export const Home: React.FC = () => {
               }}
             >
               Ver reglamento &rarr;
+            </span>
+          </div>
+          <div
+            className="flex flex-col items-start p-4 rounded-2xl shadow-md bg-purple-50 hover:scale-[1.03] transition-transform cursor-pointer"
+            onClick={() => navigate("/anuncios")}
+          >
+            <FaBullhorn className="mb-2 text-purple-600" size={28} />
+            <div className="mb-1 text-base font-bold text-purple-700">
+              Anuncios
+            </div>
+            <div className="mb-2 text-xs text-gray-700">
+              Consulta las últimas noticias, actualizaciones y correcciones de
+              errores de la plataforma directamente del equipo de desarrollo.
+            </div>
+            <span
+              className="text-xs font-semibold text-purple-600 cursor-pointer hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/anuncios");
+              }}
+            >
+              Ver anuncios &rarr;
             </span>
           </div>
         </div>

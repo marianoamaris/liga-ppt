@@ -5,4 +5,6 @@ export const MVP_LIGA = [
   { nombre: "Frederick Molina", premios: 1 },
   { nombre: "Víctor López", premios: 1 },
   { nombre: "Emanuel Navarro (Goat)", premios: 1 },
+  { nombre: "Juan de la Cruz", premios: 1 },
+  { nombre: "Hernán Medrano", premios: 1 },
 ];

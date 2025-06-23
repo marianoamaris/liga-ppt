@@ -6,6 +6,7 @@ import {
   LIGA_10,
   LIGA_11,
   LIGA_12,
+  LIGA_13,
   LIGA_2,
   LIGA_3,
   LIGA_4,
@@ -55,6 +56,7 @@ export const Clasificacion: React.FC = () => {
     LIGA_10,
     LIGA_11,
     LIGA_12,
+    LIGA_13,
   ];
 
   const datosLiga: any = LIGAS[ligaSeleccionada - 1] || null;
