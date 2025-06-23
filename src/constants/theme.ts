@@ -29,12 +29,6 @@ export const SIDEBAR_ITEMS = [
     icon: "FaHome",
   },
   {
-    id: "info",
-    label: "Información",
-    path: "/info",
-    icon: "GiSoccerKick",
-  },
-  {
     id: "clasificacion",
     label: "Clasificación",
     path: "/clasificacion",
@@ -63,5 +57,11 @@ export const SIDEBAR_ITEMS = [
     label: "Anuncios",
     path: "/anuncios",
     icon: "FaBullhorn",
+  },
+  {
+    id: "contacto",
+    label: "Contacto",
+    path: "/contacto",
+    icon: "GiSoccerKick",
   },
 ] as const;

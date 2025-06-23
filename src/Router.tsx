@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Info } from "./components/sections/Info";
+import { Contacto } from "./pages/Contacto";
 import { Clasificacion } from "./components/sections/Clasificacion";
 import { Historia } from "./components/sections/Historia/Historia";
 import { SignIn } from "./components/Auth/SignIn";
@@ -22,7 +22,7 @@ export const AppRouter = () => (
       {/* Rutas públicas con layout */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/info" element={<Info />} />
+        <Route path="/contacto" element={<Contacto />} />
         <Route path="/clasificacion" element={<Clasificacion />} />
         <Route path="/historia" element={<Historia />} />
         <Route path="/reglamento" element={<ReglamentoPage />} />

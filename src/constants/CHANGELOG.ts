@@ -15,6 +15,25 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.2.2",
+    date: "23 de Junio, 2025",
+    title: "Nuevo canal de contacto oficial",
+    description:
+      "Se habilita una nueva sección de contacto y un correo oficial para mejorar la comunicación directa entre la liga y cualquier persona interesada.",
+    changes: [
+      {
+        type: "MEJORA",
+        description:
+          "Nueva forma de comunicación directa entre la liga y nuevos aspirantes, espectadores o cualquier persona interesada en saber más sobre la Liga PPT.",
+      },
+      {
+        type: "NUEVO",
+        description:
+          "Nuevo correo para comunicación oficial con la liga, manejado por el consejo administrativo: contacto@ligappt.com.",
+      },
+    ],
+  },
+  {
     version: "1.2.1",
     date: "23 de Junio, 2025",
     title: "Mejoras de SEO y Favicon",
