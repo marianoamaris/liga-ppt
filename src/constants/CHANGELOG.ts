@@ -15,6 +15,35 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.2.1",
+    date: "23 de Junio, 2025",
+    title: "Mejoras de SEO y Favicon",
+    description:
+      "Se han optimizado las etiquetas 'meta' para mejorar cómo se muestra la web al compartirla y se ha solucionado el problema de visualización del ícono en la pestaña del navegador.",
+    changes: [
+      {
+        type: "MEJORA",
+        description:
+          "Se han actualizado las etiquetas meta (Open Graph y Twitter) para asegurar que el título, la descripción y la imagen de vista previa sean correctos al compartir el enlace ligappt.com.",
+      },
+      {
+        type: "FIX",
+        description:
+          "Se ha creado un nuevo favicon.svg con fondo negro para solucionar el problema de visualización del logo en las pestañas del navegador.",
+      },
+      {
+        type: "MEJORA",
+        description:
+          "Se ha establecido el idioma principal del sitio a español (lang='es') en el index.html.",
+      },
+      {
+        type: "NUEVO",
+        description:
+          "Se ha configurado y verificado el dominio 'https://ligappt.com', asegurando que el sitio opere con certificado de seguridad (HTTPS) y una URL profesional.",
+      },
+    ],
+  },
+  {
     version: "1.2.0",
     date: "23 de Junio, 2025",
     title: "Actualización de Datos y Módulo de Anuncios",

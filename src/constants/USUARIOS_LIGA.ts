@@ -848,7 +848,7 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     name: "Hernán Medrano",
     username: "hmedrano",
     avatar: null,
-    ligasJugadas: 3,
+    ligasJugadas: 5,
     esFundador: false,
     ligasGanadas: 1,
     esAdmin: false,
