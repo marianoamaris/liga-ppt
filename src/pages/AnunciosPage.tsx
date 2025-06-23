@@ -5,6 +5,7 @@ import {
   type ChangeType,
 } from "../constants/CHANGELOG";
 import { IoIosArrowDown } from "react-icons/io";
+import { FaShareAlt, FaWhatsapp, FaFacebookF } from "react-icons/fa";
 import { AnnouncementCard } from "../components/common/AnnouncementCard";
 
 const getBadgeClass = (type: ChangeType) => {
@@ -23,6 +24,29 @@ const getBadgeClass = (type: ChangeType) => {
 const ChangelogItem: React.FC<{ entry: ChangelogEntry }> = ({ entry }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const url = `${window.location.origin}/anuncios#${entry.version}`;
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: entry.title,
+        text: entry.description,
+        url,
+      });
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("Enlace copiado al portapapeles");
+    }
+  };
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
+    entry.title + "\n" + entry.description + "\n" + url
+  )}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+    url
+  )}`;
+
   return (
     <AnnouncementCard onClick={() => setIsExpanded(!isExpanded)}>
       {/* Top black section with logo */}
@@ -38,10 +62,37 @@ const ChangelogItem: React.FC<{ entry: ChangelogEntry }> = ({ entry }) => {
       <div className="p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">{entry.title}</h2>
-          <div className="flex items-center">
-            <span className="hidden text-sm text-gray-500 sm:block mr-4">
+          <div className="flex items-center gap-2">
+            <span className="hidden text-sm text-gray-500 sm:block mr-2">
               {entry.date}
             </span>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 text-green-600 bg-green-50 rounded-full hover:bg-green-100 hover:text-green-800 transition"
+              title="Compartir en WhatsApp"
+            >
+              <FaWhatsapp size={18} />
+            </a>
+            <a
+              href={facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 hover:text-blue-800 transition"
+              title="Compartir en Facebook"
+            >
+              <FaFacebookF size={16} />
+            </a>
+            <button
+              onClick={handleShare}
+              className="p-2 text-gray-500 bg-gray-100 rounded-full hover:bg-gray-200 hover:text-gray-700 transition"
+              title="Compartir anuncio"
+            >
+              <FaShareAlt size={18} />
+            </button>
             <IoIosArrowDown
               className={`text-gray-500 transition-transform duration-300 ${
                 isExpanded ? "rotate-180" : ""
