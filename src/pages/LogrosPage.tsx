@@ -41,17 +41,17 @@ export const LogrosPage: React.FC = () => {
           esAdmin: false,
           posicion: "delantero",
         },
-        USUARIOS_LIGA.find((u) => u.username === "jhassler") ?? {
-          name: "Jurgen Hassler",
-          username: "jhassler",
-          ligasJugadas: 6,
-          ligasGanadas: 2,
-          golesTotales: 82,
+        USUARIOS_LIGA.find((u) => u.username === "jhernandez") ?? {
+          name: "José Hernández",
+          username: "jhernandez",
+          ligasJugadas: 3,
+          ligasGanadas: 1,
+          golesTotales: 106,
           esAdmin: false,
           posicion: "delantero",
         },
       ],
-      goles: [33, 31, 28],
+      goles: [33, 31, 29],
       label: "Más goles en una liga",
       type: "user",
     },
@@ -110,13 +110,13 @@ export const LogrosPage: React.FC = () => {
           derrotas: 0,
         },
         {
-          equipo: "Palmeiras",
-          color: "#22c55e",
-          puntos: 142,
-          temporada: 5,
-          victorias: 61,
-          empates: 20,
-          derrotas: 55,
+          equipo: "Sport Boys",
+          color: "#FF69B4",
+          puntos: 150,
+          temporada: 13,
+          victorias: 67,
+          empates: 16,
+          derrotas: 39,
         },
       ],
       label: "Más puntos hechos por un equipo en una liga",
@@ -228,7 +228,7 @@ export const LogrosPage: React.FC = () => {
             Récords
           </h3>
           <select
-            className="px-3 w-full md:w-3xs py-1 text-sm font-semibold text-blue-700 transition bg-white border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 hover:border-blue-700"
+            className="w-full px-3 py-1 text-sm font-semibold text-blue-700 transition bg-white border-2 border-blue-500 rounded-lg md:w-3xs focus:outline-none focus:ring-2 focus:ring-blue-400 hover:border-blue-700"
             value={selectedRecord}
             onChange={(e) => setSelectedRecord(e.target.value as RecordId)}
           >

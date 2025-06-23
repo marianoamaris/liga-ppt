@@ -1,5 +1,5 @@
 export const BOTA_DE_ORO = [
-  { nombre: "José Hernández", premios: 3 },
+  { nombre: "José Hernández", premios: 4 },
   { nombre: "Emanuel Navarro (Goat)", premios: 2 },
   { nombre: "Andrés Farfán", premios: 2 },
   { nombre: "Fabricio Rizo", premios: 1 },
