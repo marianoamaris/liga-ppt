@@ -31,11 +31,6 @@ const SECTIONS = [
       {
         id: "3.4 Desarrollo del juego",
         label: "3.4 Desarrollo del juego",
-        children: [
-          { id: "Goles y puntos", label: "Goles y puntos" },
-          { id: "Reglas específicas", label: "Reglas específicas" },
-          { id: "Faltas y manos", label: "Faltas y manos" },
-        ],
       },
     ],
   },
@@ -86,7 +81,12 @@ function scrollToSection(id: string) {
   }
 }
 
-function renderMenu(items: any[], activeId: string, level = 0) {
+function renderMenu(
+  items: any[],
+  activeId: string,
+  onSectionClick?: (id: string) => void,
+  level = 0
+) {
   return (
     <ul className={level === 0 ? "space-y-1" : "ml-4 space-y-0.5"}>
       {items.map((item) => (
@@ -100,24 +100,35 @@ function renderMenu(items: any[], activeId: string, level = 0) {
               }
               ${level === 0 ? "font-bold" : "font-normal"}
             `}
-            onClick={() => scrollToSection(item.id)}
+            onClick={() =>
+              onSectionClick
+                ? onSectionClick(item.id)
+                : scrollToSection(item.id)
+            }
           >
             {item.label}
           </button>
-          {item.children && renderMenu(item.children, activeId, level + 1)}
+          {item.children &&
+            renderMenu(item.children, activeId, onSectionClick, level + 1)}
         </li>
       ))}
     </ul>
   );
 }
 
-export const SidebarReglamento: React.FC<{ activeId: string }> = ({
+interface SidebarReglamentoProps {
+  activeId: string;
+  onSectionClick?: (id: string) => void;
+}
+
+export const SidebarReglamento: React.FC<SidebarReglamentoProps> = ({
   activeId,
+  onSectionClick,
 }) => (
   <aside className="w-72 min-w-[200px] max-w-xs bg-white border-r border-gray-200 p-4 h-screen sticky top-0 overflow-y-auto shadow-sm">
     <div className="mb-4 text-lg font-bold text-blue-700">
       Reglamento Liga PPT
     </div>
-    {renderMenu(SECTIONS, activeId)}
+    {renderMenu(SECTIONS, activeId, onSectionClick)}
   </aside>
 );
