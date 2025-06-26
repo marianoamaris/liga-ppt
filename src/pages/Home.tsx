@@ -11,7 +11,7 @@ export const Home: React.FC = () => {
   const countdown = useCountdown(NEXT_MATCH_DATE);
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen p-2 md:px-0">
+    <div className="flex flex-col items-center justify-center w-[370px] md:w-full min-h-screen p-2 md:px-0">
       {/* Card principal de bienvenida, estilo negro */}
       <Card className="flex flex-col items-center justify-center w-full max-w-5xl p-0 mb-8 overflow-hidden text-white bg-black border border-black">
         <div className="flex flex-col items-center justify-center w-full gap-4 p-8">

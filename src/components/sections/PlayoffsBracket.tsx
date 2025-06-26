@@ -15,7 +15,7 @@ const BracketTeam = ({
     : color === "#FFFFFF" || color === "#ffffff";
 
   return (
-    <div className="flex items-center w-48 p-2 bg-gray-100 rounded-lg shadow-sm">
+    <div className="flex items-center w-full md:w-48 p-2 bg-gray-100 rounded-lg shadow-sm">
       {Array.isArray(color) ? (
         <span
           className="w-5 h-5 mr-2 border border-gray-400 rounded-full"
@@ -83,14 +83,14 @@ export const PlayoffsBracket: React.FC = () => {
               Semifinales - Viernes 27 de Junio
             </h3>
             <div className="flex flex-row flex-wrap justify-center gap-4 lg:flex-col">
-              <div className="flex flex-row items-center p-2 border border-gray-200 rounded-lg">
+              <div className="flex flex-col md:flex-row items-center p-2 border border-gray-200 rounded-lg w-full md:w-auto gap-2 md:gap-0">
                 <BracketTeam teamName="Sport Boys" seed={1} />
-                <span className="px-3 my-1 text-xs font-bold">VS</span>
+                <span className="px-3 my-2 md:my-1 text-xs font-bold">VS</span>
                 <BracketTeam teamName="Inglaterra" seed={4} />
               </div>
-              <div className="flex flex-row items-center p-2 border border-gray-200 rounded-lg">
+              <div className="flex flex-col md:flex-row items-center p-2 border border-gray-200 rounded-lg w-full md:w-auto gap-2 md:gap-0">
                 <BracketTeam teamName="Holanda" seed={2} />
-                <span className="px-3 my-1 text-xs font-bold">VS</span>
+                <span className="px-3 my-2 md:my-1 text-xs font-bold">VS</span>
                 <BracketTeam teamName="Fiorentina" seed={3} />
               </div>
             </div>
