@@ -15,6 +15,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.2.3",
+    date: "26 de Junio, 2025",
+    title: "Fix vista Clasificación en celulares",
+    description: "La web ahora se adapta perfectamente a celulares.",
+    changes: [
+      {
+        type: "FIX",
+        description:
+          "El menú de ligas ahora es horizontal, scrolleable y sticky en mobile, evitando cortes y mejorando la navegación.",
+      },
+    ],
+  },
+  {
     version: "1.2.2",
     date: "23 de Junio, 2025",
     title: "Nuevo canal de contacto oficial",
