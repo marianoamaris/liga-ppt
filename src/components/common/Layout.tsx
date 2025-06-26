@@ -14,13 +14,13 @@ export const Layout: React.FC = () => {
   const handleCloseSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="flex h-screen min-h-screen overflow-hidden box-border">
+    <div className="box-border flex h-screen min-h-screen overflow-hidden">
       {/* Desktop Sidebar */}
       <Sidebar
         onItemClick={(path) => navigate(path)}
         selectedPath={selectedPath}
         onSignInClick={() => navigate("/login")}
-        className="hidden min-h-screen p-6 md:flex flex-col justify-between transition-all duration-200"
+        className="flex-col justify-between hidden min-h-screen p-6 transition-all duration-200 md:flex"
       />
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
@@ -29,10 +29,10 @@ export const Layout: React.FC = () => {
             style={{
               background: "linear-gradient(to bottom, #000 60%, #222 100%)",
             }}
-            className="relative w-full h-full flex flex-col justify-between z-50 animate-slide-in-left"
+            className="relative z-50 flex flex-col justify-between w-full h-full animate-slide-in-left"
           >
             <button
-              className="absolute top-4 right-4 text-white text-2xl"
+              className="absolute text-2xl text-white top-4 right-4"
               onClick={handleCloseSidebar}
               aria-label="Cerrar menú"
             >
@@ -46,7 +46,7 @@ export const Layout: React.FC = () => {
                 }}
                 selectedPath={selectedPath}
                 onSignInClick={() => navigate("/login")}
-                className="flex w-full md:hidden flex-col justify-between"
+                className="flex flex-col justify-between w-full md:hidden"
                 mobile={true}
               />
             </div>
@@ -54,9 +54,9 @@ export const Layout: React.FC = () => {
         </div>
       )}
       <div className="flex flex-col flex-1 h-full">
-        <main className="flex items-center justify-center flex-1 h-0 max-h-full min-h-0 p-6 overflow-y-auto bg-gray-100">
+        <main className="flex items-center justify-center flex-1 h-0 max-h-full min-h-0 overflow-y-auto bg-gray-100 md:p-6">
           <div className="w-full h-full">
-            <div className="w-full flex md:hidden flex-row-reverse">
+            <div className="flex flex-row-reverse w-full md:hidden">
               <button
                 className="p-2 text-2xl"
                 onClick={() => setSidebarOpen(true)}
