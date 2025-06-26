@@ -1,2 +1,6 @@
 /*    /index.html   200
 https://ligappt.netlify.app/* https://ligappt.com/:splat 301! 
+/wp-admin/*  /404.html  404
+/wp-login.php  /404.html  404
+/xmlrpc.php  /404.html  404
+/wp-includes/* /404.html 404
