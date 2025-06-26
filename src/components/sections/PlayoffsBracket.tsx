@@ -44,28 +44,30 @@ export const PlayoffsBracket: React.FC = () => {
   return (
     <Card className="w-full max-w-5xl p-4 mb-8 bg-white sm:p-6">
       <h2 className="mb-4 text-xl font-bold text-center sm:text-2xl">
-        Playoffs Liga #13
+        Semifinales - Liga PPT #13
       </h2>
 
-      <div className="p-3 mb-6 rounded-lg bg-gray-50 sm:p-4">
+      {/* <div className="p-3 mb-6 rounded-lg bg-gray-50 sm:p-4">
         <h3 className="mb-3 text-base font-bold text-center sm:text-lg">
           Cuartos de Final: Miércoles 25 de Junio
         </h3>
         <div className="flex flex-col items-center justify-center gap-2 text-xs text-center sm:flex-row sm:gap-6 sm:text-sm">
-          <p>
-            <b>Partido 1 (6:00 – 7:00 p.m.):</b> 🟣 Fiorentina vs 🔵 Celta de
-            Vigo
-          </p>
-          <p>
-            <b>Partido 2 (7:00 – 8:00 p.m.):</b> ⚪️ Inglaterra vs ⚫️ Alemania
-          </p>
+          <div className="flex flex-col gap-1">
+            <span>
+              <b>Partido 1:</b> 🟣 Fiorentina <b>9</b> - <b>8</b> 🔵 Celta de
+              Vigo
+            </span>
+            <span>
+              <b>Partido 2:</b> ⚪️ Inglaterra <b>5</b> - <b>2</b> ⚫️ Alemania
+            </span>
+          </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex justify-center">
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-4">
           {/* Semifinalists */}
-          <div className="flex flex-col items-center gap-4">
+          {/* <div className="flex flex-col items-center gap-4">
             <h3 className="text-sm font-bold text-center text-gray-600 uppercase">
               Clasificados a Semifinales
             </h3>
@@ -73,26 +75,23 @@ export const PlayoffsBracket: React.FC = () => {
               <BracketTeam teamName="Sport Boys" seed={1} />
               <BracketTeam teamName="Holanda" seed={2} />
             </div>
-          </div>
+          </div> */}
 
-          {/* Quarterfinals */}
+          {/* Semifinales */}
           <div className="flex flex-col items-center gap-4">
             <h3 className="text-sm font-bold text-center text-gray-600 uppercase">
-              Cuartos de Final
+              Semifinales - Viernes 27 de Junio
             </h3>
             <div className="flex flex-row flex-wrap justify-center gap-4 lg:flex-col">
-              {/* Match 2 */}
-              <div className="flex flex-col items-center p-2 border border-gray-200 rounded-lg">
+              <div className="flex flex-row items-center p-2 border border-gray-200 rounded-lg">
+                <BracketTeam teamName="Sport Boys" seed={1} />
+                <span className="px-3 my-1 text-xs font-bold">VS</span>
                 <BracketTeam teamName="Inglaterra" seed={4} />
-                <span className="my-1 text-xs font-bold">VS</span>
-                <BracketTeam teamName="Alemania" seed={5} />
               </div>
-
-              {/* Match 1 */}
-              <div className="flex flex-col items-center p-2 border border-gray-200 rounded-lg">
+              <div className="flex flex-row items-center p-2 border border-gray-200 rounded-lg">
+                <BracketTeam teamName="Holanda" seed={2} />
+                <span className="px-3 my-1 text-xs font-bold">VS</span>
                 <BracketTeam teamName="Fiorentina" seed={3} />
-                <span className="my-1 text-xs font-bold">VS</span>
-                <BracketTeam teamName="Celta de Vigo" seed={6} />
               </div>
             </div>
           </div>
@@ -101,12 +100,9 @@ export const PlayoffsBracket: React.FC = () => {
 
       <div className="mt-6 text-sm text-center text-gray-600">
         <p>
-          El ganador de (Inglaterra vs Alemania) se enfrentará a{" "}
-          <span className="font-bold">Sport Boys</span>.
-        </p>
-        <p>
-          El ganador de (Fiorentina vs Celta de Vigo) se enfrentará a{" "}
-          <span className="font-bold">Holanda</span>.
+          Los ganadores de sus respectivas semifinales estarán a un paso de la
+          gloria
+          <span className="font-bold">PPT</span>.
         </p>
       </div>
     </Card>

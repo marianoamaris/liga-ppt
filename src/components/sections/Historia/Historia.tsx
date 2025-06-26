@@ -68,7 +68,7 @@ export const Historia: React.FC = () => {
   });
 
   return (
-    <div className="flex lg:flex-row flex-col gap-8 p-3">
+    <div className="flex flex-col gap-8 p-3 lg:flex-row">
       <SidebarTabs
         tabs={TABS}
         tabSeleccionada={tab}
@@ -78,9 +78,9 @@ export const Historia: React.FC = () => {
       <div className="flex-1">
         {tab === "jugadores" && (
           <>
-            <div className="flex flex-wrap items-center mb-4 justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
               {/* Filtros de posición */}
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex flex-wrap gap-2">
                 {POSICIONES.map((p) => (
                   <button
                     key={p.id}
@@ -164,7 +164,7 @@ export const Historia: React.FC = () => {
               }
             >
               {!usuariosFiltrados.length ? (
-                <span className="text-center text-gray-500 text-sm md:text-base">
+                <span className="text-sm text-center text-gray-500 md:text-base">
                   No hay jugadores para mostrar
                 </span>
               ) : (

@@ -1,6 +1,7 @@
 import React from "react";
 
 interface BracketSectionProps {
+  cuartos?: string[];
   semifinales?: string[];
   final: string;
   ganador: string;
@@ -27,7 +28,8 @@ function TeamCircle({
       />
     );
   }
-  const isWhite = color === "#FFFFFF";
+  const isWhite =
+    typeof color === "string" && color.toLowerCase() === "#ffffff";
   return (
     <span
       className={`inline-block w-5 h-5 rounded-full mr-2 align-middle border ${
@@ -49,6 +51,7 @@ function parseTeamAndScore(str: string) {
 }
 
 export const BracketSection: React.FC<BracketSectionProps> = ({
+  cuartos,
   semifinales,
   final,
   ganador,
@@ -56,6 +59,45 @@ export const BracketSection: React.FC<BracketSectionProps> = ({
 }) => (
   <div className="mb-6">
     <h3 className="mb-2 font-semibold text-gray-700">Bracket</h3>
+    {cuartos && cuartos.length > 0 && (
+      <div className="mb-2 text-sm md:text-base">
+        <div className="font-semibold text-gray-600 mb-1">Cuartos de final</div>
+        <ul className=" pl-6">
+          {cuartos.map((qf, idx) => {
+            if (!qf || typeof qf !== "string" || !qf.includes(" - ")) {
+              return (
+                <li key={idx} className="mb-1 text-gray-700">
+                  {qf}
+                </li>
+              );
+            }
+            const [team1Raw, team2Raw] = qf.split(" - ");
+            if (!team1Raw || !team2Raw) {
+              return (
+                <li key={idx} className="mb-1 text-gray-700">
+                  {qf}
+                </li>
+              );
+            }
+            const team1 = parseTeamAndScore(team1Raw.trim());
+            const team2 = parseTeamAndScore(team2Raw.trim());
+            return (
+              <li key={idx} className="mb-1 text-gray-700">
+                <div className="flex items-center">
+                  <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
+                  <span className="mr-2">{team1.name}</span>
+                  <span className="font-bold">{team1.score}</span>
+                  <span className="mx-2">-</span>
+                  <span className="font-bold">{team2.score}</span>
+                  <span className="mx-2">{team2.name}</span>
+                  <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    )}
     {semifinales && semifinales.length > 0 && (
       <div className="mb-2 text-sm md:text-base">
         <div className="font-semibold text-gray-600 mb-1">Semifinales</div>

@@ -33,7 +33,7 @@ export const Home: React.FC = () => {
           <div className="flex flex-col items-center justify-center w-full gap-8 mt-2 md:flex-row">
             <div className="flex flex-col items-center justify-center">
               <div className="mb-1 text-xs text-white/70">
-                Falta para playoffs:
+                Falta para semifinales:
               </div>
               <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 shadow sm:text-xl md:text-2xl lg:text-3xl rounded-xl border-white/20">
                 {countdown}
@@ -55,7 +55,7 @@ export const Home: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 text-sm text-center text-white/90">
-                <b>Playoffs:</b> Miércoles 25 de junio
+                <b>Semifinales:</b> Viernes 27 de junio
               </div>
             </div>
           </div>
@@ -63,6 +63,25 @@ export const Home: React.FC = () => {
       </Card>
       {/* Info en vivo de premios individuales y tablas */}
       <PlayoffsBracket />
+
+      {/* Resultados de Playoffs y próximas semifinales */}
+      <Card className="w-full max-w-5xl p-4 mb-8 bg-white">
+        <h2 className="mb-2 text-xl font-bold text-center ">
+          Resultados Playoffs Liga #13
+        </h2>
+        <div className="mb-4 text-sm text-center text-gray-700">
+          <b>Cuartos de Final:</b>
+          <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2 md:flex-row md:gap-8">
+            <span>
+              🟣 Fiorentina <b>9</b> - <b>8</b> 🔵 Celta de Vigo
+            </span>
+            <span>
+              ⚪️ Inglaterra <b>5</b> - <b>2</b> ⚫️ Alemania
+            </span>
+          </div>
+          <b>¡Felicitaciones a los clasificados!</b>
+        </div>
+      </Card>
 
       {/* Módulos principales */}
       <Card className="w-full max-w-5xl p-2 mb-8 bg-white">

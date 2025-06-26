@@ -126,6 +126,7 @@ export const Clasificacion: React.FC = () => {
             )}
             {tabSeleccionada === "bracket" && (
               <BracketSection
+                cuartos={datosLiga.cuartos}
                 semifinales={datosLiga.semifinales}
                 final={datosLiga.final}
                 ganador={datosLiga.ganador}

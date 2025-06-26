@@ -2432,6 +2432,11 @@ export const LIGA_13 = {
     { arquero: "Pipe Castillejo", golesRecibidos: 69 },
   ],
   mejorArquero: { arquero: "Brayan Cadena", golesRecibidos: 39 },
+  cuartos: ["Fiorentina 9 - Celta de Vigo 8", "Inglaterra 5 - Alemania 2"],
+  semifinales: [
+    "🌸 Sport Boys vs ⚪️ Inglaterra",
+    "🟠 Holanda vs 🟣 Fiorentina",
+  ],
   final: "Pendiente",
   ganador: "Pendiente",
 };

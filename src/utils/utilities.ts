@@ -33,7 +33,7 @@ export function getArquerosMap(arqueros: any[]) {
 }
 
 // Fecha de la próxima jornada (Jueves 19 de junio 2025, 18:00) -> Actualizar manual por ahora
-export const NEXT_MATCH_DATE = new Date("2025-06-25T18:00:00-05:00"); // PLAYOFF
+export const NEXT_MATCH_DATE = new Date("2025-06-27T18:00:00-05:00"); // PLAYOFF
 
 export function useCountdown(targetDate: Date) {
   const [timeLeft, setTimeLeft] = useState<string>("");
