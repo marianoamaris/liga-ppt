@@ -1,11 +1,31 @@
-# Primer orden - evitamos bots maliciosos
-/wp-admin/*      /404.html  404
-/wp-login.php    /404.html  404
-/xmlrpc.php      /404.html  404
-/wp-includes/*   /404.html  404
+# Bloqueo de rutas comúnmente utilizadas por bots y atacantes
+/wp-admin/*                         /404.html  404
+/wordpress/wp-admin/*              /404.html  404
+/wp-login.php                      /404.html  404
+/xmlrpc.php                        /404.html  404
+//xmlrpc.php                       /404.html  404
 
-# Luego redirigimos todo lo que NO sea bots eso al frontend SPA
-/*               /index.html  200
+/wp-includes/*                     /404.html  404
+//test/wp-includes/*               /404.html  404
+//shop/wp-includes/*               /404.html  404
+//wp/wp-includes/*                 /404.html  404
+//blog/wp-includes/*               /404.html  404
+//wordpress/wp-includes/*          /404.html  404
+//cms/wp-includes/*                /404.html  404
+//2018/wp-includes/*               /404.html  404
 
-# Finalmente, redirección forzada desde .netlify.app al dominio principal
-https://ligappt.netlify.app/* https://ligappt.com/:splat 301!
+/setup-config.php                  /404.html  404
+/wp-admin/setup-config.php        /404.html  404
+/wordpress/wp-admin/setup-config.php /404.html  404
+
+# Rutas válidas personalizadas (se dejan pasar)
+/clasificacion                     /index.html  200
+/historia                          /index.html  200
+/logros                            /index.html  200
+/reglamento                        /index.html  200
+
+# Redirección al frontend SPA para el resto
+/*                                 /index.html  200
+
+# Redirección del dominio .netlify.app al principal
+https://ligappt.netlify.app/*     https://ligappt.com/:splat 301!
