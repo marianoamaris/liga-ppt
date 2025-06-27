@@ -69,9 +69,19 @@ const HomeTablet: React.FC = () => {
                 📺 Ver partido
               </a>
             </div>
-            <span>
-              ⚪️ Inglaterra <b>5</b> - <b>2</b> ⚫️ Alemania
-            </span>
+            <div className="flex flex-col items-center gap-1">
+              <span>
+                ⚪️ Inglaterra <b>5</b> - <b>2</b> ⚫️ Alemania
+              </span>
+              <a
+                href="https://www.youtube.com/watch?v=YZywzjyzcE0&ab_channel=LigaPPT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                📺 Ver partido
+              </a>
+            </div>
           </div>
           <b>¡Felicitaciones a los clasificados!</b>
         </div>
