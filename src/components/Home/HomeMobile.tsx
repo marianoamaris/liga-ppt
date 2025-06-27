@@ -56,9 +56,19 @@ const HomeMobile: React.FC = () => {
         <div className="mb-2 text-xs text-center text-gray-700">
           <b>Cuartos de Final:</b>
           <div className="flex flex-col items-center gap-1 mt-1 mb-1">
-            <span>
-              🟣 Fiorentina <b>9</b> - <b>8</b> 🔵 Celta de Vigo
-            </span>
+            <div className="flex flex-col items-center gap-1">
+              <span>
+                🟣 Fiorentina <b>9</b> - <b>8</b> 🔵 Celta de Vigo
+              </span>
+              <a
+                href="https://www.youtube.com/watch?v=z_kFBRqnwv8&ab_channel=LigaPPT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                📺 Ver partido
+              </a>
+            </div>
             <span>
               ⚪️ Inglaterra <b>5</b> - <b>2</b> ⚫️ Alemania
             </span>
