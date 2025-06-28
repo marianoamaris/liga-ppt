@@ -4,11 +4,12 @@ import { FaRankingStar, FaMedal, FaGavel, FaBullhorn } from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { NEXT_MATCH_DATE, useCountdown } from "../../utils/utilities";
 import { PlayoffsBracket } from "../sections/PlayoffsBracket";
+import { NEXT_MATCH_DATE, useCountdown } from "../../utils/utilities";
 
 const HomeDesktop: React.FC = () => {
   const navigate = useNavigate();
+  const countdown = useCountdown(NEXT_MATCH_DATE);
   return (
     <div className="flex flex-col items-center justify-center w-[370px] md:w-full min-h-screen p-2 md:px-0">
       {/* Card principal de bienvenida, estilo negro */}
@@ -32,10 +33,10 @@ const HomeDesktop: React.FC = () => {
           <div className="flex flex-col items-center justify-center w-full gap-8 mt-2 md:flex-row">
             <div className="flex flex-col items-center justify-center">
               <div className="mb-1 text-xs text-white/70">
-                Falta para semifinales:
+                Falta para la final:
               </div>
               <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 shadow sm:text-xl md:text-2xl lg:text-3xl rounded-xl border-white/20">
-                {useCountdown(NEXT_MATCH_DATE)}
+                {countdown}
               </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-1">
@@ -54,7 +55,7 @@ const HomeDesktop: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 text-sm text-center text-white/90">
-                <b>Semifinales:</b> Viernes 27 de junio
+                <b>Final:</b> Domingo 29 de junio, 7:00pm
               </div>
             </div>
           </div>
@@ -62,6 +63,29 @@ const HomeDesktop: React.FC = () => {
       </Card>
       {/* Info en vivo de premios individuales y tablas */}
       <PlayoffsBracket />
+
+      {/* Resultados de Playoffs y próximas semifinales */}
+      <Card className="w-full max-w-5xl p-4 mb-8 bg-white">
+        <h2 className="mb-2 text-xl font-bold text-center ">
+          Resultados Semifinales Liga #13
+        </h2>
+        <div className="mb-4 text-sm text-center text-gray-700">
+          <b>Semifinales:</b>
+          <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2 md:flex-row md:gap-8">
+            <div className="flex flex-col items-center gap-1">
+              <span>
+                🌸 Sport Boys <b>10</b> - <b>4</b> ⚪️ Inglaterra
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <span>
+                🟠 Holanda <b>12</b> - <b>7</b> 🟣 Fiorentina
+              </span>
+            </div>
+          </div>
+          <b>¡Felicitaciones a los clasificados!</b>
+        </div>
+      </Card>
 
       {/* Resultados de Playoffs y próximas semifinales */}
       <Card className="w-full max-w-5xl p-4 mb-8 bg-white">

@@ -15,7 +15,7 @@ const BracketTeam = ({
     : color === "#FFFFFF" || color === "#ffffff";
 
   return (
-    <div className="flex items-center w-full md:w-48 p-2 bg-gray-100 rounded-lg shadow-sm">
+    <div className="flex items-center w-full p-2 bg-gray-100 rounded-lg shadow-sm md:w-48">
       {Array.isArray(color) ? (
         <span
           className="w-5 h-5 mr-2 border border-gray-400 rounded-full"
@@ -44,7 +44,7 @@ export const PlayoffsBracket: React.FC = () => {
   return (
     <Card className="w-full max-w-5xl p-4 mb-8 bg-white sm:p-6">
       <h2 className="mb-4 text-xl font-bold text-center sm:text-2xl">
-        Semifinales - Liga PPT #13
+        Finales - Liga PPT #13
       </h2>
 
       {/* <div className="p-3 mb-6 rounded-lg bg-gray-50 sm:p-4">
@@ -66,32 +66,16 @@ export const PlayoffsBracket: React.FC = () => {
 
       <div className="flex justify-center">
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-4">
-          {/* Semifinalists */}
-          {/* <div className="flex flex-col items-center gap-4">
-            <h3 className="text-sm font-bold text-center text-gray-600 uppercase">
-              Clasificados a Semifinales
-            </h3>
-            <div className="flex flex-row flex-wrap justify-center gap-4 lg:flex-col">
-              <BracketTeam teamName="Sport Boys" seed={1} />
-              <BracketTeam teamName="Holanda" seed={2} />
-            </div>
-          </div> */}
-
-          {/* Semifinales */}
+          {/* FINALES */}
           <div className="flex flex-col items-center gap-4">
             <h3 className="text-sm font-bold text-center text-gray-600 uppercase">
-              Semifinales - Viernes 27 de Junio
+              Finales - Domingo 29 de Junio
             </h3>
             <div className="flex flex-row flex-wrap justify-center gap-4 lg:flex-col">
-              <div className="flex flex-col md:flex-row items-center p-2 border border-gray-200 rounded-lg w-full md:w-auto gap-2 md:gap-0">
+              <div className="flex flex-col items-center w-full gap-2 p-2 border border-gray-200 rounded-lg md:flex-row md:w-auto md:gap-0">
                 <BracketTeam teamName="Sport Boys" seed={1} />
-                <span className="px-3 my-2 md:my-1 text-xs font-bold">VS</span>
-                <BracketTeam teamName="Inglaterra" seed={4} />
-              </div>
-              <div className="flex flex-col md:flex-row items-center p-2 border border-gray-200 rounded-lg w-full md:w-auto gap-2 md:gap-0">
+                <span className="px-3 my-2 text-xs font-bold md:my-1">VS</span>
                 <BracketTeam teamName="Holanda" seed={2} />
-                <span className="px-3 my-2 md:my-1 text-xs font-bold">VS</span>
-                <BracketTeam teamName="Fiorentina" seed={3} />
               </div>
             </div>
           </div>
@@ -100,9 +84,8 @@ export const PlayoffsBracket: React.FC = () => {
 
       <div className="mt-6 text-sm text-center text-gray-600">
         <p>
-          Los ganadores de sus respectivas semifinales estarán a un paso de la
-          gloria
-          <span className="font-bold">PPT</span>.
+          Pronto tendrémos nuevo campeón
+          <span className="font-bold"> PPT</span>.
         </p>
       </div>
     </Card>

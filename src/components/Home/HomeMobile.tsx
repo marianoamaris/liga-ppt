@@ -9,6 +9,7 @@ import { PlayoffsBracket } from "../sections/PlayoffsBracket";
 
 const HomeMobile: React.FC = () => {
   const navigate = useNavigate();
+  const countdown = useCountdown(NEXT_MATCH_DATE);
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen gap-4 p-2">
       {/* Card principal de bienvenida */}
@@ -27,9 +28,9 @@ const HomeMobile: React.FC = () => {
           Sigue el avance, consulta estadísticas, historia y más.
         </div>
         <div className="flex flex-col items-center w-full gap-2 mt-2">
-          <div className="text-xs text-white/70">Falta para semifinales:</div>
+          <div className="text-xs text-white/70">Falta para la final:</div>
           <div className="px-4 py-1 font-mono text-base font-extrabold text-white bg-black border-2 rounded-xl border-white/20">
-            {useCountdown(NEXT_MATCH_DATE)}
+            {countdown}
           </div>
           <div className="flex flex-wrap justify-center gap-2 mt-2 text-xs font-medium">
             <span className="text-white/80">
@@ -43,12 +44,36 @@ const HomeMobile: React.FC = () => {
             </span>
           </div>
           <div className="mt-1 text-xs text-center text-white/90">
-            <b>Semifinales:</b> Viernes 27 de junio
+            <b>Final:</b> Domingo 29 de junio, 7:00pm
           </div>
         </div>
       </Card>
       {/* Bracket y resultados */}
       <PlayoffsBracket />
+
+      {/* Resultados de Semifinales */}
+      <Card className="w-full p-3 mb-4 bg-white">
+        <h2 className="mb-1 text-lg font-bold text-center">
+          Resultados Semifinales Liga #13
+        </h2>
+        <div className="mb-2 text-xs text-center text-gray-700">
+          <b>Semifinales:</b>
+          <div className="flex flex-col items-center gap-1 mt-1 mb-1">
+            <div className="flex flex-col items-center gap-1">
+              <span>
+                🌸 Sport Boys <b>10</b> - <b>4</b> ⚪️ Inglaterra
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <span>
+                🟠 Holanda <b>12</b> - <b>7</b> 🟣 Fiorentina
+              </span>
+            </div>
+          </div>
+          <b>¡Felicitaciones a los clasificados!</b>
+        </div>
+      </Card>
+
       <Card className="w-full p-3 mb-4 bg-white">
         <h2 className="mb-1 text-lg font-bold text-center">
           Resultados Playoffs Liga #13
