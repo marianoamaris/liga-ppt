@@ -63,6 +63,14 @@ const HomeMobile: React.FC = () => {
               <span>
                 🌸 Sport Boys <b>10</b> - <b>4</b> ⚪️ Inglaterra
               </span>
+              <a
+                href="https://www.youtube.com/watch?v=vpXSgT7vjEs&ab_channel=LigaPPT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                📺 Ver partido
+              </a>
             </div>
             <div className="flex flex-col items-center gap-1">
               <span>
