@@ -4,7 +4,6 @@ import { FaRankingStar, FaMedal, FaGavel, FaBullhorn } from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { PlayoffsBracket } from "../sections/PlayoffsBracket";
 import { NEXT_MATCH_DATE, useCountdown } from "../../utils/utilities";
 
 const HomeDesktop: React.FC = () => {
@@ -33,7 +32,7 @@ const HomeDesktop: React.FC = () => {
           <div className="flex flex-col items-center justify-center w-full gap-8 mt-2 md:flex-row">
             <div className="flex flex-col items-center justify-center">
               <div className="mb-1 text-xs text-white/70">
-                Falta para la final:
+                Falta para el inicio de la Liga #14:
               </div>
               <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 shadow sm:text-xl md:text-2xl lg:text-3xl rounded-xl border-white/20">
                 {countdown}
@@ -42,10 +41,10 @@ const HomeDesktop: React.FC = () => {
             <div className="flex flex-col items-center justify-center gap-1">
               <div className="flex flex-wrap justify-center gap-4 text-base font-medium">
                 <span className="text-white/80">
-                  Liga <b className="text-white">#13</b>
+                  Liga <b className="text-white">#14</b>
                 </span>
                 <span className="text-white/80">
-                  Jornada <b className="text-white">6/6</b>
+                  Jornada <b className="text-white">1/6</b>
                 </span>
                 <span className="text-white/80">
                   Equipos: <b className="text-white">9</b>
@@ -55,14 +54,33 @@ const HomeDesktop: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 text-sm text-center text-white/90">
-                <b>Final:</b> Domingo 29 de junio, 7:00pm
+                <b>Jornada 1:</b> Jueves 10 de Julio
               </div>
             </div>
           </div>
         </div>
       </Card>
       {/* Info en vivo de premios individuales y tablas */}
-      <PlayoffsBracket />
+      {/* Resultado de la Final */}
+      <Card className="w-full max-w-5xl p-4 mb-8 bg-white">
+        <h2 className="mb-2 text-xl font-bold text-center text-yellow-700">
+          🏆 Final Liga #13
+        </h2>
+        <div className="mb-4 text-sm text-center text-gray-700">
+          <b>Final:</b>
+          <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2">
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-lg font-bold">
+                🌸 Sport Boys <b>4</b> - <b>4</b> 🟠 Holanda
+              </span>
+              <span className="text-sm font-semibold text-yellow-600">
+                🏆 Ganador: Sport Boys (por desempate)
+              </span>
+            </div>
+          </div>
+          <b>¡Felicitaciones al campeón de la Liga #13!</b>
+        </div>
+      </Card>
 
       {/* Resultados de Playoffs y próximas semifinales */}
       <Card className="w-full max-w-5xl p-4 mb-8 bg-white">
@@ -89,6 +107,14 @@ const HomeDesktop: React.FC = () => {
               <span>
                 🟠 Holanda <b>12</b> - <b>7</b> 🟣 Fiorentina
               </span>
+              <a
+                href="https://www.youtube.com/watch?v=fP9n-x3c3Ck&ab_channel=LigaPPT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                📺 Ver partido
+              </a>
             </div>
           </div>
           <b>¡Felicitaciones a los clasificados!</b>

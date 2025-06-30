@@ -2434,8 +2434,8 @@ export const LIGA_13 = {
   mejorArquero: { arquero: "Brayan Cadena", golesRecibidos: 39 },
   cuartos: ["Fiorentina 9 - Celta de Vigo 8", "Inglaterra 5 - Alemania 2"],
   semifinales: ["Sport Boys 10 - Inglaterra 4", "Holanda 12 - Fiorentina 7"],
-  final: "Sport Boys - Holanda",
-  ganador: "Pendiente",
+  final: "Sport Boys 4 - Holanda 4",
+  ganador: "Sport Boys",
 };
 
 export const ARQUEROS_POR_LIGA: Record<number, Record<string, string>> = {
