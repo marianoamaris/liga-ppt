@@ -73,6 +73,14 @@ const HomeDesktop: React.FC = () => {
               <span className="text-lg font-bold">
                 🌸 Sport Boys <b>4</b> - <b>4</b> 🟠 Holanda
               </span>
+              <a
+                href="https://www.youtube.com/watch?v=b7kFDpSIKPQ&ab_channel=LigaPPT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                📺 Ver partido
+              </a>
               <span className="text-sm font-semibold text-yellow-600">
                 🏆 Ganador: Sport Boys (por desempate)
               </span>
