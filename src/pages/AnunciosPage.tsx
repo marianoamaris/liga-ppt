@@ -22,7 +22,7 @@ const getBadgeClass = (type: ChangeType) => {
 };
 
 const ChangelogItem: React.FC<{ entry: ChangelogEntry }> = ({ entry }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const url = `${window.location.origin}/anuncios#${entry.version}`;
 
