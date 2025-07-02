@@ -8,4 +8,5 @@ export const MVP_FINAL = [
   { nombre: "Pipe Castillejo", premios: 1 },
   { nombre: "Juan Mora", premios: 1 },
   { nombre: "Frederick Molina", premios: 1 },
+  { nombre: "Julio Ochoa", premios: 1 },
 ];
