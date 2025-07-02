@@ -63,7 +63,7 @@ const ChangelogItem: React.FC<{ entry: ChangelogEntry }> = ({ entry }) => {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">{entry.title}</h2>
           <div className="flex items-center gap-2">
-            <span className="hidden text-sm text-gray-500 sm:block mr-2">
+            <span className="hidden mr-2 text-sm text-gray-500 sm:block">
               {entry.date}
             </span>
             <a
@@ -71,7 +71,7 @@ const ChangelogItem: React.FC<{ entry: ChangelogEntry }> = ({ entry }) => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-2 text-green-600 bg-green-50 rounded-full hover:bg-green-100 hover:text-green-800 transition"
+              className="p-2 text-green-600 transition rounded-full bg-green-50 hover:bg-green-100 hover:text-green-800"
               title="Compartir en WhatsApp"
             >
               <FaWhatsapp size={18} />
@@ -81,14 +81,14 @@ const ChangelogItem: React.FC<{ entry: ChangelogEntry }> = ({ entry }) => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-2 text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 hover:text-blue-800 transition"
+              className="p-2 text-blue-600 transition rounded-full bg-blue-50 hover:bg-blue-100 hover:text-blue-800"
               title="Compartir en Facebook"
             >
               <FaFacebookF size={16} />
             </a>
             <button
               onClick={handleShare}
-              className="p-2 text-gray-500 bg-gray-100 rounded-full hover:bg-gray-200 hover:text-gray-700 transition"
+              className="p-2 text-gray-500 transition bg-gray-100 rounded-full hover:bg-gray-200 hover:text-gray-700"
               title="Compartir anuncio"
             >
               <FaShareAlt size={18} />
@@ -149,8 +149,8 @@ export const AnunciosPage: React.FC = () => {
             Historial de Cambios y Anuncios
           </h1>
           <p className="max-w-2xl mx-auto mt-2 text-base text-gray-600">
-            Aquí encontrarás las últimas actualizaciones y mejoras de la
-            plataforma. ¡Haz clic en una tarjeta para ver más detalles!
+            Aquí encontrarás las últimas noticias referentes a la Liga y su
+            ecosistema.
           </p>
         </div>
         {CHANGELOG_DATA.map((entry) => (
