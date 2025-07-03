@@ -15,6 +15,26 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.1",
+    date: "3 de Julio, 2025",
+    title: "Anuncio #2: Sistema de Tarjetas y Reglas de Faltas",
+    description:
+      "A partir de las instancias finales de la Liga PPT #14, se introducen nuevas reglas para la gestión de faltas y sanciones. Estos cambios aplicarán parcialmente en la Liga #14 y aplicarán por completo desde la jornada 1 de la Liga #15 y siguientes temporadas.",
+    changes: [
+      {
+        type: "NUEVO",
+        description:
+          "Se implementará un nuevo sistema disciplinario basado en tarjetas: Amarilla, Azul y Roja. Este reemplazará el sistema actual de sanciones por anotaciones individuales. Entrará en vigencia desde la fase eliminatoria, es decir, playoff - semis y final de la Liga #14 y se aplicará desde el inicio en la Liga #15 en su jornada #1 hasta su finalización.",
+      },
+      {
+        type: "NUEVO",
+        description:
+          "A partir de la Liga #14, solo el jugador que reciba la falta y el capitán de su equipo podrán 'cantar' o reportar la falta. Las validaciones posteriores se mantienen según el protocolo habitual.",
+      },
+    ],
+  },
+
+  {
     version: "1",
     date: "2 de Julio, 2025",
     title: "Anuncio #1 - Liga PPT #14",
