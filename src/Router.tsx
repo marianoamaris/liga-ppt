@@ -8,6 +8,7 @@ import { Layout } from "./components/common/Layout";
 import { ReglamentoPage } from "./pages/ReglamentoPage";
 import { LogrosPage } from "./pages/LogrosPage";
 import { AnunciosPage } from "./pages/AnunciosPage";
+import { CalendarioPage } from "./pages/CalendarioPage";
 
 // Placeholder para rutas privadas
 const PrivatePlaceholder = () => (
@@ -28,6 +29,7 @@ export const AppRouter = () => (
         <Route path="/reglamento" element={<ReglamentoPage />} />
         <Route path="/logros" element={<LogrosPage />} />
         <Route path="/anuncios" element={<AnunciosPage />} />
+        <Route path="/calendario" element={<CalendarioPage />} />
       </Route>
       {/* Rutas públicas sin layout */}
       <Route path="/login" element={<SignIn />} />

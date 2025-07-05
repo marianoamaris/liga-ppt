@@ -64,4 +64,10 @@ export const SIDEBAR_ITEMS = [
     path: "/contacto",
     icon: "GiSoccerKick",
   },
+  {
+    id: "calendario",
+    label: "Calendario",
+    path: "/calendario",
+    icon: "FaRegCalendarAlt",
+  },
 ] as const;

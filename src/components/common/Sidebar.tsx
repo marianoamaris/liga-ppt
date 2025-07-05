@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GiSoccerKick, GiWhistle } from "react-icons/gi";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaRegCalendarAlt } from "react-icons/fa";
 import {
   FaRankingStar,
   FaMedal,
@@ -22,6 +22,7 @@ const ICONS: Record<
   FaMedal,
   FaGavel,
   FaBullhorn,
+  FaRegCalendarAlt,
 };
 
 interface SidebarProps {

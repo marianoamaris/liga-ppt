@@ -15,6 +15,40 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.2",
+    date: "5 de Julio, 2025",
+    title: "¡Equipos Confirmados y Nuevo Módulo de Calendario!",
+    description:
+      "Ya están confirmados los 9 equipos que participarán en la Liga PPT #14. Además, hemos agregado un nuevo módulo de calendario para que puedas consultar las fechas de las jornadas y los equipos participantes.",
+    changes: [
+      {
+        type: "NUEVO",
+        description:
+          "Equipos confirmados para la Liga PPT #14: Brasil, Equipo Rocket, River Plate, Fiorentina, Wolverhampton, Eintracht Frankfurt, Junior, Palermo FC y VfL Wolfsburgo.",
+      },
+      {
+        type: "NUEVO",
+        description:
+          "Nuevo módulo de Calendario disponible en el menú lateral. Aquí podrás consultar las fechas de las 6 jornadas regulares y ver qué equipos se enfrentan en cada cancha.",
+      },
+      {
+        type: "NUEVO",
+        description:
+          "En el calendario también encontrarás la lista completa de integrantes de cada equipo, con sus roles (Capitán y Arquero) destacados.",
+      },
+      {
+        type: "NUEVO",
+        description:
+          "La Liga PPT #14 ya está disponible en la sección de Clasificación con todos los equipos y estadísticas iniciales en 0, listas para ser actualizadas cuando comience la competencia.",
+      },
+      {
+        type: "MEJORA",
+        description:
+          "Mejorada la navegación del calendario con pestañas para cada jornada y funcionalidad para expandir/contraer la información de los equipos participantes.",
+      },
+    ],
+  },
+  {
     version: "1.1",
     date: "3 de Julio, 2025",
     title: "Anuncio #2: Sistema de Tarjetas y Reglas de Faltas",

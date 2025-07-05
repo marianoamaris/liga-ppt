@@ -6,6 +6,7 @@ import {
   LIGA_11,
   LIGA_12,
   LIGA_13,
+  LIGA_14,
   LIGA_2,
   LIGA_3,
   LIGA_4,
@@ -25,7 +26,7 @@ import { ArquerosList } from "../sections/ArquerosList";
 import { BracketSection } from "../sections/BracketSection";
 
 type TabId = "clasificacion" | "goleadores" | "arqueros" | "bracket";
-const TOTAL_LIGAS = 13;
+const TOTAL_LIGAS = 14;
 const ligas = Array.from({ length: TOTAL_LIGAS }, (_, i) => i + 1);
 
 const ClasificacionMobile: React.FC = () => {
@@ -54,6 +55,7 @@ const ClasificacionMobile: React.FC = () => {
     LIGA_11,
     LIGA_12,
     LIGA_13,
+    LIGA_14,
   ];
 
   const datosLiga: any = LIGAS[ligaSeleccionada - 1] || null;
