@@ -584,7 +584,7 @@ export const CalendarioPage: React.FC = () => {
                     )}
                   </h2>
                   <div className="grid gap-6 md:grid-cols-3">
-                    {j.canchas.map((cancha, idx) => {
+                    {j.canchas.map((cancha) => {
                       const anotador =
                         (cancha as any).anotador ?? "Por definir";
                       return (
