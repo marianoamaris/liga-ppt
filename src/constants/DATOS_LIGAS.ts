@@ -78,6 +78,7 @@ export const TEAM_COLORS: Record<string, string | [string, string]> = {
   "River Plate": "#FFFFFF", // blanco
   Wolverhampton: "#F97316", // naranja
   "Eintracht Frankfurt": "#222222", // negro
+  "E. Frankfurt": "#222222", // negro
   Junior: "#D00027", // rojo
   "Palermo FC": "#FF69B4", // rosado
   "VfL Wolfsburgo": "#22C55E", // verde

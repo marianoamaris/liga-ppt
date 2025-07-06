@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TEAM_COLORS } from "../constants/DATOS_LIGAS";
 import { TeamCircle } from "../components/sections/TablaGeneral";
+import { LIGA_14 } from "../constants/DATOS_LIGAS";
 
 const JORNADAS = [
   {
@@ -10,7 +11,8 @@ const JORNADAS = [
     canchas: [
       {
         nombre: "Cancha 1",
-        color: "border-blue-500",
+        numero: 1,
+        anotador: "Daniel Donado",
         equipos: [
           { badge: "B", color: "bg-yellow-400 text-black", nombre: "Brasil" },
           {
@@ -27,7 +29,8 @@ const JORNADAS = [
       },
       {
         nombre: "Cancha 2",
-        color: "border-purple-500",
+        numero: 2,
+        anotador: "Lucas Benjumea",
         equipos: [
           {
             badge: "F",
@@ -42,13 +45,14 @@ const JORNADAS = [
           {
             badge: "E",
             color: "bg-black text-white",
-            nombre: "Eintracht Frankfurt",
+            nombre: "E. Frankfurt",
           },
         ],
       },
       {
         nombre: "Cancha 3",
-        color: "border-red-500",
+        numero: 3,
+        anotador: "Oscar P y Luis Pabon",
         equipos: [
           { badge: "J", color: "bg-red-600 text-white", nombre: "Junior" },
           { badge: "P", color: "bg-pink-300 text-white", nombre: "Palermo FC" },
@@ -78,7 +82,7 @@ const JORNADAS = [
           {
             badge: "E",
             color: "bg-black text-white",
-            nombre: "Eintracht Frankfurt",
+            nombre: "E. Frankfurt",
           },
           { badge: "J", color: "bg-red-600 text-white", nombre: "Junior" },
         ],
@@ -171,7 +175,7 @@ const JORNADAS = [
           {
             badge: "E",
             color: "bg-black text-white",
-            nombre: "Eintracht Frankfurt",
+            nombre: "E. Frankfurt",
           },
         ],
       },
@@ -207,7 +211,7 @@ const JORNADAS = [
           {
             badge: "E",
             color: "bg-black text-white",
-            nombre: "Eintracht Frankfurt",
+            nombre: "E. Frankfurt",
           },
           {
             badge: "V",
@@ -257,7 +261,7 @@ const JORNADAS = [
           {
             badge: "E",
             color: "bg-black text-white",
-            nombre: "Eintracht Frankfurt",
+            nombre: "E. Frankfurt",
           },
         ],
       },
@@ -307,7 +311,7 @@ const JORNADAS = [
           {
             badge: "E",
             color: "bg-black text-white",
-            nombre: "Eintracht Frankfurt",
+            nombre: "E. Frankfurt",
           },
         ],
       },
@@ -432,7 +436,7 @@ const EQUIPOS = [
   {
     badge: "E",
     color: "bg-black text-white",
-    nombre: "Eintracht Frankfurt",
+    nombre: "E. Frankfurt",
     integrantes: [
       "Camilo Torres (C)",
       "🧤Carlos Barraza",
@@ -509,6 +513,22 @@ export const CalendarioPage: React.FC = () => {
     setEquiposExpandidos(nuevosExpandidos);
   };
 
+  const TEAM_STATS = React.useMemo(() => {
+    const stats: Record<
+      string,
+      { victorias: number; derrotas: number; empates: number; puntos: number }
+    > = {};
+    LIGA_14.tablaGeneral.forEach((eq) => {
+      stats[eq.equipo] = {
+        victorias: eq.victorias || 0,
+        derrotas: eq.derrotas || 0,
+        empates: eq.empates || 0,
+        puntos: eq.puntos || 0,
+      };
+    });
+    return stats;
+  }, []);
+
   return (
     <div className="container px-2 py-6 mx-auto md:py-8">
       <div className="max-w-6xl mx-auto">
@@ -564,31 +584,62 @@ export const CalendarioPage: React.FC = () => {
                     )}
                   </h2>
                   <div className="grid gap-6 md:grid-cols-3">
-                    {j.canchas.map((cancha) => (
-                      <div
-                        key={cancha.nombre}
-                        className={
-                          "match-card bg-gray-50 p-4 rounded-lg border-l-4 border-black"
-                        }
-                      >
-                        <div className="flex items-center mb-3">
-                          <h3 className="font-semibold text-gray-700">
-                            {cancha.nombre}
-                          </h3>
-                        </div>
-                        <div className="space-y-3">
-                          {cancha.equipos.map((eq, i) => (
-                            <div className="flex items-center" key={i}>
-                              <TeamCircle
-                                equipo={eq.nombre}
-                                TEAM_COLORS={TEAM_COLORS}
-                              />
-                              <span className="text-gray-800">{eq.nombre}</span>
+                    {j.canchas.map((cancha, idx) => {
+                      const anotador =
+                        (cancha as any).anotador ?? "Por definir";
+                      return (
+                        <div
+                          key={cancha.nombre}
+                          className="p-5 mb-6 bg-white border border-gray-200 shadow-md match-card rounded-2xl"
+                        >
+                          <div className="flex flex-col gap-2 mb-4">
+                            <div className="flex items-center justify-between">
+                              <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
+                                <span className="inline-block px-2 py-1 mr-2 text-xs font-semibold bg-gray-100 rounded">
+                                  {cancha.nombre}
+                                </span>
+                              </h3>
+                              <span className="text-xs text-gray-500">
+                                Anotador: <b>{anotador}</b>
+                              </span>
                             </div>
-                          ))}
+                          </div>
+                          <div className="mb-2 space-y-3">
+                            {cancha.equipos.map((eq, i) => {
+                              const stats = TEAM_STATS[eq.nombre] || {
+                                puntos: 0,
+                              };
+                              const pos =
+                                LIGA_14.tablaGeneral.findIndex(
+                                  (e) => e.equipo === eq.nombre
+                                ) + 1;
+                              return (
+                                <div
+                                  className="flex items-center gap-2 p-2 transition rounded hover:bg-gray-50"
+                                  key={i}
+                                >
+                                  <TeamCircle
+                                    equipo={eq.nombre}
+                                    TEAM_COLORS={TEAM_COLORS}
+                                  />
+                                  <span className="w-32 font-medium text-gray-800">
+                                    {eq.nombre}
+                                  </span>
+                                  <span className="flex gap-3 ml-auto text-xs text-gray-600">
+                                    <span>
+                                      Pos: <b>{pos > 0 ? pos : "-"}</b>
+                                    </span>
+                                    <span>
+                                      Pts: <b>{stats.puntos}</b>
+                                    </span>
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="p-6 bg-white shadow-lg rounded-xl">
