@@ -376,7 +376,7 @@ const EQUIPOS = [
     integrantes: [
       "Mariano Amaris (C)",
       "🧤Brayan Cadena (A)",
-      "Bryan Salas",
+      "Alexander Benitez",
       "David Carballo",
       "Eudes Pavajeau",
       "Keiler Fonseca",
