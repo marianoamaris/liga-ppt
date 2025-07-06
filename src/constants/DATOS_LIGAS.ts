@@ -2523,7 +2523,7 @@ export const LIGA_14 = {
       puntos: 0,
     },
     {
-      equipo: "Eintracht Frankfurt",
+      equipo: "E. Frankfurt",
       pj: 0,
       victorias: 0,
       empates: 0,
