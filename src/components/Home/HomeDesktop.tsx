@@ -3,6 +3,7 @@ import { Card } from "../common/Card";
 import { FaRankingStar, FaMedal, FaGavel, FaBullhorn } from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { NEXT_MATCH_DATE, useCountdown } from "../../utils/utilities";
 
@@ -192,6 +193,28 @@ const HomeDesktop: React.FC = () => {
               }}
             >
               Ver tabla y jornadas &rarr;
+            </span>
+          </div>
+          <div
+            className="flex flex-col items-start p-4 rounded-2xl shadow-md bg-orange-50 hover:scale-[1.03] transition-transform cursor-pointer"
+            onClick={() => navigate("/calendario")}
+          >
+            <FaRegCalendarAlt className="mb-2 text-orange-600" size={28} />
+            <div className="mb-1 text-base font-bold text-orange-700">
+              Calendario
+            </div>
+            <div className="mb-2 text-xs text-gray-700">
+              Consulta el calendario oficial de jornadas, canchas y equipos
+              participantes. Explora la fase final y el bracket de la Liga #14.
+            </div>
+            <span
+              className="text-xs font-semibold text-orange-600 cursor-pointer hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/calendario");
+              }}
+            >
+              Ver calendario &rarr;
             </span>
           </div>
           <div

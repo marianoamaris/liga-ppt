@@ -2,6 +2,7 @@ import React from "react";
 import { FaRankingStar, FaMedal, FaGavel, FaBullhorn } from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../common/Card";
 import { NEXT_MATCH_DATE, useCountdown } from "../../utils/utilities";
@@ -165,6 +166,16 @@ const HomeTablet: React.FC = () => {
             <FaRankingStar className="mb-1 text-blue-600" size={22} />{" "}
             <span className="text-sm font-bold text-blue-700">
               Clasificación
+            </span>{" "}
+          </div>
+          <div
+            className="flex flex-col items-start p-3 shadow cursor-pointer rounded-xl bg-orange-50"
+            onClick={() => navigate("/calendario")}
+          >
+            {" "}
+            <FaRegCalendarAlt className="mb-1 text-orange-600" size={22} />{" "}
+            <span className="text-sm font-bold text-orange-700">
+              Calendario
             </span>{" "}
           </div>
           <div
