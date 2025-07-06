@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { TEAM_COLORS } from "../constants/DATOS_LIGAS";
+import { TeamCircle } from "../components/sections/TablaGeneral";
 
 const JORNADAS = [
   {
@@ -491,18 +493,6 @@ const EQUIPOS = [
 
 const TABS = [...JORNADAS.map((j) => ({ id: j.id, label: j.nombre }))];
 
-const colorMap: { [key: string]: string } = {
-  Brasil: "bg-yellow-400 text-black",
-  "Equipo Rocket": "bg-blue-500 text-white",
-  "River Plate": "bg-white text-black border border-gray-300",
-  Fiorentina: "bg-purple-500 text-white",
-  Wolverhampton: "bg-orange-500 text-white",
-  "Eintracht Frankfurt": "bg-black text-white",
-  Junior: "bg-red-600 text-white",
-  "Palermo FC": "bg-pink-300 text-white",
-  "VfL Wolfsburgo": "bg-green-500 text-white",
-};
-
 export const CalendarioPage: React.FC = () => {
   const [tab, setTab] = useState(JORNADAS[0].id);
   const [equiposExpandidos, setEquiposExpandidos] = useState<Set<string>>(
@@ -589,12 +579,10 @@ export const CalendarioPage: React.FC = () => {
                         <div className="space-y-3">
                           {cancha.equipos.map((eq, i) => (
                             <div className="flex items-center" key={i}>
-                              <span
-                                className={`team-badge ${
-                                  colorMap[eq.nombre] ||
-                                  "bg-gray-200 text-black"
-                                }`}
-                              ></span>
+                              <TeamCircle
+                                equipo={eq.nombre}
+                                TEAM_COLORS={TEAM_COLORS}
+                              />
                               <span className="text-gray-800">{eq.nombre}</span>
                             </div>
                           ))}
@@ -641,11 +629,10 @@ export const CalendarioPage: React.FC = () => {
                           className="flex items-center p-2 transition-colors rounded cursor-pointer hover:bg-gray-50"
                           onClick={() => toggleEquipo(eq.nombre)}
                         >
-                          <span
-                            className={`team-badge ${
-                              colorMap[eq.nombre] || "bg-gray-200 text-black"
-                            }`}
-                          ></span>
+                          <TeamCircle
+                            equipo={eq.nombre}
+                            TEAM_COLORS={TEAM_COLORS}
+                          />
                           <span className="font-medium text-gray-700">
                             {eq.nombre}
                           </span>
@@ -673,35 +660,6 @@ export const CalendarioPage: React.FC = () => {
             )
         )}
       </div>
-      <style>{`
-        .team-badge {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          margin-right: 8px;
-          font-weight: bold;
-        }
-        .match-card {
-          transition: all 0.3s ease;
-        }
-        .match-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s;
-        }
-        .pitch-icon {
-          color: #4CAF50;
-        }
-      `}</style>
     </div>
   );
 };

@@ -8,7 +8,7 @@ interface TablaGeneralProps {
   arquerosEquipoMap?: Record<string, string>;
 }
 
-function TeamCircle({
+export function TeamCircle({
   equipo,
   TEAM_COLORS,
 }: {
