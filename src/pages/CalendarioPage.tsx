@@ -531,7 +531,7 @@ export const CalendarioPage: React.FC = () => {
 
   return (
     <div className="container px-2 py-6 mx-auto md:py-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-sm mx-auto md:max-w-6xl">
         {/* Header Negro con Logo */}
         <div className="flex items-center justify-center p-6 mb-8 bg-black shadow-lg rounded-xl">
           <img
@@ -590,21 +590,19 @@ export const CalendarioPage: React.FC = () => {
                       return (
                         <div
                           key={cancha.nombre}
-                          className="p-5 mb-6 bg-white border border-gray-200 shadow-md match-card rounded-2xl"
+                          className="p-3 mb-6 bg-white border border-gray-200 shadow-md match-card md:p-5 rounded-2xl"
                         >
                           <div className="flex flex-col gap-2 mb-4">
-                            <div className="flex items-center justify-between">
-                              <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
-                                <span className="inline-block px-2 py-1 mr-2 text-xs font-semibold bg-gray-100 rounded">
-                                  {cancha.nombre}
-                                </span>
-                              </h3>
-                              <span className="text-xs text-gray-500">
+                            <div className="flex items-center justify-between w-full">
+                              <span className="inline-block px-2 py-1 rounded bg-gray-100 text-xs font-semibold mr-2 truncate max-w-[90px] md:max-w-none">
+                                {cancha.nombre}
+                              </span>
+                              <span className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none ml-auto">
                                 Anotador: <b>{anotador}</b>
                               </span>
                             </div>
                           </div>
-                          <div className="mb-2 space-y-3">
+                          <div className="mb-2 space-y-2">
                             {cancha.equipos.map((eq, i) => {
                               const stats = TEAM_STATS[eq.nombre] || {
                                 puntos: 0,
@@ -615,17 +613,27 @@ export const CalendarioPage: React.FC = () => {
                                 ) + 1;
                               return (
                                 <div
-                                  className="flex items-center gap-2 p-2 transition rounded hover:bg-gray-50"
+                                  className={`flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 p-1 md:p-2 rounded hover:bg-gray-50 transition ${
+                                    i !== cancha.equipos.length - 1
+                                      ? "border-b border-gray-100"
+                                      : ""
+                                  }`}
                                   key={i}
                                 >
                                   <TeamCircle
                                     equipo={eq.nombre}
                                     TEAM_COLORS={TEAM_COLORS}
                                   />
-                                  <span className="w-32 font-medium text-gray-800">
-                                    {eq.nombre}
-                                  </span>
-                                  <span className="flex gap-3 ml-auto text-xs text-gray-600">
+                                  <div className="flex-1 min-w-0">
+                                    <span className="block text-xs font-medium text-gray-800 truncate md:text-base">
+                                      {eq.nombre}
+                                    </span>
+                                    <span className="block md:hidden text-[11px] text-gray-500 mt-0.5">
+                                      Pos: <b>{pos > 0 ? pos : "-"}</b>{" "}
+                                      &nbsp;|&nbsp; Pts: <b>{stats.puntos}</b>
+                                    </span>
+                                  </div>
+                                  <span className="hidden gap-2 ml-auto text-xs text-gray-600 md:flex">
                                     <span>
                                       Pos: <b>{pos > 0 ? pos : "-"}</b>
                                     </span>
