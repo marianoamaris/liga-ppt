@@ -460,7 +460,7 @@ const EQUIPOS = [
       "Hernán Medrano",
       "Jhonnier DLC",
       "Juan DLC",
-      "Julián Charris",
+      "Alejandro Macherna",
     ],
   },
   {
