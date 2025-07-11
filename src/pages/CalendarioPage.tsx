@@ -73,6 +73,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 1",
         color: "border-blue-500",
+        anotador: "Lucas Benjumea",
         equipos: [
           {
             badge: "R",
@@ -90,6 +91,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 2",
         color: "border-purple-500",
+        anotador: "Oscar P y Luis Pabon",
         equipos: [
           {
             badge: "E",
@@ -111,6 +113,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 3",
         color: "border-red-500",
+        anotador: "Daniel Donado",
         equipos: [
           { badge: "B", color: "bg-yellow-400 text-black", nombre: "Brasil" },
           {
@@ -366,7 +369,7 @@ const EQUIPOS = [
       "Jefferson Almanza (C)",
       "🧤Fernando Gómez (A)",
       "Cristian Trujillo",
-      "Esteban Galván",
+      "Andres Salazar",
       "Ian Need",
       "Jesús Pertuz",
       "José Mosquera",
@@ -444,7 +447,7 @@ const EQUIPOS = [
       "Emanuel Celedón",
       "Emanuel Navarro (Goat)",
       "Frederick Molina",
-      "José Viña",
+      "Frank Ramirez",
       "Juanse Tibaduiza",
     ],
   },
@@ -472,7 +475,7 @@ const EQUIPOS = [
       "🧤Brayan Ospino",
       "Daniel Cuadros",
       "Fabricio Rizo",
-      "Frank Ramírez",
+      "Jose Viña",
       "Keni Contreras",
       "Óscar DLC",
       "Santiago Corzo",
