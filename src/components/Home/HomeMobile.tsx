@@ -28,9 +28,7 @@ const HomeMobile: React.FC = () => {
           Sigue el avance, consulta estadísticas, historia y más.
         </div>
         <div className="flex flex-col items-center w-full gap-2 mt-2">
-          <div className="text-xs text-white/70">
-            Falta para el inicio de la Liga #14:
-          </div>
+          <div className="text-xs text-white/70">Jornada 2 - Liga PPT #14:</div>
           <div className="px-4 py-1 font-mono text-base font-extrabold text-white bg-black border-2 rounded-xl border-white/20">
             {countdown}
           </div>
@@ -39,14 +37,14 @@ const HomeMobile: React.FC = () => {
               Liga <b className="text-white">#14</b>
             </span>
             <span className="text-white/80">
-              Jornada <b className="text-white">1/6</b>
+              Jornada <b className="text-white">2/6</b>
             </span>
             <span className="text-white/80">
               Equipos: <b className="text-white">9</b>
             </span>
           </div>
           <div className="mt-1 text-xs text-center text-white/90">
-            <b>Jornada 1:</b> Jueves 10 de Julio
+            <b>Jornada 2:</b> Jueves 17 de Julio
           </div>
         </div>
       </Card>
@@ -70,7 +68,7 @@ const HomeMobile: React.FC = () => {
               >
                 📺 Ver partido
               </a>
-              <span className="text-xs text-yellow-600 font-semibold">
+              <span className="text-xs font-semibold text-yellow-600">
                 🏆 Ganador: Sport Boys (por desempate)
               </span>
             </div>

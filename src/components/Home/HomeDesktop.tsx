@@ -33,7 +33,7 @@ const HomeDesktop: React.FC = () => {
           <div className="flex flex-col items-center justify-center w-full gap-8 mt-2 md:flex-row">
             <div className="flex flex-col items-center justify-center">
               <div className="mb-1 text-xs text-white/70">
-                Falta para el inicio de la Liga #14:
+                Jornada 2 - Liga PPT #14:
               </div>
               <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 shadow sm:text-xl md:text-2xl lg:text-3xl rounded-xl border-white/20">
                 {countdown}
@@ -45,7 +45,7 @@ const HomeDesktop: React.FC = () => {
                   Liga <b className="text-white">#14</b>
                 </span>
                 <span className="text-white/80">
-                  Jornada <b className="text-white">1/6</b>
+                  Jornada <b className="text-white">2/6</b>
                 </span>
                 <span className="text-white/80">
                   Equipos: <b className="text-white">9</b>
@@ -55,7 +55,7 @@ const HomeDesktop: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 text-sm text-center text-white/90">
-                <b>Jornada 1:</b> Jueves 10 de Julio
+                <b>Jornada 2:</b> Jueves 17 de Julio
               </div>
             </div>
           </div>
