@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { TEAM_COLORS } from "../constants/DATOS_LIGAS";
 import { TeamCircle } from "../components/sections/TablaGeneral";
-import { LIGA_14 } from "../constants/DATOS_LIGAS";
 
 const JORNADAS = [
   {
@@ -130,6 +129,7 @@ const JORNADAS = [
     id: "jornada3",
     nombre: "Jornada 3",
     fecha: "Jueves 24 de julio",
+    anotador: "Lucas Benjumea",
     canchas: [
       {
         nombre: "Cancha 1",
@@ -147,6 +147,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 2",
         color: "border-purple-500",
+        anotador: "Luis Pabon",
         equipos: [
           {
             badge: "F",
@@ -168,6 +169,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 3",
         color: "border-red-500",
+        anotador: "Daniel Donado",
         equipos: [
           { badge: "P", color: "bg-pink-300 text-white", nombre: "Palermo FC" },
           {
@@ -516,22 +518,6 @@ export const CalendarioPage: React.FC = () => {
     setEquiposExpandidos(nuevosExpandidos);
   };
 
-  const TEAM_STATS = React.useMemo(() => {
-    const stats: Record<
-      string,
-      { victorias: number; derrotas: number; empates: number; puntos: number }
-    > = {};
-    LIGA_14.tablaGeneral.forEach((eq) => {
-      stats[eq.equipo] = {
-        victorias: eq.victorias || 0,
-        derrotas: eq.derrotas || 0,
-        empates: eq.empates || 0,
-        puntos: eq.puntos || 0,
-      };
-    });
-    return stats;
-  }, []);
-
   return (
     <div className="container px-2 py-6 mx-auto md:py-8">
       <div className="max-w-sm mx-auto md:max-w-6xl">
@@ -607,13 +593,6 @@ export const CalendarioPage: React.FC = () => {
                           </div>
                           <div className="mb-2 space-y-2">
                             {cancha.equipos.map((eq, i) => {
-                              const stats = TEAM_STATS[eq.nombre] || {
-                                puntos: 0,
-                              };
-                              const pos =
-                                LIGA_14.tablaGeneral.findIndex(
-                                  (e) => e.equipo === eq.nombre
-                                ) + 1;
                               return (
                                 <div
                                   className={`flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 p-1 md:p-2 rounded hover:bg-gray-50 transition ${
@@ -631,19 +610,7 @@ export const CalendarioPage: React.FC = () => {
                                     <span className="block text-xs font-medium text-gray-800 truncate md:text-base">
                                       {eq.nombre}
                                     </span>
-                                    <span className="block md:hidden text-[11px] text-gray-500 mt-0.5">
-                                      Pos: <b>{pos > 0 ? pos : "-"}</b>{" "}
-                                      &nbsp;|&nbsp; Pts: <b>{stats.puntos}</b>
-                                    </span>
                                   </div>
-                                  <span className="hidden gap-2 ml-auto text-xs text-gray-600 md:flex">
-                                    <span>
-                                      Pos: <b>{pos > 0 ? pos : "-"}</b>
-                                    </span>
-                                    <span>
-                                      Pts: <b>{stats.puntos}</b>
-                                    </span>
-                                  </span>
                                 </div>
                               );
                             })}
