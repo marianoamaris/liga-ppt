@@ -32,7 +32,7 @@ export function getArquerosMap(arqueros: any[]) {
   return map;
 }
 
-export const NEXT_MATCH_DATE = new Date("2025-07-17T18:00:00-05:00"); // Jornada 2 liga 14
+export const NEXT_MATCH_DATE = new Date("2025-07-24T18:00:00-05:00"); // Jornada 3 liga 14
 
 export function useCountdown(targetDate: Date) {
   const [timeLeft, setTimeLeft] = useState<string>("");
