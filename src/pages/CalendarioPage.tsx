@@ -134,6 +134,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 1",
         color: "border-blue-500",
+        anotador: "Mene",
         equipos: [
           { badge: "B", color: "bg-yellow-400 text-black", nombre: "Brasil" },
           {
@@ -194,6 +195,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 1",
         color: "border-blue-500",
+        anotador: "Daniel Donado",
         equipos: [
           {
             badge: "W",
@@ -211,6 +213,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 2",
         color: "border-purple-500",
+        anotador: "Mene",
         equipos: [
           { badge: "B", color: "bg-yellow-400 text-black", nombre: "Brasil" },
           {
@@ -228,6 +231,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 3",
         color: "border-red-500",
+        anotador: "Luis Pabon",
         equipos: [
           { badge: "J", color: "bg-red-600 text-white", nombre: "Junior" },
           {
@@ -252,6 +256,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 1",
         color: "border-blue-500",
+        anotador: "Mene",
         equipos: [
           {
             badge: "W",
@@ -273,6 +278,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 2",
         color: "border-purple-500",
+        anotador: "Luis Pabon",
         equipos: [
           {
             badge: "R",
@@ -290,6 +296,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 3",
         color: "border-red-500",
+        anotador: "Daniel Donado",
         equipos: [
           { badge: "B", color: "bg-yellow-400 text-black", nombre: "Brasil" },
           { badge: "P", color: "bg-pink-300 text-white", nombre: "Palermo FC" },
@@ -310,6 +317,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 1",
         color: "border-blue-500",
+        anotador: "Luis Pabón",
         equipos: [
           { badge: "J", color: "bg-red-600 text-white", nombre: "Junior" },
           { badge: "P", color: "bg-pink-300 text-white", nombre: "Palermo FC" },
@@ -323,6 +331,8 @@ const JORNADAS = [
       {
         nombre: "Cancha 2",
         color: "border-purple-500",
+        anotador: "Daniel Donado",
+
         equipos: [
           { badge: "B", color: "bg-yellow-400 text-black", nombre: "Brasil" },
           {
@@ -340,6 +350,7 @@ const JORNADAS = [
       {
         nombre: "Cancha 3",
         color: "border-red-500",
+        anotador: "Mene",
         equipos: [
           {
             badge: "V",
@@ -434,7 +445,7 @@ const EQUIPOS = [
       "Jeysson Henríquez",
       "José Henao 2",
       "Juan Dybala",
-      "Julio Ochoa",
+      "Victor Castilla (Toto)",
       "Miguel Guerra",
     ],
   },

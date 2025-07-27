@@ -28,7 +28,7 @@ const HomeMobile: React.FC = () => {
           Sigue el avance, consulta estadísticas, historia y más.
         </div>
         <div className="flex flex-col items-center w-full gap-2 mt-2">
-          <div className="text-xs text-white/70">Jornada 3 - Liga PPT #14:</div>
+          <div className="text-xs text-white/70">Jornada 4 - Liga PPT #14:</div>
           <div className="px-4 py-1 font-mono text-base font-extrabold text-white bg-black border-2 rounded-xl border-white/20">
             {countdown}
           </div>
@@ -37,14 +37,14 @@ const HomeMobile: React.FC = () => {
               Liga <b className="text-white">#14</b>
             </span>
             <span className="text-white/80">
-              Jornada <b className="text-white">3/6</b>
+              Jornada <b className="text-white">4/6</b>
             </span>
             <span className="text-white/80">
               Equipos: <b className="text-white">9</b>
             </span>
           </div>
           <div className="mt-1 text-xs text-center text-white/90">
-            <b>Jornada 3:</b> Jueves 24 de Julio
+            <b>Jornada 4:</b> Jueves 31 de Julio
           </div>
         </div>
       </Card>
