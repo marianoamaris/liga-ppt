@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import React from "react";
 
 export function getEquipoStats(
   equipo: string,
@@ -32,7 +33,52 @@ export function getArquerosMap(arqueros: any[]) {
   return map;
 }
 
-export const NEXT_MATCH_DATE = new Date("2025-07-31T18:00:00-05:00"); // Jornada 4 liga 14
+// Fechas de las jornadas de la Liga PPT #14
+export const JORNADAS_FECHAS = [
+  { jornada: 1, fecha: new Date("2025-07-10"), nombre: "Jueves 10 de Julio" },
+  { jornada: 2, fecha: new Date("2025-07-17"), nombre: "Jueves 17 de Julio" },
+  { jornada: 3, fecha: new Date("2025-07-24"), nombre: "Jueves 24 de Julio" },
+  { jornada: 4, fecha: new Date("2025-07-31"), nombre: "Jueves 31 de Julio" },
+  { jornada: 5, fecha: new Date("2025-08-07"), nombre: "Jueves 7 de Agosto" },
+  { jornada: 6, fecha: new Date("2025-08-14"), nombre: "Jueves 14 de Agosto" },
+];
+
+// Función para obtener la jornada actual automáticamente
+export const getCurrentJornada = () => {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Buscar la próxima jornada
+  for (let i = 0; i < JORNADAS_FECHAS.length; i++) {
+    const jornadaDate = new Date(JORNADAS_FECHAS[i].fecha);
+    if (jornadaDate >= today) {
+      return {
+        jornada: JORNADAS_FECHAS[i].jornada,
+        fecha: JORNADAS_FECHAS[i].fecha,
+        nombre: JORNADAS_FECHAS[i].nombre,
+        esProxima: true,
+      };
+    }
+  }
+
+  // Si no hay próxima jornada, la última es la actual
+  const ultimaJornada = JORNADAS_FECHAS[JORNADAS_FECHAS.length - 1];
+  return {
+    jornada: ultimaJornada.jornada,
+    fecha: ultimaJornada.fecha,
+    nombre: ultimaJornada.nombre,
+    esProxima: false,
+  };
+};
+
+// Función para obtener la fecha de la próxima jornada para el countdown
+export const getNextMatchDate = () => {
+  const currentJornada = getCurrentJornada();
+  return currentJornada.fecha;
+};
+
+// Actualizar NEXT_MATCH_DATE para que sea automático
+export const NEXT_MATCH_DATE = getNextMatchDate();
 
 export function useCountdown(targetDate: Date) {
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -76,3 +122,47 @@ export function getTopColor(idx: number) {
   if (idx === 2) return "bg-orange-100 text-orange-800"; // bronce suave
   return "";
 }
+
+// Hook personalizado para obtener información de la jornada actual
+export const useCurrentJornada = () => {
+  const [currentJornada, setCurrentJornada] = React.useState(
+    getCurrentJornada()
+  );
+  const countdown = useCountdown(currentJornada.fecha);
+
+  // Actualizar cada día a las 00:00
+  React.useEffect(() => {
+    const updateJornada = () => {
+      setCurrentJornada(getCurrentJornada());
+    };
+
+    // Actualizar inmediatamente
+    updateJornada();
+
+    // Configurar actualización diaria
+    const now = new Date();
+    const tomorrow = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1
+    );
+    const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+
+    const timer = setTimeout(() => {
+      updateJornada();
+      // Configurar actualización cada 24 horas
+      setInterval(updateJornada, 24 * 60 * 60 * 1000);
+    }, timeUntilMidnight);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return {
+    jornada: currentJornada.jornada,
+    fecha: currentJornada.fecha,
+    nombre: currentJornada.nombre,
+    esProxima: currentJornada.esProxima,
+    countdown,
+    totalJornadas: JORNADAS_FECHAS.length,
+  };
+};

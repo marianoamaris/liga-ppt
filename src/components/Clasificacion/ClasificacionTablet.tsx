@@ -24,6 +24,7 @@ import { Jornadas } from "../sections/Jornadas";
 import { GoleadoresList } from "../sections/GoleadoresList";
 import { ArquerosList } from "../sections/ArquerosList";
 import { BracketSection } from "../sections/BracketSection";
+import { LigaDropdown } from "../common/LigaDropdown";
 
 type TabId = "clasificacion" | "goleadores" | "arqueros" | "bracket";
 const TOTAL_LIGAS = 14;
@@ -66,21 +67,14 @@ const ClasificacionTablet: React.FC = () => {
 
   return (
     <div className="flex flex-col w-screen min-h-screen max-w-none bg-gray-100">
-      {/* Menú de ligas horizontal sticky y scrolleable */}
-      <div className="-mx-4 px-4 w-screen overflow-x-auto flex flex-nowrap sticky top-0 z-20 bg-white border-b border-gray-200">
-        {ligas.map((liga) => (
-          <button
-            key={liga}
-            className={`min-w-[110px] px-5 py-3 rounded-lg font-semibold text-lg whitespace-nowrap transition-all border ${
-              ligaSeleccionada === liga
-                ? "bg-blue-100 border-blue-400 text-blue-700"
-                : "bg-gray-100 border-gray-200 text-gray-700 hover:bg-blue-50"
-            }`}
-            onClick={() => setLigaSeleccionada(liga)}
-          >
-            Liga #{liga}
-          </button>
-        ))}
+      {/* Dropdown de ligas */}
+      <div className="sticky top-0 z-20 p-6 bg-white border-b border-gray-200">
+        <LigaDropdown
+          ligas={ligas}
+          ligaSeleccionada={ligaSeleccionada}
+          setLigaSeleccionada={setLigaSeleccionada}
+          TOTAL_LIGAS={TOTAL_LIGAS}
+        />
       </div>
       {/* Tabs */}
       <div className="w-full bg-white border-b border-gray-200 px-8">

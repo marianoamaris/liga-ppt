@@ -5,11 +5,12 @@ import { FaRegEnvelope } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../common/Card";
-import { NEXT_MATCH_DATE, useCountdown } from "../../utils/utilities";
+import { useCurrentJornada } from "../../utils/utilities";
 
 const HomeTablet: React.FC = () => {
   const navigate = useNavigate();
-  const countdown = useCountdown(NEXT_MATCH_DATE);
+  const { jornada, nombre, countdown, totalJornadas } = useCurrentJornada();
+
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen gap-6 p-4">
       {/* Card principal de bienvenida */}
@@ -30,7 +31,7 @@ const HomeTablet: React.FC = () => {
         <div className="flex flex-col items-center w-full gap-3 mt-2">
           <div className="text-sm text-white/70">
             <div className="text-xs text-white/70">
-              Jornada 4 - Liga PPT #14:
+              Jornada {jornada} - Liga PPT #14:
             </div>
           </div>
           <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 rounded-xl border-white/20">
@@ -41,14 +42,17 @@ const HomeTablet: React.FC = () => {
               Liga <b className="text-white">#14</b>
             </span>
             <span className="text-white/80">
-              Jornada <b className="text-white">4/6</b>
+              Jornada{" "}
+              <b className="text-white">
+                {jornada}/{totalJornadas}
+              </b>
             </span>
             <span className="text-white/80">
               Equipos: <b className="text-white">9</b>
             </span>
           </div>
           <div className="mt-1 text-sm text-center text-white/90">
-            <b>Jornada 4:</b> Jueves 31 de Julio
+            <b>Jornada {jornada}:</b> {nombre}
           </div>
         </div>
       </Card>

@@ -25,7 +25,7 @@ import { Jornadas } from "../sections/Jornadas";
 import { GoleadoresList } from "../sections/GoleadoresList";
 import { ArquerosList } from "../sections/ArquerosList";
 import { BracketSection } from "../sections/BracketSection";
-import { LigaSidebar } from "../sections/LigaSidebar";
+import { LigaDropdown } from "../common/LigaDropdown";
 
 type TabId = "clasificacion" | "goleadores" | "arqueros" | "bracket";
 const TOTAL_LIGAS = 14;
@@ -142,12 +142,14 @@ const ClasificacionDesktop: React.FC = () => {
 
   return (
     <div className="hidden h-full max-h-full gap-8 md:flex">
-      <LigaSidebar
-        ligas={ligas}
-        ligaSeleccionada={ligaSeleccionada}
-        setLigaSeleccionada={setLigaSeleccionada}
-        TOTAL_LIGAS={TOTAL_LIGAS}
-      />
+      <div className="flex flex-col gap-4 min-w-[200px]">
+        <LigaDropdown
+          ligas={ligas}
+          ligaSeleccionada={ligaSeleccionada}
+          setLigaSeleccionada={setLigaSeleccionada}
+          TOTAL_LIGAS={TOTAL_LIGAS}
+        />
+      </div>
       {content}
     </div>
   );
