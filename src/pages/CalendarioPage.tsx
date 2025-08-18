@@ -251,7 +251,7 @@ const JORNADAS = [
   {
     id: "jornada5",
     nombre: "Jornada 5",
-    fecha: "Jueves 7 de agosto",
+    fecha: "Jueves 14 de agosto",
     canchas: [
       {
         nombre: "Cancha 1",
@@ -312,7 +312,7 @@ const JORNADAS = [
   {
     id: "jornada6",
     nombre: "Jornada 6",
-    fecha: "Jueves 14 de agosto",
+    fecha: "Jueves 21 de agosto",
     canchas: [
       {
         nombre: "Cancha 1",
