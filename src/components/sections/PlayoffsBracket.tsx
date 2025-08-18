@@ -44,7 +44,7 @@ export const PlayoffsBracket: React.FC = () => {
   return (
     <Card className="w-full max-w-5xl p-4 mb-8 bg-white sm:p-6">
       <h2 className="mb-4 text-xl font-bold text-center sm:text-2xl">
-        Finales - Liga PPT #13
+        Finales - Domingo 29 de Junio
       </h2>
 
       {/* <div className="p-3 mb-6 rounded-lg bg-gray-50 sm:p-4">
@@ -69,7 +69,7 @@ export const PlayoffsBracket: React.FC = () => {
           {/* FINALES */}
           <div className="flex flex-col items-center gap-4">
             <h3 className="text-sm font-bold text-center text-gray-600 uppercase">
-              Finales - Domingo 29 de Junio
+              Finales - Liga PPT #14
             </h3>
             <div className="flex flex-row flex-wrap justify-center gap-4 lg:flex-col">
               <div className="flex flex-col items-center w-full gap-2 p-2 border border-gray-200 rounded-lg md:flex-row md:w-auto md:gap-0">

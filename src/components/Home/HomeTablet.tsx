@@ -56,6 +56,7 @@ const HomeTablet: React.FC = () => {
           </div>
         </div>
       </Card>
+      {/* Info en vivo de premios individuales y tablas */}
       {/* Resultado de la Final */}
       <Card className="w-full p-4 mb-6 bg-white">
         <h2 className="mb-2 text-xl font-bold text-center text-yellow-700">

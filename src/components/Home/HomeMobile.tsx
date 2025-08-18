@@ -54,6 +54,7 @@ const HomeMobile: React.FC = () => {
           </div>
         </div>
       </Card>
+      {/* Info en vivo de premios individuales y tablas */}
       {/* Resultado de la Final */}
       <Card className="w-full p-3 mb-4 bg-white">
         <h2 className="mb-1 text-lg font-bold text-center text-yellow-700">

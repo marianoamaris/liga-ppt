@@ -40,7 +40,11 @@ export const JORNADAS_FECHAS = [
   { jornada: 3, fecha: new Date("2025-07-24"), nombre: "Jueves 24 de Julio" },
   { jornada: 4, fecha: new Date("2025-07-31"), nombre: "Jueves 31 de Julio" },
   { jornada: 5, fecha: new Date("2025-08-07"), nombre: "Jueves 7 de Agosto" },
-  { jornada: 6, fecha: new Date("2025-08-14"), nombre: "Jueves 14 de Agosto" },
+  {
+    jornada: 6,
+    fecha: new Date("2025-08-21T18:00:00"),
+    nombre: "Jueves 21 de Agosto - 6:00 PM",
+  },
 ];
 
 // Función para obtener la jornada actual automáticamente

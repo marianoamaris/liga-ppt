@@ -69,7 +69,7 @@ export const Jornadas: React.FC<JornadasProps> = ({
             ))}
           </ul>
         ) : (
-          <div className="mb-2 text-xs md:text-sm italic text-gray-400">
+          <div className="mb-2 text-xs italic text-gray-400 md:text-sm">
             Sin datos de resultados
           </div>
         )}
