@@ -50,7 +50,7 @@ export const JORNADAS_FECHAS = [
 // Fechas de playoffs de la Liga PPT #14
 export const PLAYOFFS_FECHAS = [
   {
-    fase: "cuartos",
+    fase: "Cuartos de Final",
     fecha: new Date("2025-08-24T19:00:00"),
     nombre: "Domingo 24 de Agosto - Cuartos de Final (7:00 PM - 9:00 PM)",
   },
