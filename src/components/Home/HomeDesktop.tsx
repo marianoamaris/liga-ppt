@@ -9,7 +9,8 @@ import { useCurrentJornada } from "../../utils/utilities";
 
 const HomeDesktop: React.FC = () => {
   const navigate = useNavigate();
-  const { jornada, nombre, countdown, totalJornadas } = useCurrentJornada();
+  const { jornada, nombre, countdown, totalJornadas, tipo, fase } =
+    useCurrentJornada();
 
   return (
     <div className="flex flex-col items-center justify-center w-[370px] md:w-full min-h-screen p-2 md:px-0">
@@ -34,7 +35,11 @@ const HomeDesktop: React.FC = () => {
           <div className="flex flex-col items-center justify-center w-full gap-8 mt-2 md:flex-row">
             <div className="flex flex-col items-center justify-center">
               <div className="mb-1 text-xs text-white/70">
-                Jornada {jornada} - Liga PPT #14:
+                {tipo === "playoff" && fase
+                  ? `${
+                      fase.charAt(0).toUpperCase() + fase.slice(1)
+                    } - Liga PPT #14:`
+                  : `Jornada ${jornada} - Liga PPT #14:`}
               </div>
               <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 shadow sm:text-xl md:text-2xl lg:text-3xl rounded-xl border-white/20">
                 {countdown}
@@ -46,20 +51,29 @@ const HomeDesktop: React.FC = () => {
                   Liga <b className="text-white">#14</b>
                 </span>
                 <span className="text-white/80">
-                  Jornada{" "}
+                  {tipo === "playoff" ? "Fase" : "Jornada"}{" "}
                   <b className="text-white">
-                    {jornada}/{totalJornadas}
+                    {tipo === "playoff" && fase
+                      ? fase
+                      : `${jornada}/${totalJornadas}`}
                   </b>
                 </span>
                 <span className="text-white/80">
                   Equipos: <b className="text-white">9</b>
                 </span>
                 <span className="text-white/80">
-                  Total jornadas: <b className="text-white">{totalJornadas}</b>
+                  {tipo === "playoff"
+                    ? "Playoffs"
+                    : `Total jornadas: ${totalJornadas}`}
                 </span>
               </div>
               <div className="mt-2 text-sm text-center text-white/90">
-                <b>Jornada {jornada}:</b> {nombre}
+                <b>
+                  {tipo === "playoff" && fase
+                    ? `${fase.charAt(0).toUpperCase() + fase.slice(1)}:`
+                    : `Jornada ${jornada}:`}
+                </b>{" "}
+                {nombre}
               </div>
             </div>
           </div>

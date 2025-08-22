@@ -47,31 +47,69 @@ export const JORNADAS_FECHAS = [
   },
 ];
 
+// Fechas de playoffs de la Liga PPT #14
+export const PLAYOFFS_FECHAS = [
+  {
+    fase: "cuartos",
+    fecha: new Date("2025-08-24T19:00:00"),
+    nombre: "Domingo 24 de Agosto - Cuartos de Final (7:00 PM - 9:00 PM)",
+  },
+  {
+    fase: "semifinales",
+    fecha: new Date("2025-08-28T19:00:00"),
+    nombre: "Jueves 28 de Agosto - Semifinales (7:00 PM - 9:00 PM)",
+  },
+  {
+    fase: "final",
+    fecha: new Date("2025-08-31T19:00:00"),
+    nombre: "Domingo 31 de Agosto - Final (7:00 PM - 9:00 PM)",
+  },
+];
+
 // Función para obtener la jornada actual automáticamente
 export const getCurrentJornada = () => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  // Buscar la próxima jornada
+  // Primero verificar si hay playoffs próximos
+  for (let i = 0; i < PLAYOFFS_FECHAS.length; i++) {
+    const playoffDate = new Date(PLAYOFFS_FECHAS[i].fecha);
+    if (playoffDate >= today) {
+      return {
+        jornada: `playoff_${PLAYOFFS_FECHAS[i].fase}`,
+        fecha: playoffDate,
+        nombre: PLAYOFFS_FECHAS[i].nombre,
+        esProxima: true,
+        tipo: "playoff",
+        fase: PLAYOFFS_FECHAS[i].fase,
+      };
+    }
+  }
+
+  // Si no hay playoffs próximos, verificar jornadas
   for (let i = 0; i < JORNADAS_FECHAS.length; i++) {
     const jornadaDate = new Date(JORNADAS_FECHAS[i].fecha);
     if (jornadaDate >= today) {
       return {
         jornada: JORNADAS_FECHAS[i].jornada,
-        fecha: JORNADAS_FECHAS[i].fecha,
+        fecha: jornadaDate,
         nombre: JORNADAS_FECHAS[i].nombre,
         esProxima: true,
+        tipo: "jornada",
+        fase: null,
       };
     }
   }
 
-  // Si no hay próxima jornada, la última es la actual
+  // Si no hay próxima jornada ni playoff, la última es la actual
   const ultimaJornada = JORNADAS_FECHAS[JORNADAS_FECHAS.length - 1];
   return {
     jornada: ultimaJornada.jornada,
     fecha: ultimaJornada.fecha,
     nombre: ultimaJornada.nombre,
     esProxima: false,
+    tipo: "jornada",
+    fase: null,
   };
 };
 
@@ -168,5 +206,7 @@ export const useCurrentJornada = () => {
     esProxima: currentJornada.esProxima,
     countdown,
     totalJornadas: JORNADAS_FECHAS.length,
+    tipo: currentJornada.tipo,
+    fase: currentJornada.fase,
   };
 };

@@ -44,38 +44,36 @@ export const PlayoffsBracket: React.FC = () => {
   return (
     <Card className="w-full max-w-5xl p-4 mb-8 bg-white sm:p-6">
       <h2 className="mb-4 text-xl font-bold text-center sm:text-2xl">
-        Finales - Domingo 29 de Junio
+        Playoffs - Liga PPT #14
       </h2>
-
-      {/* <div className="p-3 mb-6 rounded-lg bg-gray-50 sm:p-4">
-        <h3 className="mb-3 text-base font-bold text-center sm:text-lg">
-          Cuartos de Final: Miércoles 25 de Junio
-        </h3>
-        <div className="flex flex-col items-center justify-center gap-2 text-xs text-center sm:flex-row sm:gap-6 sm:text-sm">
-          <div className="flex flex-col gap-1">
-            <span>
-              <b>Partido 1:</b> 🟣 Fiorentina <b>9</b> - <b>8</b> 🔵 Celta de
-              Vigo
-            </span>
-            <span>
-              <b>Partido 2:</b> ⚪️ Inglaterra <b>5</b> - <b>2</b> ⚫️ Alemania
-            </span>
-          </div>
-        </div>
-      </div> */}
 
       <div className="flex justify-center">
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-4">
-          {/* FINALES */}
+          {/* CUARTOS DE FINAL */}
           <div className="flex flex-col items-center gap-4">
             <h3 className="text-sm font-bold text-center text-gray-600 uppercase">
-              Finales - Liga PPT #14
+              Cuartos de Final - Domingo 24 de Agosto
             </h3>
             <div className="flex flex-row flex-wrap justify-center gap-4 lg:flex-col">
               <div className="flex flex-col items-center w-full gap-2 p-2 border border-gray-200 rounded-lg md:flex-row md:w-auto md:gap-0">
-                <BracketTeam teamName="Sport Boys" seed={1} />
+                <BracketTeam teamName="VfL Wolfsburgo" seed={1} />
                 <span className="px-3 my-2 text-xs font-bold md:my-1">VS</span>
-                <BracketTeam teamName="Holanda" seed={2} />
+                <BracketTeam teamName="Eintracht Frankfurt" seed={8} />
+              </div>
+              <div className="flex flex-col items-center w-full gap-2 p-2 border border-gray-200 rounded-lg md:flex-row md:w-auto md:gap-0">
+                <BracketTeam teamName="Junior" seed={2} />
+                <span className="px-3 my-2 text-xs font-bold md:my-1">VS</span>
+                <BracketTeam teamName="Equipo Rocket" seed={7} />
+              </div>
+              <div className="flex flex-col items-center w-full gap-2 p-2 border border-gray-200 rounded-lg md:flex-row md:w-auto md:gap-0">
+                <BracketTeam teamName="Brasil" seed={3} />
+                <span className="px-3 my-2 text-xs font-bold md:my-1">VS</span>
+                <BracketTeam teamName="Fiorentina" seed={6} />
+              </div>
+              <div className="flex flex-col items-center w-full gap-2 p-2 border border-gray-200 rounded-lg md:flex-row md:w-auto md:gap-0">
+                <BracketTeam teamName="Wolverhampton" seed={4} />
+                <span className="px-3 my-2 text-xs font-bold md:my-1">VS</span>
+                <BracketTeam teamName="River Plate" seed={5} />
               </div>
             </div>
           </div>
@@ -84,8 +82,17 @@ export const PlayoffsBracket: React.FC = () => {
 
       <div className="mt-6 text-sm text-center text-gray-600">
         <p>
-          Pronto tendrémos nuevo campeón
-          <span className="font-bold"> PPT</span>.
+          Los cuartos de final se jugarán el <b>domingo 24 de agosto</b> de{" "}
+          <b>7:00 PM a 9:00 PM</b>
+        </p>
+        <p className="mt-2">
+          <b>Semifinales:</b> Jueves 28 de agosto a las 7:00 PM
+        </p>
+        <p className="mt-1">
+          <b>Final:</b> Domingo 31 de agosto a las 7:00 PM
+        </p>
+        <p className="mt-2">
+          ¡Los 8 mejores equipos de la liga se enfrentan por el título!
         </p>
       </div>
     </Card>
