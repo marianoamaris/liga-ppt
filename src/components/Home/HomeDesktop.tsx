@@ -80,49 +80,46 @@ const HomeDesktop: React.FC = () => {
         </div>
       </Card>
       {/* Info en vivo de premios individuales y tablas */}
-      {/* Resultado de la Final */}
+      {/* Resultados de Playoffs Liga #14 */}
       <Card className="w-full max-w-5xl p-4 mb-8 bg-white">
-        <h2 className="mb-2 text-xl font-bold text-center text-yellow-700">
-          🏆 Final Liga #13
+        <h2 className="mb-2 text-xl font-bold text-center text-blue-700">
+          🏆 Gran Final Liga #14
         </h2>
         <div className="mb-4 text-sm text-center text-gray-700">
-          <b>Final:</b>
+          <b>Gran Final:</b>
           <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2">
             <div className="flex flex-col items-center gap-1">
               <span className="text-lg font-bold">
-                🌸 Sport Boys <b>4</b> - <b>4</b> 🟠 Holanda
+                🟡 Brasil <b>VS</b> 🟢 VfL Wolfsburgo
               </span>
-              <a
-                href="https://www.youtube.com/watch?v=b7kFDpSIKPQ&ab_channel=LigaPPT"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
-              >
-                📺 Ver partido
-              </a>
-              <span className="text-sm font-semibold text-yellow-600">
-                🏆 Ganador: Sport Boys (por desempate)
+              <span className="text-sm text-gray-600">
+                Domingo 31 de Agosto - 7:00 PM
+              </span>
+              <span className="text-sm font-semibold text-blue-600">
+                ¡Se define el campeón de la Liga #14!
               </span>
             </div>
           </div>
-          <b>¡Felicitaciones al campeón de la Liga #13!</b>
         </div>
       </Card>
 
-      {/* Resultados de Playoffs y próximas semifinales */}
+      {/* Resultados de Semifinales */}
       <Card className="w-full max-w-5xl p-4 mb-8 bg-white">
-        <h2 className="mb-2 text-xl font-bold text-center ">
-          Resultados Semifinales Liga #13
+        <h2 className="mb-2 text-xl font-bold text-center text-purple-700">
+          🥉 Semifinales Liga #14
         </h2>
         <div className="mb-4 text-sm text-center text-gray-700">
           <b>Semifinales:</b>
           <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2 md:flex-row md:gap-8">
             <div className="flex flex-col items-center gap-1">
               <span>
-                🌸 Sport Boys <b>10</b> - <b>4</b> ⚪️ Inglaterra
+                🟡 Brasil <b>6</b> - <b>6</b> 🔴 Junior
+              </span>
+              <span className="text-xs text-gray-600">
+                Brasil gana por penales 1-0
               </span>
               <a
-                href="https://www.youtube.com/watch?v=vpXSgT7vjEs&ab_channel=LigaPPT"
+                href="https://youtu.be/NSdU__dtG2A"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
@@ -132,10 +129,10 @@ const HomeDesktop: React.FC = () => {
             </div>
             <div className="flex flex-col items-center gap-1">
               <span>
-                🟠 Holanda <b>12</b> - <b>7</b> 🟣 Fiorentina
+                🟢 VfL Wolfsburgo <b>8</b> - <b>4</b> 🟠 Wolverhampton
               </span>
               <a
-                href="https://www.youtube.com/watch?v=fP9n-x3c3Ck&ab_channel=LigaPPT"
+                href="https://youtu.be/ZPyn0cDfVpU"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
@@ -144,24 +141,24 @@ const HomeDesktop: React.FC = () => {
               </a>
             </div>
           </div>
-          <b>¡Felicitaciones a los clasificados!</b>
+          <b>¡Felicitaciones a los finalistas!</b>
         </div>
       </Card>
 
-      {/* Resultados de Playoffs y próximas semifinales */}
+      {/* Resultados de Cuartos de Final */}
       <Card className="w-full max-w-5xl p-4 mb-8 bg-white">
-        <h2 className="mb-2 text-xl font-bold text-center ">
-          Resultados Playoffs Liga #13
+        <h2 className="mb-2 text-xl font-bold text-center text-green-700">
+          🏅 Cuartos de Final Liga #14
         </h2>
         <div className="mb-4 text-sm text-center text-gray-700">
           <b>Cuartos de Final:</b>
           <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2 md:flex-row md:gap-8">
             <div className="flex flex-col items-center gap-1">
               <span>
-                🟣 Fiorentina <b>9</b> - <b>8</b> 🔵 Celta de Vigo
+                🟡 Brasil <b>7</b> - <b>5</b> 🟣 Palermo FC
               </span>
               <a
-                href="https://www.youtube.com/watch?v=z_kFBRqnwv8&ab_channel=LigaPPT"
+                href="https://youtu.be/aH2_GvzfRSg"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
@@ -171,10 +168,10 @@ const HomeDesktop: React.FC = () => {
             </div>
             <div className="flex flex-col items-center gap-1">
               <span>
-                ⚪️ Inglaterra <b>5</b> - <b>2</b> ⚫️ Alemania
+                🟠 Wolverhampton <b>7</b> - <b>6</b> 🔵 River Plate
               </span>
               <a
-                href="https://www.youtube.com/watch?v=YZywzjyzcE0&ab_channel=LigaPPT"
+                href="https://youtu.be/QSTIKbthSUo"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
