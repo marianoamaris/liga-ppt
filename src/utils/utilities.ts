@@ -71,22 +71,7 @@ export const getCurrentJornada = () => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  // Primero verificar si hay playoffs próximos
-  for (let i = 0; i < PLAYOFFS_FECHAS.length; i++) {
-    const playoffDate = new Date(PLAYOFFS_FECHAS[i].fecha);
-    if (playoffDate >= today) {
-      return {
-        jornada: `playoff_${PLAYOFFS_FECHAS[i].fase}`,
-        fecha: playoffDate,
-        nombre: PLAYOFFS_FECHAS[i].nombre,
-        esProxima: true,
-        tipo: "playoff",
-        fase: PLAYOFFS_FECHAS[i].fase,
-      };
-    }
-  }
-
-  // Si no hay playoffs próximos, verificar jornadas
+  // Priorizar jornadas de Liga 15 (empezando 11 de septiembre)
   for (let i = 0; i < JORNADAS_FECHAS.length; i++) {
     const jornadaDate = new Date(JORNADAS_FECHAS[i].fecha);
     if (jornadaDate >= today) {
@@ -97,6 +82,21 @@ export const getCurrentJornada = () => {
         esProxima: true,
         tipo: "jornada",
         fase: null,
+      };
+    }
+  }
+
+  // Si no hay jornadas próximas, verificar playoffs
+  for (let i = 0; i < PLAYOFFS_FECHAS.length; i++) {
+    const playoffDate = new Date(PLAYOFFS_FECHAS[i].fecha);
+    if (playoffDate >= today) {
+      return {
+        jornada: `playoff_${PLAYOFFS_FECHAS[i].fase}`,
+        fecha: playoffDate,
+        nombre: PLAYOFFS_FECHAS[i].nombre,
+        esProxima: true,
+        tipo: "playoff",
+        fase: PLAYOFFS_FECHAS[i].fase,
       };
     }
   }
