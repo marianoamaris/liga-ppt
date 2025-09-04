@@ -101,14 +101,15 @@ export const TablaGeneral: React.FC<TablaGeneralProps> = ({
             } else {
               const victorias = row.victorias || 0;
               const empates = row.empates || 0;
-              const partidosJugados = victorias + empates;
+              const derrotas = row.derrotas || 0;
+              const partidosJugados = victorias + empates + derrotas;
               const porcentajeVictoria =
                 partidosJugados > 0
                   ? ((victorias / partidosJugados) * 100).toFixed(1)
                   : "-";
               stats = {
                 partidosJugados,
-                derrotas: "-",
+                derrotas: derrotas,
                 porcentajeVictoria,
               };
             }
