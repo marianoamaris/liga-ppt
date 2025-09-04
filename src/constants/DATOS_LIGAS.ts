@@ -83,12 +83,12 @@ export const TEAM_COLORS: Record<string, string | [string, string]> = {
   "Palermo FC": "#FF69B4", // rosado
   "VfL Wolfsburgo": "#22C55E", // verde
   // Colores de equipos para Liga PPT #15
-  "Palermo FC": "#FF69B4", // rosado
+  "Palermo FC 15": "#FF69B4", // rosado
   "Luton Town FC": "#F97316", // naranja
   "Leicester City": "#2563EB", // azul
   "Deportivo Cali": "#22C55E", // verde
   "Al-Nassr": "#FDB913", // amarillo
-  "Orlando City": "#9333EA", // morado
+  "Orlando City 15": "#9333EA", // morado
   "Al-Ahly": "#D00027", // rojo
   "Valencia CF": "#FFFFFF", // blanco
   "DC United": "#222222", // negro
@@ -3162,7 +3162,7 @@ export const LIGA_14 = {
 export const LIGA_15 = {
   tablaGeneral: [
     {
-      equipo: "Palermo FC",
+      equipo: "Palermo FC 15",
       pj: 0,
       victorias: 0,
       empates: 0,
@@ -3207,7 +3207,7 @@ export const LIGA_15 = {
       puntos: 0,
     },
     {
-      equipo: "Orlando City",
+      equipo: "Orlando City 15",
       pj: 0,
       victorias: 0,
       empates: 0,
