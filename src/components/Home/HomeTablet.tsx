@@ -31,7 +31,7 @@ const HomeTablet: React.FC = () => {
         <div className="flex flex-col items-center w-full gap-3 mt-2">
           <div className="text-sm text-white/70">
             <div className="text-xs text-white/70">
-              Jornada {jornada} - Liga PPT #15:
+              Jornada {jornada} - Liga PPT #14:
             </div>
           </div>
           <div className="px-6 py-2 font-mono text-lg font-extrabold text-white bg-black border-2 rounded-xl border-white/20">
@@ -39,7 +39,7 @@ const HomeTablet: React.FC = () => {
           </div>
           <div className="flex flex-wrap justify-center gap-3 mt-2 text-sm font-medium">
             <span className="text-white/80">
-              Liga <b className="text-white">#15</b>
+              Liga <b className="text-white">#14</b>
             </span>
             <span className="text-white/80">
               Jornada{" "}
@@ -67,22 +67,14 @@ const HomeTablet: React.FC = () => {
           <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2">
             <div className="flex flex-col items-center gap-1">
               <span className="text-lg font-bold">
-                🟡 Brasil <b>3</b> - <b>3</b> 🟢 VfL Wolfsburgo
+                🟡 Brasil <b>VS</b> 🟢 VfL Wolfsburgo
               </span>
               <span className="text-sm text-gray-600">
                 Domingo 31 de Agosto - 7:00 PM
               </span>
-              <span className="text-sm font-semibold text-green-600">
-                🏆 ¡Amarillos ganan 4-3 en penaltis!
+              <span className="text-sm font-semibold text-blue-600">
+                ¡Se define el campeón de la Liga #14!
               </span>
-              <a
-                href="https://www.youtube.com/watch?v=Pgfd3efjpQI"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-              >
-                📺 Ver partido
-              </a>
             </div>
           </div>
         </div>

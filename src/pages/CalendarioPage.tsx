@@ -544,7 +544,7 @@ export const CalendarioPage: React.FC = () => {
         {/* Header */}
         <div className="mb-8 text-center md:mb-10">
           <h1 className="mb-2 text-3xl font-bold text-gray-800 md:text-4xl">
-            Liga PPT #15
+            Liga PPT #14
           </h1>
           <p className="text-gray-600">Calendario Oficial de Enfrentamientos</p>
         </div>

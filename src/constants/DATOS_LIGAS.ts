@@ -3144,6 +3144,6 @@ export const LIGA_14 = {
   mejorArquero: { arquero: "Carlos Barraza", golesRecibidos: 16 },
   cuartos: [],
   semifinales: [],
-  final: "Brasil 3 - VfL Wolfsburgo 3 (Amarillos ganan 4-3 en penaltis)",
-  ganador: "Brasil",
+  final: "",
+  ganador: "",
 };
