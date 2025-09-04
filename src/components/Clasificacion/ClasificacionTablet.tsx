@@ -6,6 +6,7 @@ import {
   LIGA_11,
   LIGA_12,
   LIGA_13,
+  LIGA_14,
   LIGA_15,
   LIGA_2,
   LIGA_3,
@@ -56,6 +57,7 @@ const ClasificacionTablet: React.FC = () => {
     LIGA_11,
     LIGA_12,
     LIGA_13,
+    LIGA_14,
     LIGA_15,
   ];
 
