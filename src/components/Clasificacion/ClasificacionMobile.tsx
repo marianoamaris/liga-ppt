@@ -28,7 +28,7 @@ import { BracketSection } from "../sections/BracketSection";
 import { LigaDropdown } from "../common/LigaDropdown";
 
 type TabId = "clasificacion" | "goleadores" | "arqueros" | "bracket";
-const TOTAL_LIGAS = 14;
+const TOTAL_LIGAS = 15;
 const ligas = Array.from({ length: TOTAL_LIGAS }, (_, i) => i + 1);
 
 const ClasificacionMobile: React.FC = () => {

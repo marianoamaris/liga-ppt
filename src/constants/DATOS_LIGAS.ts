@@ -74,6 +74,7 @@ export const TEAM_COLORS: Record<string, string | [string, string]> = {
   Alemania: "#222222", // rojo
   // Colores de equipos para Liga PPT #14
   Brasil: "#FDB913", // amarillo
+  "Brasil 🏆": "#FDB913", // amarillo
   "Equipo Rocket": "#2563EB", // azul
   "River Plate": "#FFFFFF", // blanco
   Wolverhampton: "#F97316", // naranja
