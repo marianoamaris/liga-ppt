@@ -3185,12 +3185,13 @@ export const LIGA_14 = {
   ],
   mejorArquero: { arquero: "Leonardo Cadena", golesRecibidos: 30 },
   cuartos: [
-    "Brasil 🏆 2 - Junior 1",
-    "VfL Wolfsburgo 3 - Wolverhampton 1",
-    "River Plate 1 - Palermo FC 0",
-    "Fiorentina 2 - Equipo Rocket 1",
+    "Brasil 🏆 7 - Palermo FC 5",
+    "Wolverhampton 7 - River Plate 6",
   ],
-  semifinales: ["Brasil 🏆 3 - River Plate 1", "VfL Wolfsburgo 2 - Fiorentina 0"],
+  semifinales: [
+    "Brasil 🏆 6 - Junior 6 (Brasil gana penales 1-0)",
+    "VfL Wolfsburgo 8 - Wolverhampton 4",
+  ],
   final: "Brasil 🏆 3-3 VfL Wolfsburgo (4-3 penaltis)",
   ganador: "Brasil 🏆",
 };
