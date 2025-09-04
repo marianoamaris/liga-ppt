@@ -33,36 +33,36 @@ export function getArquerosMap(arqueros: any[]) {
   return map;
 }
 
-// Fechas de las jornadas de la Liga PPT #14
+// Fechas de las jornadas de la Liga PPT #15
 export const JORNADAS_FECHAS = [
-  { jornada: 1, fecha: new Date("2025-07-10"), nombre: "Jueves 10 de Julio" },
-  { jornada: 2, fecha: new Date("2025-07-17"), nombre: "Jueves 17 de Julio" },
-  { jornada: 3, fecha: new Date("2025-07-24"), nombre: "Jueves 24 de Julio" },
-  { jornada: 4, fecha: new Date("2025-07-31"), nombre: "Jueves 31 de Julio" },
-  { jornada: 5, fecha: new Date("2025-08-07"), nombre: "Jueves 7 de Agosto" },
+  { jornada: 1, fecha: new Date("2025-09-11T18:00:00"), nombre: "Jueves 11 de Septiembre - 6:00 PM" },
+  { jornada: 2, fecha: new Date("2025-09-18T18:00:00"), nombre: "Jueves 18 de Septiembre - 6:00 PM" },
+  { jornada: 3, fecha: new Date("2025-09-25T18:00:00"), nombre: "Jueves 25 de Septiembre - 6:00 PM" },
+  { jornada: 4, fecha: new Date("2025-10-02T18:00:00"), nombre: "Jueves 2 de Octubre - 6:00 PM" },
+  { jornada: 5, fecha: new Date("2025-10-09T18:00:00"), nombre: "Jueves 9 de Octubre - 6:00 PM" },
   {
     jornada: 6,
-    fecha: new Date("2025-08-21T18:00:00"),
-    nombre: "Jueves 21 de Agosto - 6:00 PM",
+    fecha: new Date("2025-10-16T18:00:00"),
+    nombre: "Jueves 16 de Octubre - 6:00 PM",
   },
 ];
 
-// Fechas de playoffs de la Liga PPT #14
+// Fechas de playoffs de la Liga PPT #15
 export const PLAYOFFS_FECHAS = [
   {
     fase: "Cuartos de Final",
-    fecha: new Date("2025-08-24T19:00:00"),
-    nombre: "Domingo 24 de Agosto - Cuartos de Final (7:00 PM - 9:00 PM)",
+    fecha: new Date("2025-10-19T19:00:00"),
+    nombre: "Domingo 19 de Octubre - Cuartos de Final (7:00 PM - 9:00 PM)",
   },
   {
     fase: "semifinales",
-    fecha: new Date("2025-08-28T19:00:00"),
-    nombre: "Jueves 28 de Agosto - Semifinales (7:00 PM - 9:00 PM)",
+    fecha: new Date("2025-10-23T19:00:00"),
+    nombre: "Jueves 23 de Octubre - Semifinales (7:00 PM - 9:00 PM)",
   },
   {
     fase: "final",
-    fecha: new Date("2025-08-31T19:00:00"),
-    nombre: "Domingo 31 de Agosto - Final (7:00 PM - 9:00 PM)",
+    fecha: new Date("2025-10-26T19:00:00"),
+    nombre: "Domingo 26 de Octubre - Final (7:00 PM - 9:00 PM)",
   },
 ];
 

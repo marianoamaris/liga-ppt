@@ -7,7 +7,7 @@ import {
   LIGA_11,
   LIGA_12,
   LIGA_13,
-  LIGA_14,
+  LIGA_15,
   LIGA_2,
   LIGA_3,
   LIGA_4,
@@ -57,7 +57,7 @@ const ClasificacionDesktop: React.FC = () => {
     LIGA_11,
     LIGA_12,
     LIGA_13,
-    LIGA_14,
+    LIGA_15,
   ];
 
   const datosLiga: any = LIGAS[ligaSeleccionada - 1] || null;

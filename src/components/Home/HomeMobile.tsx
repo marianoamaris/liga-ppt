@@ -30,14 +30,14 @@ const HomeMobile: React.FC = () => {
         </div>
         <div className="flex flex-col items-center w-full gap-2 mt-2">
           <div className="text-xs text-white/70">
-            Jornada {jornada} - Liga PPT #14:
+            Jornada {jornada} - Liga PPT #15:
           </div>
           <div className="px-4 py-1 font-mono text-base font-extrabold text-white bg-black border-2 rounded-xl border-white/20">
             {countdown}
           </div>
           <div className="flex flex-wrap justify-center gap-2 mt-2 text-xs font-medium">
             <span className="text-white/80">
-              Liga <b className="text-white">#14</b>
+              Liga <b className="text-white">#15</b>
             </span>
             <span className="text-white/80">
               Jornada{" "}
@@ -65,14 +65,22 @@ const HomeMobile: React.FC = () => {
           <div className="flex flex-col items-center justify-center gap-1 mt-2 mb-2">
             <div className="flex flex-col items-center gap-1">
               <span className="text-base font-bold">
-                🟡 Brasil <b>VS</b> 🟢 VfL Wolfsburgo
+                🟡 Brasil <b>3</b> - <b>3</b> 🟢 VfL Wolfsburgo
               </span>
               <span className="text-xs text-gray-600">
                 Domingo 31 de Agosto - 7:00 PM
               </span>
-              <span className="text-xs font-semibold text-blue-600">
-                ¡Se define el campeón!
+              <span className="text-xs font-semibold text-green-600">
+                🏆 ¡Amarillos ganan 4-3 en penaltis!
               </span>
+              <a
+                href="https://www.youtube.com/watch?v=Pgfd3efjpQI"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                📺 Ver partido
+              </a>
             </div>
           </div>
         </div>

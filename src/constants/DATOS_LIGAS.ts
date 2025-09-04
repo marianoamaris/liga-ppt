@@ -82,6 +82,16 @@ export const TEAM_COLORS: Record<string, string | [string, string]> = {
   Junior: "#D00027", // rojo
   "Palermo FC": "#FF69B4", // rosado
   "VfL Wolfsburgo": "#22C55E", // verde
+  // Colores de equipos para Liga PPT #15
+  "Palermo FC": "#FF69B4", // rosado
+  "Luton Town FC": "#F97316", // naranja
+  "Leicester City": "#2563EB", // azul
+  "Deportivo Cali": "#22C55E", // verde
+  "Al-Nassr": "#FDB913", // amarillo
+  "Orlando City": "#9333EA", // morado
+  "Al-Ahly": "#D00027", // rojo
+  "Valencia CF": "#FFFFFF", // blanco
+  "DC United": "#222222", // negro
 };
 
 // Datos de ejemplo para Liga 1
@@ -2498,7 +2508,7 @@ export const LIGA_14 = {
       puntos: 125,
     },
     {
-      equipo: "Brasil",
+      equipo: "Brasil 🏆",
       pj: 111,
       victorias: 52,
       empates: 21,
@@ -3142,6 +3152,102 @@ export const LIGA_14 = {
     { arquero: "Nicolás Baute", golesRecibidos: 24 },
   ],
   mejorArquero: { arquero: "Carlos Barraza", golesRecibidos: 16 },
+  cuartos: [],
+  semifinales: [],
+  final: "",
+  ganador: "",
+};
+
+// Datos para Liga PPT #15
+export const LIGA_15 = {
+  tablaGeneral: [
+    {
+      equipo: "Palermo FC",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "Luton Town FC",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "Leicester City",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "Deportivo Cali",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "Al-Nassr",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "Orlando City",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "Al-Ahly",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "Valencia CF",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+    {
+      equipo: "DC United",
+      pj: 0,
+      victorias: 0,
+      empates: 0,
+      derrotas: 0,
+      porcentajeVictorias: 0,
+      puntos: 0,
+    },
+  ],
+  jornadas: [],
+  goleadoresTotales: [],
+  goleadorLiga: { jugador: "", goles: 0 },
+  arqueros: [],
+  mejorArquero: { arquero: "", golesRecibidos: 0 },
   cuartos: [],
   semifinales: [],
   final: "",
