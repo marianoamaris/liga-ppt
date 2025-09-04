@@ -9,12 +9,20 @@ export function getEquipoStats(
 ) {
   const victorias = row.victorias || 0;
   const empates = row.empates || 0;
-  // Buscar el nombre del arquero para este equipo
-  const arquero = arquerosEquipoMap[equipo];
-  const derrotas =
-    arquero && arquerosMap[arquero] !== undefined
-      ? String(arquerosMap[arquero])
-      : "-";
+  
+  // Usar row.derrotas si está disponible, sino calcular basándose en arquero
+  let derrotas;
+  if (row.derrotas !== undefined && row.derrotas !== null) {
+    derrotas = String(row.derrotas);
+  } else {
+    // Buscar el nombre del arquero para este equipo
+    const arquero = arquerosEquipoMap[equipo];
+    derrotas =
+      arquero && arquerosMap[arquero] !== undefined
+        ? String(arquerosMap[arquero])
+        : "-";
+  }
+  
   const partidosJugados = String(
     victorias + empates + (derrotas !== "-" ? Number(derrotas) : 0)
   );
