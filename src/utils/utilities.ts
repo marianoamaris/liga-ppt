@@ -60,7 +60,7 @@ export const PLAYOFFS_FECHAS = [
   {
     fase: "Cuartos de Final",
     fecha: new Date("2025-10-19T19:00:00"),
-    nombre: "Domingo 19 de Octubre - Cuartos de Final (7:00 PM - 9:00 PM)",
+    nombre: "🟠 Luton Town FC vs 🟢 Deportivo Cali - Domingo 19 Oct 7:00 PM\n⚫ DC United vs 🔴 Al-Ahly - Domingo 19 Oct 8:00 PM",
   },
   {
     fase: "semifinales",
