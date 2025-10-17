@@ -62,79 +62,111 @@ export const BracketSection: React.FC<BracketSectionProps> = ({
     {cuartos && cuartos.length > 0 && (
       <div className="mb-2 text-sm md:text-base">
         <div className="font-semibold text-gray-600 mb-1">Cuartos de final</div>
-        <ul className=" pl-6">
+        <div className="space-y-2">
           {cuartos.map((qf, idx) => {
-            if (!qf || typeof qf !== "string" || !qf.includes(" - ")) {
+            if (!qf || typeof qf !== "string") {
               return (
-                <li key={idx} className="mb-1 text-gray-700">
+                <div key={idx} className="mb-1 text-gray-700">
                   {qf}
-                </li>
-              );
-            }
-            const [team1Raw, team2Raw] = qf.split(" - ");
-            if (!team1Raw || !team2Raw) {
-              return (
-                <li key={idx} className="mb-1 text-gray-700">
-                  {qf}
-                </li>
-              );
-            }
-            const team1 = parseTeamAndScore(team1Raw.trim());
-            const team2 = parseTeamAndScore(team2Raw.trim());
-            return (
-              <li key={idx} className="mb-1 text-gray-700">
-                <div className="flex items-center">
-                  <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
-                  <span className="mr-2">{team1.name}</span>
-                  <span className="font-bold">{team1.score}</span>
-                  <span className="mx-2">-</span>
-                  <span className="font-bold">{team2.score}</span>
-                  <span className="mx-2">{team2.name}</span>
-                  <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
                 </div>
-              </li>
+              );
+            }
+            // Para el formato de Liga 15 con emojis y "vs"
+            if (qf.includes(" vs ")) {
+              return (
+                <div key={idx} className="mb-1 text-gray-700">
+                  {qf}
+                </div>
+              );
+            }
+            // Para el formato tradicional con " - "
+            if (qf.includes(" - ")) {
+              const [team1Raw, team2Raw] = qf.split(" - ");
+              if (!team1Raw || !team2Raw) {
+                return (
+                  <div key={idx} className="mb-1 text-gray-700">
+                    {qf}
+                  </div>
+                );
+              }
+              const team1 = parseTeamAndScore(team1Raw.trim());
+              const team2 = parseTeamAndScore(team2Raw.trim());
+              return (
+                <div key={idx} className="mb-1 text-gray-700">
+                  <div className="flex items-center">
+                    <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
+                    <span className="mr-2">{team1.name}</span>
+                    <span className="font-bold">{team1.score}</span>
+                    <span className="mx-2">-</span>
+                    <span className="font-bold">{team2.score}</span>
+                    <span className="mx-2">{team2.name}</span>
+                    <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key={idx} className="mb-1 text-gray-700">
+                {qf}
+              </div>
             );
           })}
-        </ul>
+        </div>
       </div>
     )}
     {semifinales && semifinales.length > 0 && (
       <div className="mb-2 text-sm md:text-base">
         <div className="font-semibold text-gray-600 mb-1">Semifinales</div>
-        <ul className=" pl-6">
+        <div className="space-y-2">
           {semifinales.map((sf, idx) => {
-            if (!sf || typeof sf !== "string" || !sf.includes(" - ")) {
+            if (!sf || typeof sf !== "string") {
               return (
-                <li key={idx} className="mb-1 text-gray-700">
+                <div key={idx} className="mb-1 text-gray-700">
                   {sf}
-                </li>
-              );
-            }
-            const [team1Raw, team2Raw] = sf.split(" - ");
-            if (!team1Raw || !team2Raw) {
-              return (
-                <li key={idx} className="mb-1 text-gray-700">
-                  {sf}
-                </li>
-              );
-            }
-            const team1 = parseTeamAndScore(team1Raw.trim());
-            const team2 = parseTeamAndScore(team2Raw.trim());
-            return (
-              <li key={idx} className="mb-1 text-gray-700">
-                <div className="flex items-center">
-                  <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
-                  <span className="mr-2">{team1.name}</span>
-                  <span className="font-bold">{team1.score}</span>
-                  <span className="mx-2">-</span>
-                  <span className="font-bold">{team2.score}</span>
-                  <span className="mx-2">{team2.name}</span>
-                  <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
                 </div>
-              </li>
+              );
+            }
+            // Para el formato de Liga 15 con emojis y "vs"
+            if (sf.includes(" vs ")) {
+              return (
+                <div key={idx} className="mb-1 text-gray-700">
+                  {sf}
+                </div>
+              );
+            }
+            // Para el formato tradicional con " - "
+            if (sf.includes(" - ")) {
+              const [team1Raw, team2Raw] = sf.split(" - ");
+              if (!team1Raw || !team2Raw) {
+                return (
+                  <div key={idx} className="mb-1 text-gray-700">
+                    {sf}
+                  </div>
+                );
+              }
+              const team1 = parseTeamAndScore(team1Raw.trim());
+              const team2 = parseTeamAndScore(team2Raw.trim());
+              return (
+                <div key={idx} className="mb-1 text-gray-700">
+                  <div className="flex items-center">
+                    <TeamCircle equipo={team1.name} TEAM_COLORS={TEAM_COLORS} />
+                    <span className="mr-2">{team1.name}</span>
+                    <span className="font-bold">{team1.score}</span>
+                    <span className="mx-2">-</span>
+                    <span className="font-bold">{team2.score}</span>
+                    <span className="mx-2">{team2.name}</span>
+                    <TeamCircle equipo={team2.name} TEAM_COLORS={TEAM_COLORS} />
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key={idx} className="mb-1 text-gray-700">
+                {sf}
+              </div>
             );
           })}
-        </ul>
+        </div>
       </div>
     )}
     <div className="mb-2">
