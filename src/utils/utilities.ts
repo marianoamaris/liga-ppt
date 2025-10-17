@@ -9,7 +9,7 @@ export function getEquipoStats(
 ) {
   const victorias = row.victorias || 0;
   const empates = row.empates || 0;
-  
+
   // Usar row.derrotas si está disponible, sino calcular basándose en arquero
   let derrotas;
   if (row.derrotas !== undefined && row.derrotas !== null) {
@@ -22,7 +22,7 @@ export function getEquipoStats(
         ? String(arquerosMap[arquero])
         : "-";
   }
-  
+
   const partidosJugados = String(
     victorias + empates + (derrotas !== "-" ? Number(derrotas) : 0)
   );
@@ -43,11 +43,31 @@ export function getArquerosMap(arqueros: any[]) {
 
 // Fechas de las jornadas de la Liga PPT #15
 export const JORNADAS_FECHAS = [
-  { jornada: 1, fecha: new Date("2025-09-11T18:00:00"), nombre: "Jueves 11 de Septiembre - 6:00 PM" },
-  { jornada: 2, fecha: new Date("2025-09-18T18:00:00"), nombre: "Jueves 18 de Septiembre - 6:00 PM" },
-  { jornada: 3, fecha: new Date("2025-09-25T18:00:00"), nombre: "Jueves 25 de Septiembre - 6:00 PM" },
-  { jornada: 4, fecha: new Date("2025-10-02T18:00:00"), nombre: "Jueves 2 de Octubre - 6:00 PM" },
-  { jornada: 5, fecha: new Date("2025-10-09T18:00:00"), nombre: "Jueves 9 de Octubre - 6:00 PM" },
+  {
+    jornada: 1,
+    fecha: new Date("2025-09-11T18:00:00"),
+    nombre: "Jueves 11 de Septiembre - 6:00 PM",
+  },
+  {
+    jornada: 2,
+    fecha: new Date("2025-09-18T18:00:00"),
+    nombre: "Jueves 18 de Septiembre - 6:00 PM",
+  },
+  {
+    jornada: 3,
+    fecha: new Date("2025-09-25T18:00:00"),
+    nombre: "Jueves 25 de Septiembre - 6:00 PM",
+  },
+  {
+    jornada: 4,
+    fecha: new Date("2025-10-02T18:00:00"),
+    nombre: "Jueves 2 de Octubre - 6:00 PM",
+  },
+  {
+    jornada: 5,
+    fecha: new Date("2025-10-09T18:00:00"),
+    nombre: "Jueves 9 de Octubre - 6:00 PM",
+  },
   {
     jornada: 6,
     fecha: new Date("2025-10-16T18:00:00"),
@@ -60,7 +80,8 @@ export const PLAYOFFS_FECHAS = [
   {
     fase: "Cuartos de Final",
     fecha: new Date("2025-10-19T19:00:00"),
-    nombre: "🟠 Luton Town FC vs 🟢 Deportivo Cali - Domingo 19 Oct 7:00 PM\n⚫ DC United vs 🔴 Al-Ahly - Domingo 19 Oct 8:00 PM",
+    nombre:
+      "🟠 Luton Town FC vs 🟢 Deportivo Cali - Domingo 19 Oct 7:00 PM\n⚫ DC United vs 🔴 Al-Ahly - Domingo 19 Oct 8:00 PM",
   },
   {
     fase: "semifinales",

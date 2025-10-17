@@ -9,7 +9,7 @@ import { Card } from "../common/Card";
 
 const HomeMobile: React.FC = () => {
   const navigate = useNavigate();
-  const { jornada, nombre, countdown, totalJornadas } = useCurrentJornada();
+  const { jornada, nombre, countdown, totalJornadas, tipo, fase } = useCurrentJornada();
 
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen gap-4 p-2">
@@ -30,7 +30,9 @@ const HomeMobile: React.FC = () => {
         </div>
         <div className="flex flex-col items-center w-full gap-2 mt-2">
           <div className="text-xs text-white/70">
-            Jornada {jornada} - Liga PPT #15:
+            {tipo === "playoff" && fase
+              ? `${fase.charAt(0).toUpperCase() + fase.slice(1)} - Liga PPT #15:`
+              : `Jornada ${jornada} - Liga PPT #15:`}
           </div>
           <div className="px-4 py-1 font-mono text-base font-extrabold text-white bg-black border-2 rounded-xl border-white/20">
             {countdown}
@@ -40,9 +42,11 @@ const HomeMobile: React.FC = () => {
               Liga <b className="text-white">#15</b>
             </span>
             <span className="text-white/80">
-              Jornada{" "}
+              {tipo === "playoff" ? "Playoffs" : "Jornada"}{" "}
               <b className="text-white">
-                {jornada}/{totalJornadas}
+                {tipo === "playoff" && fase
+                  ? fase
+                  : `${jornada}/${totalJornadas}`}
               </b>
             </span>
             <span className="text-white/80">
@@ -50,7 +54,19 @@ const HomeMobile: React.FC = () => {
             </span>
           </div>
           <div className="mt-1 text-xs text-center text-white/90">
-            <b>Jornada {jornada}:</b> {nombre}
+            <b>
+              {tipo === "playoff" && fase
+                ? `${fase.charAt(0).toUpperCase() + fase.slice(1)}:`
+                : `Jornada ${jornada}:`}
+            </b>{" "}
+            {tipo === "playoff" && fase === "Cuartos de Final" ? (
+              <div className="flex flex-col gap-1">
+                <div>🟠 Luton Town FC vs 🟢 Deportivo Cali - Domingo 19 Oct 7:00 PM</div>
+                <div>⚫ DC United vs 🔴 Al-Ahly - Domingo 19 Oct 8:00 PM</div>
+              </div>
+            ) : (
+              nombre
+            )}
           </div>
         </div>
       </Card>

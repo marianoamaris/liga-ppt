@@ -73,7 +73,14 @@ const HomeDesktop: React.FC = () => {
                     ? `${fase.charAt(0).toUpperCase() + fase.slice(1)}:`
                     : `Jornada ${jornada}:`}
                 </b>{" "}
-                {nombre}
+                {tipo === "playoff" && fase === "Cuartos de Final" ? (
+                  <div className="flex flex-col gap-1">
+                    <div>🟠 Luton Town FC vs 🟢 Deportivo Cali - Domingo 19 Oct 7:00 PM</div>
+                    <div>⚫ DC United vs 🔴 Al-Ahly - Domingo 19 Oct 8:00 PM</div>
+                  </div>
+                ) : (
+                  nombre
+                )}
               </div>
             </div>
           </div>
