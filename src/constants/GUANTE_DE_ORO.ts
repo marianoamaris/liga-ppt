@@ -6,4 +6,6 @@ export const GUANTE_DE_ORO = [
   { nombre: "Camilo Laborde", premios: 1 },
   { nombre: "Nicolás Baute", premios: 1 },
   { nombre: "Brayan Cadena", premios: 1 },
+  { nombre: "Leonardo Cadena", premios: 1 },
+  { nombre: "Fernando Gómez", premios: 1 },
 ];
