@@ -53,9 +53,9 @@ export const Layout: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="flex flex-col flex-1 h-full">
-        <main className="flex items-center justify-center flex-1 h-0 max-h-full min-h-0 overflow-y-auto bg-gray-100 md:p-6">
-          <div className="w-full h-full">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <main className="flex h-0 min-h-0 max-h-full flex-1 items-center justify-center overflow-y-auto bg-gray-100 md:p-6">
+          <div className="h-full min-h-0 w-full min-w-0">
             <div className="flex flex-row-reverse w-full md:hidden">
               <button
                 className="p-2 text-2xl"

@@ -70,14 +70,14 @@ export const Historia: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col gap-8 p-3 lg:flex-row">
+    <div className="flex min-w-0 w-full max-w-full flex-col gap-8 p-3 lg:flex-row">
       <SidebarTabs
         tabs={TABS}
         tabSeleccionada={tab}
         setTabSeleccionada={setTab}
         setSearch={setSearch}
       />
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         {tab === "jugadores" && (
           <>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-4">

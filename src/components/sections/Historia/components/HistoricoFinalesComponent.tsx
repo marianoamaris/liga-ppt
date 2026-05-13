@@ -41,7 +41,7 @@ function MarcadorCelda({
     <span
       className={`inline-flex min-w-[2.25rem] items-center justify-center rounded px-2 py-1 text-sm font-bold transition ${
         chipColor[color]
-      } ${destacado ? "ring-2 ring-offset-2 ring-yellow-400" : "opacity-90"}`}
+      } ${destacado ? "ring-2 ring-yellow-400 ring-offset-0 md:ring-offset-2" : "opacity-90"}`}
     >
       {goles}
     </span>
@@ -67,24 +67,24 @@ function FilaFinal({ f }: { f: FinalHistorica }) {
   return (
     <tr className={rowClass}>
       <td
-        className={`px-3 py-3 whitespace-nowrap ${
+        className={`px-3 py-3 ${
           esFinalChampions
-            ? "align-middle text-[#c9a227]"
-            : "font-semibold text-gray-800"
+            ? "min-w-0 max-w-[11rem] align-middle text-[#c9a227] sm:max-w-none"
+            : "whitespace-nowrap font-semibold text-gray-800"
         }`}
       >
         {esFinalChampions ? (
-          <div className="flex items-start gap-2 leading-tight">
+          <div className="flex min-w-0 flex-col items-start gap-1.5 sm:flex-row sm:items-start sm:gap-2">
             <img
               src={championsLogo}
               alt="Champions"
               width={40}
               height={40}
-              className="shrink-0 object-contain w-9 h-9 mt-0.5 md:w-10 md:h-10"
+              className="h-8 w-8 shrink-0 object-contain sm:h-9 sm:w-9 md:h-10 md:w-10"
               loading="lazy"
               decoding="async"
             />
-            <div className="flex flex-col gap-0.5">
+            <div className="min-w-0 flex flex-col gap-0.5 leading-tight">
               <span className="text-lg font-black tracking-tight">18</span>
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-100/90">
                 Champions
@@ -181,32 +181,40 @@ const HistoricoFinalesComponent = () => {
   const resumen = resumenVictoriasPorColor();
 
   return (
-    <div className="overflow-x-auto">
+    <div className="min-w-0 w-full max-w-full">
       <h2 className="mb-2 text-2xl font-extrabold text-center text-gray-800">
         Histórico de finales
       </h2>
-      <p className="max-w-3xl mx-auto mb-6 text-sm text-center text-gray-600 md:text-base">
+      <p className="mx-auto mb-6 max-w-3xl text-center text-sm text-gray-600 md:text-base">
         Resultado de las finales por temporada. El marcador resalta al campeón
         según el color de camiseta del equipo ganador.
       </p>
 
-      <table className="min-w-full overflow-hidden text-sm text-left border border-gray-200 shadow-lg md:text-base rounded-xl">
-        <thead className="text-white bg-gradient-to-r from-slate-800 to-slate-600">
-          <tr>
-            <th className="px-3 py-3 rounded-tl-xl md:px-4">Temp.</th>
-            <th className="px-3 py-3 md:px-4">Equipo 1</th>
-            <th className="px-3 py-3 text-center md:px-4">Marcador</th>
-            <th className="px-3 py-3 rounded-tr-xl md:px-4">Equipo 2</th>
-          </tr>
-        </thead>
-        <tbody>
-          {FINALES_HISTORICAS.map((f) => (
-            <FilaFinal key={f.temporada} f={f} />
-          ))}
-        </tbody>
-      </table>
+      <div className="min-w-0 overflow-x-auto rounded-xl border border-gray-200 shadow-lg [-webkit-overflow-scrolling:touch]">
+        <table className="w-max min-w-[36rem] border-collapse text-left text-sm md:min-w-full md:w-full md:text-base">
+          <thead className="text-white bg-gradient-to-r from-slate-800 to-slate-600">
+            <tr>
+              <th className="rounded-tl-xl px-3 py-3 md:px-4">Temp.</th>
+              <th className="min-w-[8.5rem] px-3 py-3 md:min-w-0 md:px-4">
+                Equipo 1
+              </th>
+              <th className="min-w-[8rem] px-3 py-3 text-center md:px-4">
+                Marcador
+              </th>
+              <th className="min-w-[8.5rem] rounded-tr-xl px-3 py-3 md:min-w-0 md:px-4">
+                Equipo 2
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {FINALES_HISTORICAS.map((f) => (
+              <FilaFinal key={f.temporada} f={f} />
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <section className="p-5 mt-8 border border-gray-200 shadow-md bg-gradient-to-br from-amber-50 to-white rounded-xl">
+      <section className="mt-8 rounded-xl border border-gray-200 bg-gradient-to-br from-amber-50 to-white p-5 shadow-md">
         <h3 className="mb-3 text-lg font-bold text-gray-900 md:text-xl">
           Resumen: finales ganadas por color de camiseta
         </h3>
