@@ -45,7 +45,6 @@ export const MAS_GANADORES = [
   { nombre: "Pier Rizo", titulos: 1, ligas: [5] },
   { nombre: "Ronaldo", titulos: 1, ligas: [3] },
   { nombre: "Santiago Sánchez", titulos: 1, ligas: [12] },
-  { nombre: "Sergio Blanchar", titulos: 1, ligas: [11] },
   { nombre: "Daniel Prens", titulos: 1, ligas: [1] },
   { nombre: "Kevin Pineda", titulos: 1, ligas: [14] },
   { nombre: "Arnold Castillo", titulos: 1, ligas: [13] },

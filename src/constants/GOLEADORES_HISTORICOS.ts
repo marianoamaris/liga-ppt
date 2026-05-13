@@ -29,7 +29,6 @@ export const GOLEADORES_HISTORICOS = [
   { nombre: "Mario Orozco", goles: 40 },
   { nombre: "Nico Yamal", goles: 38 },
   { nombre: "Camilo Laborde", goles: 37 },
-  { nombre: "Sergio Blanchar", goles: 37 },
   { nombre: "Kevin Pineda", goles: 36 },
   { nombre: "José Viña", goles: 34 },
   { nombre: "Hernán Medrano", goles: 34 },

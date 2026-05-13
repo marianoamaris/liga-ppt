@@ -9,6 +9,9 @@ import {
   LIGA_13,
   LIGA_14,
   LIGA_15,
+  LIGA_16,
+  LIGA_17,
+  LIGA_18,
   LIGA_2,
   LIGA_3,
   LIGA_4,
@@ -29,7 +32,7 @@ import { BracketSection } from "../sections/BracketSection";
 import { LigaDropdown } from "../common/LigaDropdown";
 
 type TabId = "clasificacion" | "goleadores" | "arqueros" | "bracket";
-const TOTAL_LIGAS = 15;
+const TOTAL_LIGAS = 18;
 const ligas = Array.from({ length: TOTAL_LIGAS }, (_, i) => i + 1);
 
 const ClasificacionDesktop: React.FC = () => {
@@ -60,6 +63,9 @@ const ClasificacionDesktop: React.FC = () => {
     LIGA_13,
     LIGA_14,
     LIGA_15,
+    LIGA_16,
+    LIGA_17,
+    LIGA_18,
   ];
 
   const datosLiga: any = LIGAS[ligaSeleccionada - 1] || null;

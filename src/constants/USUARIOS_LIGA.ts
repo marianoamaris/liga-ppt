@@ -338,17 +338,6 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     posicion: "delantero",
   },
   {
-    name: "Sergio Blanchar",
-    username: "sblanchar",
-    avatar: null,
-    ligasJugadas: 5,
-    esFundador: false,
-    ligasGanadas: 2,
-    esAdmin: false,
-    golesTotales: 32,
-    posicion: "delantero",
-  },
-  {
     name: "Frederick Molina",
     username: "fmolina",
     avatar: null,

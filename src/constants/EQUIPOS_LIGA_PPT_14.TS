@@ -131,7 +131,6 @@ export const EQUIPOS = [
       "Edward Brito (Titi)",
       "Jeison Santa",
       "Ronald Rojas",
-      "Sergio Blanchar",
     ],
   },
 ];

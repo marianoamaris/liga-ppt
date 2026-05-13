@@ -91,6 +91,15 @@ export const TEAM_COLORS: Record<string, string | [string, string]> = {
   "Al-Ahly": "#D00027", // rojo
   "Valencia CF": "#FFFFFF", // blanco
   "DC United": "#222222", // negro
+  // Colores de equipos para Liga PPT #18
+  "Tottenham Hotspur": "#FFFFFF",
+  "Galatasaray SK": "#F97316",
+  "Borussia Dortmund": "#FDE100",
+  "Sporting Lisboa": "#007A3D",
+  "Arsenal F.C.": "#EF0107",
+  "París Saint-Germain": "#222222",
+  "Inter de Milán": "#0068A8",
+  "Palermo F.C.": "#FF69B4", // rosado
 };
 
 // Colores específicos para Liga PPT #15
@@ -486,7 +495,6 @@ export const LIGA_5 = {
     { jugador: "Juan de la Cruz", goles: 11 },
     { jugador: "Keni Contreras", goles: 11 },
     { jugador: "Emanuel Navarro", goles: 10 },
-    { jugador: "Sergio Blanchar", goles: 10 },
     { jugador: "Esteban Galván", goles: 9 },
     { jugador: "Fabricio Rizo", goles: 9 },
     { jugador: "Henry Hernandez", goles: 7 },
@@ -598,7 +606,6 @@ export const LIGA_6 = {
     { jugador: "Elias Lacera", goles: 5 },
     { jugador: "Esteban Galván", goles: 4 },
     { jugador: "Camilo Laborde", goles: 4 },
-    { jugador: "Sergio Blanchar", goles: 4 },
     { jugador: "Cristian Benjumea", goles: 3 },
     { jugador: "Fabricio Rizo", goles: 2 },
     { jugador: "Edward Brito", goles: 2 },
@@ -693,7 +700,6 @@ export const LIGA_7 = {
     { jugador: "Henry Hernandez", goles: 5 },
     { jugador: "Jairo Galván", goles: 4 },
     { jugador: "Edward Brito", goles: 3 },
-    { jugador: "Sergio Blanchar", goles: 3 },
     { jugador: "Jhonnier de la Cruz", goles: 2 },
     { jugador: "Frank Ramirez", goles: 2 },
     { jugador: "Andres Felipe nuevo", goles: 2 },
@@ -788,7 +794,6 @@ export const LIGA_8 = {
     { jugador: "Jesus Abuchaibe", goles: 7 },
     { jugador: "Frederick", goles: 6 },
     { jugador: "Mariano Amaris", goles: 6 },
-    { jugador: "Sergio Blanchard", goles: 5 },
     { jugador: "Jefferson Almanza", goles: 5 },
     { jugador: "Eudes Pavajeau", goles: 5 },
     { jugador: "José Viña", goles: 5 },
@@ -911,7 +916,6 @@ export const LIGA_9 = {
     { jugador: "Fabricio Rizo", goles: 7 },
     { jugador: "Jorge Farfán", goles: 7 },
     { jugador: "Carlos Armenta", goles: 7 },
-    { jugador: "Sergio Blanchar", goles: 6 },
     { jugador: "Jefferson Almanza", goles: 6 },
     { jugador: "Juan Mora", goles: 5 },
     { jugador: "Hernan Medrano", goles: 5 },
@@ -1265,7 +1269,6 @@ export const LIGA_11 = {
     { jugador: "Cristian Benjumea", goles: 2 },
     { jugador: "Nicolas Yamal", goles: 1 },
     { jugador: "Frederick", goles: 1 },
-    { jugador: "Sergio Blanchar", goles: 1 },
     { jugador: "Hernan Medrano", goles: 1 },
     { jugador: "Jesús Pertuz", goles: 1 },
     { jugador: "Daniel Cuadros", goles: 1 },
@@ -1749,7 +1752,6 @@ export const LIGA_12 = {
     { jugador: "Charris", goles: 1 },
     { jugador: "Eudes Pavajeau", goles: 1 },
     { jugador: "Oscar Perez", goles: 1 },
-    { jugador: "Sergio Blanchar", goles: 1 },
     { jugador: "Edward Brito", goles: 1 },
   ],
   goleadorLiga: { jugador: "Jurgen Hassler H", goles: 28 },
@@ -2446,7 +2448,6 @@ export const LIGA_13 = {
     { jugador: "Daniel Periñan", goles: 1 },
     { jugador: "Jesús Pertuz", goles: 1 },
     { jugador: "Miguel Guerra", goles: 1 },
-    { jugador: "Sergio Blanchar", goles: 1 },
     { jugador: "Óscar Pérez", goles: 1 },
     { jugador: "Eudes Pavajeau", goles: 1 },
     { jugador: "Meyssal Murillo", goles: 1 },
@@ -2485,6 +2486,18 @@ export const ARQUEROS_LIGA_14: Record<string, string> = {
   "VfL Wolfsburgo": "Camilo Laborde",
 };
 
+export const ARQUEROS_LIGA_18: Record<string, string> = {
+  "Arsenal F.C.": "Brayan Ospino",
+  Fiorentina: "Keyner Vides",
+  "Sporting Lisboa": "Brayan Cadena",
+  "Borussia Dortmund": "Santiago Sánchez",
+  "Galatasaray SK": "Hernán García",
+  "Tottenham Hotspur": "Fernando Gómez",
+  "París Saint-Germain": "Luiska Fonseca",
+  "Inter de Milán": "Leonardo Cadena",
+  "Palermo F.C.": "Pipe Castillejo",
+};
+
 export const ARQUEROS_POR_LIGA: Record<number, Record<string, string>> = {
   5: ARQUEROS_LIGA_5,
   6: ARQUEROS_LIGA_6,
@@ -2496,6 +2509,7 @@ export const ARQUEROS_POR_LIGA: Record<number, Record<string, string>> = {
   12: ARQUEROS_LIGA_12,
   13: ARQUEROS_LIGA_13,
   14: ARQUEROS_LIGA_14,
+  18: ARQUEROS_LIGA_18,
 };
 
 // Datos para Liga PPT #14 (actualizados con resultados reales de Jornada 1, 2 y 3)
@@ -3166,9 +3180,7 @@ export const LIGA_14 = {
     { jugador: "Ian Need", goles: 1 },
     { jugador: "Esteban Hinojosa", goles: 1 },
     { jugador: "Jeysson Henríquez", goles: 1 },
-    { jugador: "Sergio Blanchar", goles: 1 },
     { jugador: "Daniel Cuadros", goles: 1 },
-    { jugador: "Sergio Blanchar", goles: 1 },
     { jugador: "Juanse Pinedo", goles: 1 },
   ],
   goleadorLiga: { jugador: "José Hernández", goles: 26 },
@@ -3826,7 +3838,6 @@ export const LIGA_15 = {
     { jugador: "José Henao 2", goles: 4 },
     { jugador: "Henry Hernández", goles: 4 },
     { jugador: "Cristian Benjumea", goles: 4 },
-    { jugador: "Sergio Blanchar", goles: 4 },
     { jugador: "Juan DLC", goles: 4 },
     { jugador: "Juanse Pinedo", goles: 3 },
     { jugador: "Juan Tellez", goles: 3 },
@@ -3883,3 +3894,66 @@ export const LIGA_15 = {
   final: "Ganador Semifinal A vs Ganador Semifinal B",
   ganador: "",
 };
+
+// Ligas 16 y 17: estructura vacía hasta cargar histórico completo en el repo
+export const LIGA_16 = {
+  tablaGeneral: [] as {
+    equipo: string;
+    pj?: number;
+    victorias: number;
+    empates: number;
+    derrotas: number;
+    porcentajeVictorias: number;
+    puntos: number;
+  }[],
+  jornadas: Array.from({ length: 6 }, (_, i) => ({
+    nombre: `Jornada ${i + 1}`,
+    resultados: [] as {
+      equipo: string;
+      pj: number;
+      v: number;
+      e: number;
+      d: number;
+      puntos: number;
+      porcentajeVictorias: number;
+    }[],
+  })),
+  goleadoresTotales: [] as { jugador: string; goles: number }[],
+  arqueros: [] as { arquero: string; golesRecibidos: number }[],
+  cuartos: [] as string[],
+  semifinales: [] as string[],
+  final: "",
+  ganador: "",
+};
+
+export const LIGA_17 = {
+  tablaGeneral: [] as {
+    equipo: string;
+    pj?: number;
+    victorias: number;
+    empates: number;
+    derrotas: number;
+    porcentajeVictorias: number;
+    puntos: number;
+  }[],
+  jornadas: Array.from({ length: 6 }, (_, i) => ({
+    nombre: `Jornada ${i + 1}`,
+    resultados: [] as {
+      equipo: string;
+      pj: number;
+      v: number;
+      e: number;
+      d: number;
+      puntos: number;
+      porcentajeVictorias: number;
+    }[],
+  })),
+  goleadoresTotales: [] as { jugador: string; goles: number }[],
+  arqueros: [] as { arquero: string; golesRecibidos: number }[],
+  cuartos: [] as string[],
+  semifinales: [] as string[],
+  final: "",
+  ganador: "",
+};
+
+export { LIGA_18 } from "./liga18";
