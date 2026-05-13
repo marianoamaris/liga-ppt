@@ -39,8 +39,8 @@ export const GoleadoresList: React.FC<GoleadoresListProps> = ({
         return (
           <li
             key={g.jugador + i}
-            className={`flex items-center px-4 py-2 rounded-lg border transition-all duration-300 shadow-sm gap-2 ${bg} ${
-              i < 3 ? "scale-105" : "hover:bg-gray-100"
+            className={`flex items-center px-4 py-2 rounded-lg border transition-all duration-300 gap-2 ${bg} ${
+              i < 3 ? "shadow-md" : "shadow-sm hover:bg-gray-100"
             } animate-fade-in-up`}
             style={{ animationDelay: `${i * 40}ms` }}
           >
