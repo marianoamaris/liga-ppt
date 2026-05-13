@@ -614,6 +614,17 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     posicion: "delantero",
   },
   {
+    name: "Keyner Vides",
+    username: "kvides",
+    avatar: null,
+    ligasJugadas: 3,
+    esFundador: false,
+    ligasGanadas: 3,
+    esAdmin: false,
+    golesTotales: 0,
+    posicion: "arquero",
+  },
+  {
     name: "Sergio Barrera",
     username: "sbarrera",
     avatar: null,

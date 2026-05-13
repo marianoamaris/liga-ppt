@@ -5,6 +5,7 @@ import {
   type ColorCamiseta,
   type FinalHistorica,
 } from "../../../../constants/HISTORICO_FINALES";
+import championsLogo from "../../../../assets/UEFA_Champions_League_logo.png";
 
 const chipColor: Record<ColorCamiseta, string> = {
   azul: "bg-blue-600 text-white",
@@ -52,30 +53,75 @@ function FilaFinal({ f }: { f: FinalHistorica }) {
   const gana2 = f.resultado === "2";
   const empate = f.resultado === "empate";
   const pendiente = f.resultado === "pendiente";
+  const esFinalChampions = f.temporada === 18;
+
+  const rowClass = esFinalChampions
+    ? "relative border-y border-[#c9a227]/45 bg-gradient-to-r from-[#050a14] via-[#0c1f45] to-[#050a14] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+    : f.temporada % 2 === 0
+      ? "bg-gray-50 border-t border-gray-100"
+      : "bg-white border-t border-gray-100";
+
+  const chipUcl =
+    "inline-block rounded px-2 py-1 text-sm font-semibold bg-blue-950/75 text-white border border-white/10 shadow-sm ring-1 ring-[#c9a227]/30";
 
   return (
-    <tr
-      className={
-        f.temporada % 2 === 0
-          ? "bg-gray-50 border-t border-gray-100"
-          : "bg-white border-t border-gray-100"
-      }
-    >
-      <td className="px-3 py-3 font-semibold text-gray-800 whitespace-nowrap">
-        {f.temporada}
+    <tr className={rowClass}>
+      <td
+        className={`px-3 py-3 whitespace-nowrap ${
+          esFinalChampions
+            ? "align-middle text-[#c9a227]"
+            : "font-semibold text-gray-800"
+        }`}
+      >
+        {esFinalChampions ? (
+          <div className="flex items-start gap-2 leading-tight">
+            <img
+              src={championsLogo}
+              alt="Champions"
+              width={40}
+              height={40}
+              className="shrink-0 object-contain w-9 h-9 mt-0.5 md:w-10 md:h-10"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="flex flex-col gap-0.5">
+              <span className="text-lg font-black tracking-tight">18</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-100/90">
+                Champions
+              </span>
+            </div>
+          </div>
+        ) : (
+          f.temporada
+        )}
       </td>
       <td className="px-3 py-3">
         <span
-          className={`inline-block rounded px-2 py-1 text-sm font-medium ${chipColor[f.color1]}`}
+          className={
+            esFinalChampions
+              ? chipUcl
+              : `inline-block rounded px-2 py-1 text-sm font-medium ${chipColor[f.color1]}`
+          }
         >
           {f.equipo1}
         </span>
       </td>
       <td className="px-3 py-3 text-center">
         {pendiente ? (
-          <span className="text-sm font-semibold text-amber-700">
-            Por definir
-          </span>
+          esFinalChampions ? (
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs font-semibold tracking-widest uppercase text-blue-100/70">
+                Final Champions
+              </span>
+              <span className="text-sm font-bold tracking-wide text-[#c9a227]">
+                Por definir
+              </span>
+            </div>
+          ) : (
+            <span className="text-sm font-semibold text-amber-700">
+              Por definir
+            </span>
+          )
         ) : empate ? (
           <div className="flex flex-wrap items-center justify-center gap-2">
             <MarcadorCelda
@@ -118,7 +164,11 @@ function FilaFinal({ f }: { f: FinalHistorica }) {
       </td>
       <td className="px-3 py-3">
         <span
-          className={`inline-block rounded px-2 py-1 text-sm font-medium ${chipColor[f.color2]}`}
+          className={
+            esFinalChampions
+              ? chipUcl
+              : `inline-block rounded px-2 py-1 text-sm font-medium ${chipColor[f.color2]}`
+          }
         >
           {f.equipo2}
         </span>
