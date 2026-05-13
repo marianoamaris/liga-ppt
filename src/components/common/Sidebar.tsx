@@ -77,7 +77,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {expanded ? <FaChevronLeft /> : <FaChevronRight />}
         </button>
       </div>
-      <ul className="flex flex-col justify-center flex-1 space-y-2">
+      <ul
+        className={`flex flex-col flex-1 justify-start space-y-2 ${
+          mobile ? "pt-2" : "pt-1"
+        }`}
+      >
         {SIDEBAR_ITEMS.map((item) => (
           <li
             key={item.id}

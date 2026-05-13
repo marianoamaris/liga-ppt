@@ -38,7 +38,7 @@ export const Layout: React.FC = () => {
             >
               ×
             </button>
-            <div className="w-full h-full p-10">
+            <div className="w-full h-full px-5 pt-14 pb-6 sm:px-6">
               <Sidebar
                 onItemClick={(path) => {
                   handleCloseSidebar();
