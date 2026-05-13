@@ -8,6 +8,7 @@ import MvpLigaComponent from "./components/MvpLigaComponent";
 import GuanteDeOroComponent from "./components/GuanteDeOroComponent";
 import BotaDeOroComponent from "./components/BotaDeOroComponent";
 import MasGanadoresComponent from "./components/MasGanadoresComponent";
+import HistoricoFinalesComponent from "./components/HistoricoFinalesComponent";
 import HistoricoGoleadoresComponent from "./components/HistoricoGoleadoresComponent";
 import SearchInput from "../../common/SearchInput";
 
@@ -16,6 +17,7 @@ const TABS = [
   { id: "admins", label: "Admins" },
   { id: "goleadores", label: "Top Goleadores Histórico" },
   { id: "ganadores", label: "Los más ganadores" },
+  { id: "historico_finales", label: "Histórico finales" },
   { id: "bota", label: "Bota de oro" },
   { id: "guante", label: "Guante de oro" },
   { id: "mvp", label: "MVP de la liga" },
@@ -184,6 +186,7 @@ export const Historia: React.FC = () => {
         )}
         {tab === "goleadores" && <HistoricoGoleadoresComponent />}
         {tab === "ganadores" && <MasGanadoresComponent />}
+        {tab === "historico_finales" && <HistoricoFinalesComponent />}
         {tab === "bota" && <BotaDeOroComponent />}
         {tab === "guante" && <GuanteDeOroComponent />}
         {tab === "mvp" && <MvpLigaComponent />}
