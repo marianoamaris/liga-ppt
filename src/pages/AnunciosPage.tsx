@@ -7,6 +7,7 @@ import {
 import { IoIosArrowDown } from "react-icons/io";
 import { FaShareAlt, FaWhatsapp, FaFacebookF } from "react-icons/fa";
 import { AnnouncementCard } from "../components/common/AnnouncementCard";
+import { Liga19MundialAnnouncement } from "../components/anuncios/Liga19MundialAnnouncement";
 
 const getBadgeClass = (type: ChangeType) => {
   switch (type) {
@@ -149,10 +150,11 @@ export const AnunciosPage: React.FC = () => {
             Historial de Cambios y Anuncios
           </h1>
           <p className="max-w-2xl mx-auto mt-2 text-base text-gray-600">
-            Aquí encontrarás las últimas noticias referentes a la Liga y su
-            ecosistema.
+            Últimas novedades de la Liga PPT, modalidades y premios. Más abajo,
+            el historial de cambios y anuncios anteriores.
           </p>
         </div>
+        <Liga19MundialAnnouncement />
         {CHANGELOG_DATA.map((entry) => (
           <ChangelogItem key={entry.version} entry={entry} />
         ))}
