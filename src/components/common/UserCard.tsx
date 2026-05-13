@@ -2,10 +2,16 @@ import React from "react";
 import { Card } from "./Card";
 import noPhoto from "../../assets/no-photo.jpg";
 import type { UsuarioLiga } from "../../constants/USUARIOS_LIGA";
+import { fotoJugadorPorNombre } from "../../utils/fotosJugadores";
 import { FaStar, FaTrophy, FaFutbol, FaMedal } from "react-icons/fa6";
 
 export const UserCard: React.FC<{ user: UsuarioLiga }> = ({ user }) => {
   const isFundador = !!user.esFundador;
+  const avatarSrc =
+    user.avatar ??
+    (user.username === "sirama"
+      ? null
+      : fotoJugadorPorNombre(user.name));
   const cardBg = isFundador
     ? "bg-gradient-to-b from-blue-100 to-gray-100 border-blue-400"
     : "bg-gradient-to-b from-gray-900 to-gray-700 border-gray-800";
@@ -22,21 +28,23 @@ export const UserCard: React.FC<{ user: UsuarioLiga }> = ({ user }) => {
       </div>
       {/* Avatar */}
       <div
-        className={`w-20 h-20 rounded-full bg-gray-200 border-4 ${
+        className={`relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-200 border-4 ${
           isFundador ? "border-blue-400" : "border-gray-700"
-        } shadow mb-2 flex items-center justify-center overflow-hidden`}
+        } shadow mb-2`}
       >
-        {user.avatar ? (
+        {avatarSrc ? (
           <img
-            src={user.avatar}
+            src={avatarSrc}
             alt={user.name}
-            className="object-cover w-full h-full"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover object-top [image-rendering:high-quality] [backface-visibility:hidden]"
           />
         ) : user.username === "sirama" ? (
           <img
             src={noPhoto}
             alt="Default Facebook"
-            className="object-cover w-full h-full"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover object-top [image-rendering:high-quality] [backface-visibility:hidden]"
           />
         ) : (
           <span className="text-4xl text-gray-400">⚽️</span>
