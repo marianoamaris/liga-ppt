@@ -1,4 +1,13 @@
-export const MAS_GANADORES = [
+/** Fila del ranking de más ganadores. `champions` y `mundial` son títulos aparte de las ligas regulares (0 si no aplica). */
+export type MasGanador = {
+  nombre: string;
+  titulos: number;
+  ligas: number[];
+  champions?: number;
+  mundial?: number;
+};
+
+export const MAS_GANADORES: MasGanador[] = [
   { nombre: "Emanuel Navarro (Goat)", titulos: 7, ligas: [2, 3, 4, 5, 6, 7, 17] },
   { nombre: "Cristian Benjumea", titulos: 5, ligas: [1, 3, 7, 8, 12] },
   { nombre: "Frank Ramírez", titulos: 5, ligas: [5, 7, 11, 13, 15] },

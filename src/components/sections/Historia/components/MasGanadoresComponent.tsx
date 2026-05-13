@@ -12,6 +12,8 @@ const MasGanadoresComponent = () => {
             <th className="px-4 py-3 text-lg">#</th>
             <th className="px-4 py-3 text-lg">Nombre</th>
             <th className="px-4 py-3 text-lg">Títulos</th>
+            <th className="px-4 py-3 text-lg whitespace-nowrap">Champions</th>
+            <th className="px-4 py-3 text-lg whitespace-nowrap">Mundial</th>
             <th className="px-4 py-3 text-lg">Ligas ganadas</th>
           </tr>
         </thead>
@@ -44,6 +46,12 @@ const MasGanadoresComponent = () => {
                 <td className="px-4 py-2 text-lg">{medal || idx + 1}</td>
                 <td className="px-4 py-2">{g.nombre}</td>
                 <td className="px-4 py-2 font-bold">{g.titulos}</td>
+                <td className="px-4 py-2 font-semibold text-center tabular-nums">
+                  {g.champions ?? 0}
+                </td>
+                <td className="px-4 py-2 font-semibold text-center tabular-nums">
+                  {g.mundial ?? 0}
+                </td>
                 <td className="px-4 py-2">{g.ligas.join(", ")}</td>
               </tr>
             );
