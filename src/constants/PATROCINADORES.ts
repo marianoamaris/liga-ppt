@@ -1,8 +1,8 @@
 import logoRey from "../assets/El rey del estampado.png";
 import logoFrens from "../assets/Frens Burgers.jpg";
 import logoVV from "../assets/V&V Accesorios.jpg";
-// Nombre de archivo en disco: “o” + acento combinante (NFD)
-import logoSalon from "../assets/Salo\u0301n de eventos Mariano Amaris.jpg";
+// Nombre ASCII: evita fallos de build en Linux (NFC/NFD del “ó” en Git/Netlify)
+import logoSalon from "../assets/salon-eventos-mariano-amaris.jpg";
 
 export type Patrocinador = {
   id: string;
