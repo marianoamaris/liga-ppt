@@ -59,6 +59,12 @@ export const SIDEBAR_ITEMS = [
     icon: "FaBullhorn",
   },
   {
+    id: "patrocinadores",
+    label: "Patrocinadores",
+    path: "/patrocinadores",
+    icon: "FaHandshake",
+  },
+  {
     id: "contacto",
     label: "Contacto",
     path: "/contacto",

@@ -8,6 +8,7 @@ import {
   FaChevronRight,
   FaGavel,
   FaBullhorn,
+  FaHandshake,
 } from "react-icons/fa6";
 import { SIDEBAR_ITEMS, THEME } from "../../constants/theme";
 
@@ -22,6 +23,7 @@ const ICONS: Record<
   FaMedal,
   FaGavel,
   FaBullhorn,
+  FaHandshake,
   FaRegCalendarAlt,
 };
 
