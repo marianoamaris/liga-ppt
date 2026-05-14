@@ -92,12 +92,12 @@ export const LogrosPage: React.FC = () => {
     },
     menos_goles_recibidos: {
       podium: [
-        USUARIOS_LIGA.find((u) => u.username === "fgomez") ?? {
-          name: "Fernando Gomez",
-          username: "fgomez",
-          ligasJugadas: 10,
+        USUARIOS_LIGA.find((u) => u.username === "jlaborde") ?? {
+          name: "José Laborde",
+          username: "jlaborde",
+          ligasJugadas: 2,
           ligasGanadas: 1,
-          golesTotales: 2,
+          golesTotales: 22,
           esAdmin: false,
           posicion: "arquero",
         },
@@ -110,17 +110,17 @@ export const LogrosPage: React.FC = () => {
           esAdmin: false,
           posicion: "arquero",
         },
-        USUARIOS_LIGA.find((u) => u.username === "lcadena") ?? {
-          name: "Leonardo Cadena",
-          username: "lcadena",
-          ligasJugadas: 3,
-          ligasGanadas: 0,
-          golesTotales: 30,
+        USUARIOS_LIGA.find((u) => u.username === "fgomez") ?? {
+          name: "Fernando Gomez",
+          username: "fgomez",
+          ligasJugadas: 10,
+          ligasGanadas: 1,
+          golesTotales: 2,
           esAdmin: false,
           posicion: "arquero",
         },
       ],
-      goles: [29, 30, 32],
+      goles: [22, 28, 29],
       label: "Menos goles recibidos en una liga",
       type: "user",
     },

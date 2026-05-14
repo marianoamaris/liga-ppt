@@ -10,6 +10,7 @@ import BotaDeOroComponent from "./components/BotaDeOroComponent";
 import MasGanadoresComponent from "./components/MasGanadoresComponent";
 import HistoricoFinalesComponent from "./components/HistoricoFinalesComponent";
 import HistoricoGoleadoresComponent from "./components/HistoricoGoleadoresComponent";
+import CapitanesHistoricosComponent from "./components/CapitanesHistoricosComponent";
 import SearchInput from "../../common/SearchInput";
 
 const TABS = [
@@ -17,6 +18,7 @@ const TABS = [
   { id: "admins", label: "Admins" },
   { id: "goleadores", label: "Top Goleadores Histórico" },
   { id: "ganadores", label: "Los más ganadores" },
+  { id: "capitanes", label: "Capitanes históricos" },
   { id: "historico_finales", label: "Histórico finales" },
   { id: "bota", label: "Bota de oro" },
   { id: "guante", label: "Guante de oro" },
@@ -186,6 +188,7 @@ export const Historia: React.FC = () => {
         )}
         {tab === "goleadores" && <HistoricoGoleadoresComponent />}
         {tab === "ganadores" && <MasGanadoresComponent />}
+        {tab === "capitanes" && <CapitanesHistoricosComponent />}
         {tab === "historico_finales" && <HistoricoFinalesComponent />}
         {tab === "bota" && <BotaDeOroComponent />}
         {tab === "guante" && <GuanteDeOroComponent />}
