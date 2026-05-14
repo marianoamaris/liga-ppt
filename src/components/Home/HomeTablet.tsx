@@ -1,5 +1,11 @@
 import React from "react";
-import { FaRankingStar, FaMedal, FaGavel, FaBullhorn } from "react-icons/fa6";
+import {
+  FaRankingStar,
+  FaMedal,
+  FaGavel,
+  FaBullhorn,
+  FaHandshake,
+} from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
@@ -170,6 +176,29 @@ const HomeTablet: React.FC = () => {
               }}
             >
               Ver anuncios &rarr;
+            </span>
+          </div>
+          <div
+            className="flex flex-col items-start p-3 shadow cursor-pointer rounded-xl bg-teal-50 hover:scale-[1.02] transition-transform"
+            onClick={() => navigate("/patrocinadores")}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <FaHandshake className="text-teal-600" size={22} />
+              <span className="text-sm font-bold text-teal-800">
+                Patrocinadores
+              </span>
+            </div>
+            <div className="mb-2 text-xs text-gray-700">
+              Conoce a las marcas que apoyan la liga y sus redes.
+            </div>
+            <span
+              className="text-xs font-semibold text-teal-600 cursor-pointer hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/patrocinadores");
+              }}
+            >
+              Ver patrocinadores &rarr;
             </span>
           </div>
           <div
