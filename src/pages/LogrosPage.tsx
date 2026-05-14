@@ -6,6 +6,7 @@ import { UserCard } from "../components/common/UserCard";
 export const LogrosPage: React.FC = () => {
   const RECORDS = [
     { id: "mas_goles_liga", label: "Más goles en una liga" },
+    { id: "mas_goles_jornada", label: "Más goles en una jornada" },
     { id: "menos_goles_recibidos", label: "Menos goles recibidos en una liga" },
     {
       id: "mas_puntos_equipo",
@@ -55,14 +56,48 @@ export const LogrosPage: React.FC = () => {
       label: "Más goles en una liga",
       type: "user",
     },
+    mas_goles_jornada: {
+      podium: [
+        USUARIOS_LIGA.find((u) => u.username === "scorzo") ?? {
+          name: "Santiago Corzo",
+          username: "scorzo",
+          ligasJugadas: 6,
+          ligasGanadas: 1,
+          golesTotales: 106,
+          esAdmin: false,
+          posicion: "delantero",
+        },
+        USUARIOS_LIGA.find((u) => u.username === "jhernandez") ?? {
+          name: "José Hernández",
+          username: "jhernandez",
+          ligasJugadas: 10,
+          ligasGanadas: 2,
+          golesTotales: 240,
+          esAdmin: false,
+          posicion: "delantero",
+        },
+        USUARIOS_LIGA.find((u) => u.username === "vcastilla") ?? {
+          name: "Víctor Castilla (Toto)",
+          username: "vcastilla",
+          ligasJugadas: 6,
+          ligasGanadas: 0,
+          golesTotales: 74,
+          esAdmin: false,
+          posicion: "delantero",
+        },
+      ],
+      goles: [12, 11, 10],
+      label: "Más goles en una jornada",
+      type: "user",
+    },
     menos_goles_recibidos: {
       podium: [
-        USUARIOS_LIGA.find((u) => u.username === "jlaborde") ?? {
-          name: "José Laborde",
-          username: "jlaborde",
-          ligasJugadas: 2,
+        USUARIOS_LIGA.find((u) => u.username === "fgomez") ?? {
+          name: "Fernando Gomez",
+          username: "fgomez",
+          ligasJugadas: 10,
           ligasGanadas: 1,
-          golesTotales: 22,
+          golesTotales: 2,
           esAdmin: false,
           posicion: "arquero",
         },
@@ -85,7 +120,7 @@ export const LogrosPage: React.FC = () => {
           posicion: "arquero",
         },
       ],
-      goles: [22, 28, 30],
+      goles: [29, 30, 32],
       label: "Menos goles recibidos en una liga",
       type: "user",
     },
@@ -125,31 +160,22 @@ export const LogrosPage: React.FC = () => {
     menos_puntos_equipo: {
       podium: [
         {
+          equipo: "Eintracht Frankfurt",
+          color: "#111827",
+          puntos: 62,
+          temporada: 14,
+        },
+        {
           equipo: "Panathinaikos FC",
           color: "#22c55e",
           puntos: 63,
           temporada: 10,
-          victorias: 26,
-          empates: 11,
-          derrotas: 41,
         },
         {
-          equipo: "San Marino",
-          color: "#f59e42",
-          puntos: 69,
-          temporada: 11,
-          victorias: 26,
-          empates: 17,
-          derrotas: 53,
-        },
-        {
-          equipo: "Shakhtar Donetsk",
-          color: "#f59e42",
-          puntos: 77,
-          temporada: 9,
-          victorias: 31,
-          empates: 15,
-          derrotas: 52,
+          equipo: "Orlando City",
+          color: "#7c3aed",
+          puntos: 64,
+          temporada: 15,
         },
       ],
       label: "Menos puntos hechos por un equipo en una liga",
@@ -192,30 +218,34 @@ export const LogrosPage: React.FC = () => {
         <div className="mb-3 text-2xl font-extrabold text-blue-700">
           {puntos} pts
         </div>
-        <div className="flex flex-col w-full gap-1 mb-2 text-sm font-medium">
-          <div className="flex items-center justify-between w-full gap-2">
-            <span className="flex items-center gap-1 text-blue-900">
-              <span className="text-base">🥅</span> Victorias
-            </span>
-            <span className="font-bold text-green-700">{victorias ?? 0}</span>
-          </div>
-          <div className="flex items-center justify-between w-full gap-2">
-            <span className="flex items-center gap-1 text-yellow-700">
-              <span className="text-base">🟡</span> Empates
-            </span>
-            <span className="font-bold text-yellow-700">{empates ?? 0}</span>
-          </div>
-          <div className="flex items-center justify-between w-full gap-2">
-            <span className="flex items-center gap-1 text-red-700">
-              <span className="text-base">🔴</span> Derrotas
-            </span>
-            <span className="font-bold text-red-700">{derrotas ?? 0}</span>
-          </div>
-        </div>
-        <div className="relative mt-1 text-xs text-gray-600 cursor-pointer group">
-          <span className="font-bold text-blue-700">{porcentaje}%</span> %
-          Victoria
-        </div>
+        {pj > 0 ? (
+          <>
+            <div className="flex flex-col w-full gap-1 mb-2 text-sm font-medium">
+              <div className="flex items-center justify-between w-full gap-2">
+                <span className="flex items-center gap-1 text-blue-900">
+                  <span className="text-base">🥅</span> Victorias
+                </span>
+                <span className="font-bold text-green-700">{victorias ?? 0}</span>
+              </div>
+              <div className="flex items-center justify-between w-full gap-2">
+                <span className="flex items-center gap-1 text-yellow-700">
+                  <span className="text-base">🟡</span> Empates
+                </span>
+                <span className="font-bold text-yellow-700">{empates ?? 0}</span>
+              </div>
+              <div className="flex items-center justify-between w-full gap-2">
+                <span className="flex items-center gap-1 text-red-700">
+                  <span className="text-base">🔴</span> Derrotas
+                </span>
+                <span className="font-bold text-red-700">{derrotas ?? 0}</span>
+              </div>
+            </div>
+            <div className="relative mt-1 text-xs text-gray-600 cursor-pointer group">
+              <span className="font-bold text-blue-700">{porcentaje}%</span> %
+              Victoria
+            </div>
+          </>
+        ) : null}
       </div>
     );
   };
