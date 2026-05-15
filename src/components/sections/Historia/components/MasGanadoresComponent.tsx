@@ -1,11 +1,19 @@
 import { MAS_GANADORES } from "../../../../constants/GANADORES";
 
+const porTitulosDesc = [...MAS_GANADORES].sort((a, b) => {
+  if (b.titulos !== a.titulos) return b.titulos - a.titulos;
+  return a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" });
+});
+
 const MasGanadoresComponent = () => {
   return (
     <div className="min-w-0 w-full max-w-full">
       <h2 className="mb-4 text-2xl font-extrabold text-center text-gray-800">
         Los más ganadores
       </h2>
+      <p className="mb-2 text-center text-xs text-gray-500 md:text-sm">
+        Orden: más títulos a menos; a igual número de títulos, por nombre.
+      </p>
       <p className="mb-2 text-xs text-center text-gray-500 md:hidden">
         Desliza horizontalmente para ver todas las columnas
       </p>
@@ -37,7 +45,7 @@ const MasGanadoresComponent = () => {
             </tr>
           </thead>
           <tbody>
-            {MAS_GANADORES.map((g, idx) => {
+            {porTitulosDesc.map((g, idx) => {
               let rowClass = "";
               let medal = "";
               if (idx === 0) {
