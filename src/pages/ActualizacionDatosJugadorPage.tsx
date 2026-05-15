@@ -8,6 +8,32 @@ import {
   isFormularioActualizacionDatosAbierto,
 } from "../constants/ACTUALIZACION_DATOS_JUGADOR";
 
+/** Cuerpo `FormData` para Netlify: mismo patrón que la doc; omitimos `foto` si no hay archivo (multipart vacío a veces falla). */
+function buildActualizacionDatosFormData(form: HTMLFormElement): FormData {
+  const fd = new FormData();
+  fd.append("form-name", NETLIFY_FORM_ACTUALIZACION_DATOS);
+
+  const bot = form.querySelector<HTMLInputElement>('input[name="bot-field"]');
+  if (bot) fd.append("bot-field", bot.value);
+
+  const nombre = form.querySelector<HTMLInputElement>("#nombreEnLiga");
+  if (nombre) fd.append("nombreEnLiga", nombre.value);
+
+  const email = form.querySelector<HTMLInputElement>("#email");
+  if (email) fd.append("email", email.value);
+
+  const jugadorDesde = form.querySelector<HTMLInputElement>("#jugadorDesde");
+  if (jugadorDesde) fd.append("jugadorDesde", jugadorDesde.value);
+
+  const mensaje = form.querySelector<HTMLTextAreaElement>("#mensaje");
+  if (mensaje) fd.append("mensaje", mensaje.value);
+
+  const foto = form.querySelector<HTMLInputElement>("#foto");
+  if (foto?.files?.length) fd.append("foto", foto.files[0]);
+
+  return fd;
+}
+
 export const ActualizacionDatosJugadorPage: React.FC = () => {
   const abierto = isFormularioActualizacionDatosAbierto();
   const [exito, setExito] = useState(false);
@@ -35,9 +61,11 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
     const form = e.currentTarget;
     setEnviando(true);
     try {
+      // AJAX con archivo: sin cabecera Content-Type (lo pone el navegador con el boundary).
+      // https://docs.netlify.com/manage/forms/setup/#submit-file-uploads-with-ajax
       const res = await fetch("/", {
         method: "POST",
-        body: new FormData(form),
+        body: buildActualizacionDatosFormData(form),
       });
       if (!res.ok) throw new Error("http");
       setExito(true);
@@ -251,10 +279,17 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   </Button>
 
                   <p className="text-center text-xs text-gray-500">
-                    Envío con Netlify Forms. En el panel de Netlify, configura
-                    las notificaciones del formulario «
-                    {NETLIFY_FORM_ACTUALIZACION_DATOS}» hacia{" "}
-                    {CONTACTO_LIGA_EMAIL}.
+                    Netlify Forms ({" "}
+                    <a
+                      className="text-pink-600 underline"
+                      href="https://docs.netlify.com/manage/forms/setup/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      documentación
+                    </a>
+                    ). Notificaciones del formulario «
+                    {NETLIFY_FORM_ACTUALIZACION_DATOS}» → {CONTACTO_LIGA_EMAIL}.
                   </p>
                 </form>
               )}
