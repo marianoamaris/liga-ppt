@@ -8,44 +8,11 @@ import {
   isFormularioActualizacionDatosAbierto,
 } from "../constants/ACTUALIZACION_DATOS_JUGADOR";
 
-/** Cuerpo `FormData` para Netlify: mismo patrón que la doc; omitimos `foto` si no hay archivo (multipart vacío a veces falla). */
-function buildActualizacionDatosFormData(form: HTMLFormElement): FormData {
-  const fd = new FormData();
-  fd.append("form-name", NETLIFY_FORM_ACTUALIZACION_DATOS);
-
-  const bot = form.querySelector<HTMLInputElement>('input[name="bot-field"]');
-  if (bot) fd.append("bot-field", bot.value);
-
-  const nombre = form.querySelector<HTMLInputElement>("#nombreEnLiga");
-  if (nombre) fd.append("nombreEnLiga", nombre.value);
-
-  const email = form.querySelector<HTMLInputElement>("#email");
-  if (email) fd.append("email", email.value);
-
-  const jugadorDesde = form.querySelector<HTMLInputElement>("#jugadorDesde");
-  if (jugadorDesde) fd.append("jugadorDesde", jugadorDesde.value);
-
-  const mensaje = form.querySelector<HTMLTextAreaElement>("#mensaje");
-  if (mensaje) fd.append("mensaje", mensaje.value);
-
-  const foto = form.querySelector<HTMLInputElement>("#foto");
-  if (foto?.files?.length) fd.append("foto", foto.files[0]);
-
-  return fd;
-}
-
 export const ActualizacionDatosJugadorPage: React.FC = () => {
   const abierto = isFormularioActualizacionDatosAbierto();
   const [exito, setExito] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const fechaCierre = new Date(
-    ACTUALIZACION_DATOS_JUGADOR.mundialPptInicio,
-  ).toLocaleString("es-CO", {
-    dateStyle: "long",
-    timeStyle: "short",
-  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,11 +28,15 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
     const form = e.currentTarget;
     setEnviando(true);
     try {
-      // AJAX con archivo: sin cabecera Content-Type (lo pone el navegador con el boundary).
-      // https://docs.netlify.com/manage/forms/setup/#submit-file-uploads-with-ajax
+      const raw = new FormData(form);
+      const params = new URLSearchParams();
+      raw.forEach((value, key) => {
+        params.append(key, typeof value === "string" ? value : "");
+      });
       const res = await fetch("/", {
         method: "POST",
-        body: buildActualizacionDatosFormData(form),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
       });
       if (!res.ok) throw new Error("http");
       setExito(true);
@@ -87,8 +58,8 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
             Actualizar mis datos en la liga
           </h1>
           <p className="mb-4 text-center text-sm text-gray-600">
-            Ayúdanos a corregir nombres, fotos o estadísticas si algo no cuadra
-            con tu ficha. Las notificaciones del panel de Netlify deben ir a{" "}
+            Ayúdanos a corregir nombres o estadísticas si algo no cuadra con tu
+            ficha. <strong>Todo lo que envíes llegará a</strong>{" "}
             <a
               className="font-semibold text-pink-600 underline"
               href={`mailto:${CONTACTO_LIGA_EMAIL}`}
@@ -106,9 +77,8 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
             </p>
           ) : !abierto ? (
             <p className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-sm text-gray-700">
-              El periodo de corrección de datos ya cerró (inicio del Mundial
-              PPT o fecha programada: <strong>{fechaCierre}</strong>). Si
-              necesitas algo urgente, escribe a{" "}
+              El periodo de corrección de datos ya cerró. Si necesitas algo
+              urgente, escribe a{" "}
               <a
                 className="font-semibold text-pink-600 underline"
                 href={`mailto:${CONTACTO_LIGA_EMAIL}`}
@@ -132,9 +102,7 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   </li>
                   <li>
                     Permanecerá abierto hasta el{" "}
-                    <strong>inicio del Mundial PPT</strong> (fecha límite:{" "}
-                    <strong>{fechaCierre}</strong> — ajústala en código si
-                    cambia el calendario).
+                    <strong>inicio del Mundial PPT</strong>.
                   </li>
                 </ul>
               </div>
@@ -163,7 +131,6 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   method="POST"
                   data-netlify="true"
                   data-netlify-honeypot="bot-field"
-                  encType="multipart/form-data"
                   onSubmit={handleSubmit}
                   className="relative space-y-4"
                 >
@@ -229,23 +196,6 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="foto" className="text-sm font-semibold">
-                      Foto para tu ficha (opcional)
-                    </label>
-                    <input
-                      id="foto"
-                      name="foto"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="text-sm text-gray-800 file:mr-3 file:rounded file:border-0 file:bg-pink-600 file:px-3 file:py-2 file:text-white hover:file:bg-pink-700"
-                    />
-                    <p className="text-xs text-gray-500">
-                      JPG, PNG o WebP. Tamaño razonable (p. ej. máx. 5 MB). Si no
-                      envías foto, solo corregiremos texto/datos.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
                     <label htmlFor="mensaje" className="text-sm font-semibold">
                       Sugerencias, dudas o datos que crees incorrectos{" "}
                       <span className="text-red-600">*</span>
@@ -277,20 +227,6 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   >
                     {enviando ? "Enviando…" : "Enviar"}
                   </Button>
-
-                  <p className="text-center text-xs text-gray-500">
-                    Netlify Forms ({" "}
-                    <a
-                      className="text-pink-600 underline"
-                      href="https://docs.netlify.com/manage/forms/setup/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      documentación
-                    </a>
-                    ). Notificaciones del formulario «
-                    {NETLIFY_FORM_ACTUALIZACION_DATOS}» → {CONTACTO_LIGA_EMAIL}.
-                  </p>
                 </form>
               )}
             </>
