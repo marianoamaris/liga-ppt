@@ -65,6 +65,12 @@ export const SIDEBAR_ITEMS = [
     icon: "FaHandshake",
   },
   {
+    id: "actualizacion-datos",
+    label: "Actualizar mis datos",
+    path: "/actualizacion-datos",
+    icon: "FaUserPen",
+  },
+  {
     id: "contacto",
     label: "Contacto",
     path: "/contacto",

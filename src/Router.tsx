@@ -10,6 +10,7 @@ import { LogrosPage } from "./pages/LogrosPage";
 import { AnunciosPage } from "./pages/AnunciosPage";
 import { CalendarioPage } from "./pages/CalendarioPage";
 import { PatrocinadoresPage } from "./pages/PatrocinadoresPage";
+import { ActualizacionDatosJugadorPage } from "./pages/ActualizacionDatosJugadorPage";
 
 // Placeholder para rutas privadas
 const PrivatePlaceholder = () => (
@@ -32,6 +33,10 @@ export const AppRouter = () => (
         <Route path="/anuncios" element={<AnunciosPage />} />
         <Route path="/calendario" element={<CalendarioPage />} />
         <Route path="/patrocinadores" element={<PatrocinadoresPage />} />
+        <Route
+          path="/actualizacion-datos"
+          element={<ActualizacionDatosJugadorPage />}
+        />
       </Route>
       {/* Rutas públicas sin layout */}
       <Route path="/login" element={<SignIn />} />

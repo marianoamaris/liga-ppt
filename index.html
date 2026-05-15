@@ -50,6 +50,20 @@
     </script>
   </head>
   <body>
+    <!-- Netlify Forms: detección en build (nombres de campos = formulario React). -->
+    <form
+      name="actualizacion-datos-jugador"
+      netlify
+      netlify-honeypot="bot-field"
+      hidden
+    >
+      <input type="text" name="nombreEnLiga" />
+      <input type="email" name="email" />
+      <input type="text" name="jugadorDesde" />
+      <textarea name="mensaje"></textarea>
+      <input type="file" name="foto" />
+      <input type="text" name="bot-field" />
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
