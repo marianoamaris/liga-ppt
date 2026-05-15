@@ -155,7 +155,13 @@ function FilaFinal({ f }: { f: FinalHistorica }) {
               />
             </div>
             {f.notaMarcador ? (
-              <span className="max-w-[16rem] text-xs font-medium leading-snug text-gray-600 md:max-w-none">
+              <span
+                className={`max-w-[16rem] text-xs font-medium leading-snug md:max-w-none ${
+                  esFinalChampions
+                    ? "text-blue-100/95"
+                    : "text-gray-600"
+                }`}
+              >
                 {f.notaMarcador}
               </span>
             ) : null}
@@ -220,7 +226,7 @@ const HistoricoFinalesComponent = () => {
         </h3>
         <p className="mb-4 text-sm text-gray-600">
           Solo se cuentan victorias en la final con resultado definido. No
-          incluye empates ni la final pendiente.
+          incluye empates.
         </p>
         <ul className="space-y-2">
           {resumen.map(({ color, finales }) => (

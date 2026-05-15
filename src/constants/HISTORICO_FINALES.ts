@@ -215,11 +215,13 @@ export const FINALES_HISTORICAS: FinalHistorica[] = [
     temporada: 18,
     equipo1: "Sporting de Lisboa",
     equipo2: "Tottenham Hotspur",
-    goles1: null,
-    goles2: null,
+    goles1: 3,
+    goles2: 3,
     color1: "verde",
     color2: "blanco",
-    resultado: "pendiente",
+    resultado: "1",
+    notaMarcador:
+      "Campeón Sporting de Lisboa: 2-0 en penales tras empate 3-3 en tiempo reglamentario",
   },
 ];
 

@@ -9,7 +9,8 @@ const CapitanesHistoricosComponent: React.FC = () => (
     </h2>
     <p className="mx-auto mb-4 max-w-2xl text-center text-sm text-gray-600">
       Capitanes que levantaron el título de la Liga PPT al menos una vez; se
-      ordenan por número de títulos y luego por nombre.
+      ordenan por cantidad de títulos como capitán (empates comparten posición
+      en la tabla).
     </p>
     <div className="min-w-0 overflow-x-auto rounded-xl border border-gray-200 shadow-lg">
       <table className="w-full min-w-[20rem] border-collapse text-left text-sm">

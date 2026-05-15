@@ -3,6 +3,8 @@ import logoFrens from "../assets/Frens Burgers.jpg";
 import logoVV from "../assets/V&V Accesorios.jpg";
 // Nombre ASCII: evita fallos de build en Linux (NFC/NFD del “ó” en Git/Netlify)
 import logoSalon from "../assets/salon-eventos-mariano-amaris.jpg";
+import logoAndariego from "../assets/Andariego.jpg";
+import logoDondeVaro from "../assets/Donde Varo.jpg";
 
 export type Patrocinador = {
   id: string;
@@ -47,5 +49,21 @@ export const PATROCINADORES: Patrocinador[] = [
       "Celulares, accesorios y todo lo relacionado con tecnología para equipar tu día a día.",
     logo: logoVV,
     instagramHandle: "vv_accesorios",
+  },
+  {
+    id: "andariego",
+    nombre: "Andariego",
+    descripcion:
+      "Comida mexicana y cocina oculta: sabores auténticos para compartir en Valledupar.",
+    logo: logoAndariego,
+    instagramHandle: "andariegomxco",
+  },
+  {
+    id: "donde-varo",
+    nombre: "Donde Varo",
+    descripcion:
+      "Comidas rápidas y las mejores salchipapas de Valledupar, calidad y buen ambiente.",
+    logo: logoDondeVaro,
+    instagramHandle: "dondevaro",
   },
 ];

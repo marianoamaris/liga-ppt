@@ -11,6 +11,7 @@ import { FaRegEnvelope } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../common/Card";
+import Liga18DestacadoCarousel from "./Liga18DestacadoCarousel";
 
 const HomeTablet: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const HomeTablet: React.FC = () => {
           Sigue el avance, consulta estadísticas, historia y más.
         </div>
       </Card>
+      <Liga18DestacadoCarousel />
       {/* Módulos principales */}
       <Card className="w-full p-3 mb-6 bg-white">
         <div className="grid grid-cols-2 gap-3">

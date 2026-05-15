@@ -13,4 +13,6 @@ export const MVP_FINAL = [
   { nombre: "Eduardo Sarmiento (Mou)", premios: 1 },
   { nombre: "Santiago Corzo", premios: 1 },
   { nombre: "Emanuel Navarro (Goat)", premios: 1 },
+  { nombre: "Brayan Cadena", premios: 1 },
+  { nombre: "Fernando Gómez", premios: 1 },
 ];
