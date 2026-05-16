@@ -1077,6 +1077,17 @@ export const USUARIOS_LIGA: UsuarioLiga[] = [
     posicion: "delantero",
   },
   {
+    name: "Jesús Cartagena",
+    username: "jcartagena",
+    avatar: null,
+    ligasJugadas: 1,
+    esFundador: false,
+    ligasGanadas: 0,
+    esAdmin: false,
+    golesTotales: 0,
+    posicion: "delantero",
+  },
+  {
     name: "Roberto Arrieta (Cante)",
     username: "rarrieta",
     avatar: null,
