@@ -11,6 +11,7 @@ import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Liga19DestacadoCarousel from "./Liga19DestacadoCarousel";
 import Liga18DestacadoCarousel from "./Liga18DestacadoCarousel";
 
 const HomeDesktop: React.FC = () => {
@@ -39,6 +40,7 @@ const HomeDesktop: React.FC = () => {
         </div>
       </Card>
 
+      <Liga19DestacadoCarousel />
       <Liga18DestacadoCarousel />
 
       {/* Módulos principales */}
