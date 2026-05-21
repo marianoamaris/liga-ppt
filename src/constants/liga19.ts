@@ -9,23 +9,28 @@ import imgRosado from "../assets/LIGA_19/Rosado.png";
 import imgVerde from "../assets/LIGA_19/Verde.png";
 
 export type Liga19Equipo = {
+  /** Slug del color de camiseta (archivo en `assets/LIGA_19/`) */
   id: string;
-  /** Nombre visible en la home (camiseta / color del equipo) */
+  /** Selección / país en la Edición Mundial */
   nombre: string;
   imagen: string;
 };
 
-/** Equipos Liga #19 – Edición Mundial (fotos en `assets/LIGA_19/`). */
+/**
+ * Liga #19 – selección según color de camiseta:
+ * amarillo→Brasil, azul→Argentina, verde→México, negro→Alemania,
+ * rosado→Noruega, blanco→Francia, morado→Corea del Sur, naranja→Países Bajos, rojo→Portugal
+ */
 export const LIGA_19_EQUIPOS: Liga19Equipo[] = [
-  { id: "amarillo", nombre: "Amarillo", imagen: imgAmarillo },
-  { id: "azul", nombre: "Azul", imagen: imgAzul },
-  { id: "blanco", nombre: "Blanco", imagen: imgBlanco },
-  { id: "morado", nombre: "Morado", imagen: imgMorado },
-  { id: "naranja", nombre: "Naranja", imagen: imgNaranja },
-  { id: "negro", nombre: "Negro", imagen: imgNegro },
-  { id: "rojo", nombre: "Rojo", imagen: imgRojo },
-  { id: "rosado", nombre: "Rosado", imagen: imgRosado },
-  { id: "verde", nombre: "Verde", imagen: imgVerde },
+  { id: "amarillo", nombre: "Brasil", imagen: imgAmarillo },
+  { id: "azul", nombre: "Argentina", imagen: imgAzul },
+  { id: "verde", nombre: "México", imagen: imgVerde },
+  { id: "negro", nombre: "Alemania", imagen: imgNegro },
+  { id: "rosado", nombre: "Noruega", imagen: imgRosado },
+  { id: "blanco", nombre: "Francia", imagen: imgBlanco },
+  { id: "morado", nombre: "Corea del Sur", imagen: imgMorado },
+  { id: "naranja", nombre: "Países Bajos", imagen: imgNaranja },
+  { id: "rojo", nombre: "Portugal", imagen: imgRojo },
 ];
 
 export const LIGA_19_DESTACADO = {
@@ -34,3 +39,40 @@ export const LIGA_19_DESTACADO = {
   descripcion:
     "La temporada 19 llega con temática Copa del Mundo 2026: equipos con nombres de selecciones clasificadas y premios especiales. Conoce a los equipos de esta edición.",
 } as const;
+
+const EQUIPOS_L19 = LIGA_19_EQUIPOS.map((e) => e.nombre);
+
+const filaTablaCero = (equipo: string) => ({
+  equipo,
+  pj: 0,
+  victorias: 0,
+  empates: 0,
+  derrotas: 0,
+  porcentajeVictorias: 0,
+  puntos: 0,
+});
+
+const filaJornadaCero = (equipo: string) => ({
+  equipo,
+  pj: 0,
+  v: 0,
+  e: 0,
+  d: 0,
+  puntos: 0,
+  porcentajeVictorias: 0,
+});
+
+/** Datos de clasificación Liga #19 (inicio de temporada — todo en cero). */
+export const LIGA_19 = {
+  tablaGeneral: EQUIPOS_L19.map(filaTablaCero),
+  jornadas: Array.from({ length: 6 }, (_, i) => ({
+    nombre: `Jornada ${i + 1}`,
+    resultados: EQUIPOS_L19.map(filaJornadaCero),
+  })),
+  goleadoresTotales: [] as { jugador: string; goles: number }[],
+  arqueros: [] as { arquero: string; golesRecibidos: number }[],
+  cuartos: [] as string[],
+  semifinales: [] as string[],
+  final: "Por definir",
+  ganador: "—",
+};

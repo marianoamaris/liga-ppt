@@ -91,7 +91,7 @@ const Liga19DestacadoCarousel: React.FC = () => {
           ))}
         </div>
         <p className="mt-3 text-center text-base font-bold text-lime-300 md:text-lg">
-          Equipo {equipo.nombre}
+          {equipo.nombre}
         </p>
         <p className="mt-1 text-center text-xs text-gray-400">
           {slide + 1} de {SLIDE_COUNT} equipos

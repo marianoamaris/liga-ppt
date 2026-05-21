@@ -100,6 +100,14 @@ export const TEAM_COLORS: Record<string, string | [string, string]> = {
   "París Saint-Germain": "#222222",
   "Inter de Milán": "#0068A8",
   "Palermo F.C.": "#FF69B4", // rosado
+  // Liga PPT #19: color de camiseta por selección (amarillo→Brasil, azul→Argentina, etc.)
+  Argentina: "#2563EB",
+  México: "#22C55E",
+  Noruega: "#FF69B4",
+  Francia: "#FFFFFF",
+  "Corea del Sur": "#9333EA",
+  "Países Bajos": "#F97316",
+  Portugal: "#D00027",
 };
 
 // Colores específicos para Liga PPT #15
@@ -3957,3 +3965,4 @@ export const LIGA_17 = {
 };
 
 export { LIGA_18 } from "./liga18";
+export { LIGA_19 } from "./liga19";
