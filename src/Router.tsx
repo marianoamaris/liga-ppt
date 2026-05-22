@@ -11,6 +11,7 @@ import { AnunciosPage } from "./pages/AnunciosPage";
 import { CalendarioPage } from "./pages/CalendarioPage";
 import { PatrocinadoresPage } from "./pages/PatrocinadoresPage";
 import { ActualizacionDatosJugadorPage } from "./pages/ActualizacionDatosJugadorPage";
+import { AnotadorPage } from "./pages/AnotadorPage";
 
 // Placeholder para rutas privadas
 const PrivatePlaceholder = () => (
@@ -40,6 +41,7 @@ export const AppRouter = () => (
       </Route>
       {/* Rutas públicas sin layout */}
       <Route path="/login" element={<SignIn />} />
+      <Route path="/anotador" element={<AnotadorPage />} />
       {/* Rutas privadas (placeholder) */}
       <Route path="/privado" element={<PrivatePlaceholder />} />
       {/* Redirección para rutas no encontradas */}
