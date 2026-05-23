@@ -1,15 +1,15 @@
 import type { EquipoEnCancha, Evento, TeamScore } from "./types";
 
 export const LIGA19_COLORES: Record<string, string> = {
-  amarillo: "#EAB308",
-  azul: "#3B82F6",
-  verde: "#22C55E",
-  negro: "#6B7280",
-  rosado: "#EC4899",
-  blanco: "#D1D5DB",
-  morado: "#8B5CF6",
-  naranja: "#F97316",
-  rojo: "#EF4444",
+  brasil:        "#EAB308",
+  argentina:     "#3B82F6",
+  mexico:        "#22C55E",
+  alemania:      "#6B7280",
+  noruega:       "#EC4899",
+  francia:       "#D1D5DB",
+  "corea-del-sur": "#8B5CF6",
+  "paises-bajos":  "#F97316",
+  portugal:      "#EF4444",
 };
 
 export const DURACION_PARTIDO = 7 * 60; // 420 segundos
@@ -19,7 +19,11 @@ export function getColor(id: string): string {
 }
 
 export function getTextColor(id: string): string {
-  return ["blanco", "amarillo"].includes(id) ? "#111827" : "#ffffff";
+  return ["francia", "brasil"].includes(id) ? "#111827" : "#ffffff";
+}
+
+export function makeId(): string {
+  return crypto.randomUUID();
 }
 
 export function formatCountdown(secs: number): string {
@@ -28,9 +32,13 @@ export function formatCountdown(secs: number): string {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-export function makeId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+/** Format elapsed seconds as "M'SS"" (e.g. 1'23" = 83 seconds) */
+export function formatElapsed(secs: number): string {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m}'${String(s).padStart(2, "0")}"`;
 }
+
 
 export function computeScores(
   equipos: EquipoEnCancha[],

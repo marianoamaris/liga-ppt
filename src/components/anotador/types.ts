@@ -57,11 +57,17 @@ export interface TeamScore {
   puntos: number;
 }
 
-export interface PartidoConfig {
-  modo: ModoPartido;
-  jornada: number; // 0 para playoff
-  equipos: EquipoEnCancha[]; // 3 para jornada, 2 para playoff
-}
+export type PartidoConfig =
+  | {
+      modo: "jornada";
+      jornada: number; // 1-6
+      equipos: [EquipoEnCancha, EquipoEnCancha, EquipoEnCancha];
+    }
+  | {
+      modo: "cuartos" | "semifinal" | "final";
+      jornada?: never;
+      equipos: [EquipoEnCancha, EquipoEnCancha];
+    };
 
 export interface PartidoVivo {
   config: PartidoConfig;

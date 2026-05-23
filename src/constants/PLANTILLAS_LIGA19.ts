@@ -12,7 +12,7 @@ export interface PlantillaEquipo {
 
 export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
   {
-    equipoId: "amarillo", // Brasil
+    equipoId: "brasil",
     arqueroDesignado: "Brayan Ospino",
     jugadores: [
       "Brayan Ospino",
@@ -24,7 +24,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "azul", // Argentina
+    equipoId: "argentina",
     arqueroDesignado: "Fernando Gómez",
     jugadores: [
       "Fernando Gómez",
@@ -36,7 +36,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "verde", // México
+    equipoId: "mexico",
     arqueroDesignado: "Keyner Vides",
     jugadores: [
       "Keyner Vides",
@@ -48,7 +48,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "negro", // Alemania
+    equipoId: "alemania",
     arqueroDesignado: "Bryan Cadena",
     jugadores: [
       "Bryan Cadena",
@@ -60,7 +60,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "rosado", // Noruega
+    equipoId: "noruega",
     arqueroDesignado: "Pipe Castillejo",
     jugadores: [
       "Pipe Castillejo",
@@ -72,7 +72,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "blanco", // Francia
+    equipoId: "francia",
     arqueroDesignado: "Leonardo Cadena",
     jugadores: [
       "Leonardo Cadena",
@@ -84,7 +84,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "morado", // Corea del Sur
+    equipoId: "corea-del-sur",
     arqueroDesignado: "Nadim Camall",
     jugadores: [
       "Nadim Camall",
@@ -96,7 +96,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "naranja", // Países Bajos
+    equipoId: "paises-bajos",
     arqueroDesignado: "Nicolás Baute",
     jugadores: [
       "Nicolás Baute",
@@ -108,7 +108,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     ],
   },
   {
-    equipoId: "rojo", // Portugal
+    equipoId: "portugal",
     arqueroDesignado: "Santiago Sánchez",
     jugadores: [
       "Santiago Sánchez",

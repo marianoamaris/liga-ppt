@@ -29,6 +29,12 @@ export const SIDEBAR_ITEMS = [
     icon: "FaHome",
   },
   {
+    id: "en-vivo",
+    label: "En Vivo",
+    path: "/en-vivo",
+    icon: "FaSignal",
+  },
+  {
     id: "clasificacion",
     label: "Clasificación",
     path: "/clasificacion",

@@ -5,7 +5,7 @@ interface Props {
   modo: ModoPartido;
   equipos: EquipoEnCancha[];
   eventos: Evento[];
-  jornada: number;
+  jornada?: number;
   // jornada only
   tiempoRestante?: number;
   corriendo?: boolean;
@@ -99,9 +99,11 @@ export function MarcadorVivo({
             </div>
           );
         })}
-        <div className="text-gray-700 text-[10px] shrink-0 pl-2 border-l border-gray-800 leading-tight text-right">
-          J{jornada}
-        </div>
+        {jornada && (
+          <div className="text-gray-700 text-[10px] shrink-0 pl-2 border-l border-gray-800 leading-tight text-right">
+            J{jornada}
+          </div>
+        )}
       </div>
 
       <div className="h-px bg-gray-800 mx-3" />

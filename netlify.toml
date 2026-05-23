@@ -1,5 +1,16 @@
 # netlify.toml
 
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA — todas las rutas van a index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Bloquear rutas de WordPress/bots
 [[redirects]]
   from = "/wp-admin/*"
   to = "/404.html"
@@ -27,4 +38,4 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer-when-downgrade"
-    Content-Security-Policy = "default-src 'self';"
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://syjhbpkavaljkwysuwsc.supabase.co wss://syjhbpkavaljkwysuwsc.supabase.co https://liga-ppt-backend-production.up.railway.app; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"

@@ -21,16 +21,17 @@ export type Liga19Equipo = {
  * amarillo→Brasil, azul→Argentina, verde→México, negro→Alemania,
  * rosado→Noruega, blanco→Francia, morado→Corea del Sur, naranja→Países Bajos, rojo→Portugal
  */
+// IDs coinciden exactamente con los del backend
 export const LIGA_19_EQUIPOS: Liga19Equipo[] = [
-  { id: "amarillo", nombre: "Brasil", imagen: imgAmarillo },
-  { id: "azul", nombre: "Argentina", imagen: imgAzul },
-  { id: "verde", nombre: "México", imagen: imgVerde },
-  { id: "negro", nombre: "Alemania", imagen: imgNegro },
-  { id: "rosado", nombre: "Noruega", imagen: imgRosado },
-  { id: "blanco", nombre: "Francia", imagen: imgBlanco },
-  { id: "morado", nombre: "Corea del Sur", imagen: imgMorado },
-  { id: "naranja", nombre: "Países Bajos", imagen: imgNaranja },
-  { id: "rojo", nombre: "Portugal", imagen: imgRojo },
+  { id: "brasil",        nombre: "Brasil",        imagen: imgAmarillo },
+  { id: "argentina",     nombre: "Argentina",     imagen: imgAzul },
+  { id: "mexico",        nombre: "México",        imagen: imgVerde },
+  { id: "alemania",      nombre: "Alemania",      imagen: imgNegro },
+  { id: "noruega",       nombre: "Noruega",       imagen: imgRosado },
+  { id: "francia",       nombre: "Francia",       imagen: imgBlanco },
+  { id: "corea-del-sur", nombre: "Corea del Sur", imagen: imgMorado },
+  { id: "paises-bajos",  nombre: "Países Bajos",  imagen: imgNaranja },
+  { id: "portugal",      nombre: "Portugal",      imagen: imgRojo },
 ];
 
 export const LIGA_19_DESTACADO = {

@@ -12,18 +12,12 @@ import { CalendarioPage } from "./pages/CalendarioPage";
 import { PatrocinadoresPage } from "./pages/PatrocinadoresPage";
 import { ActualizacionDatosJugadorPage } from "./pages/ActualizacionDatosJugadorPage";
 import { AnotadorPage } from "./pages/AnotadorPage";
-
-// Placeholder para rutas privadas
-const PrivatePlaceholder = () => (
-  <div className="p-8 text-center text-gray-700">
-    Zona privada (próximamente)
-  </div>
-);
+import { EnVivoPage } from "./pages/EnVivoPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
     <Routes>
-      {/* Rutas públicas con layout */}
+      {/* Rutas públicas con layout (datos estáticos, sin auth) */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/contacto" element={<Contacto />} />
@@ -34,17 +28,16 @@ export const AppRouter = () => (
         <Route path="/anuncios" element={<AnunciosPage />} />
         <Route path="/calendario" element={<CalendarioPage />} />
         <Route path="/patrocinadores" element={<PatrocinadoresPage />} />
-        <Route
-          path="/actualizacion-datos"
-          element={<ActualizacionDatosJugadorPage />}
-        />
+        <Route path="/actualizacion-datos" element={<ActualizacionDatosJugadorPage />} />
+
+        {/* En Vivo es pública — cualquiera puede ver los partidos */}
+        <Route path="/en-vivo" element={<EnVivoPage />} />
       </Route>
-      {/* Rutas públicas sin layout */}
+
+      {/* Sin layout */}
       <Route path="/login" element={<SignIn />} />
       <Route path="/anotador" element={<AnotadorPage />} />
-      {/* Rutas privadas (placeholder) */}
-      <Route path="/privado" element={<PrivatePlaceholder />} />
-      {/* Redirección para rutas no encontradas */}
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>

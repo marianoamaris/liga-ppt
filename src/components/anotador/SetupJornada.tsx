@@ -126,11 +126,18 @@ export function SetupJornada({ onIniciar }: Props) {
   function handleIniciar() {
     if (!listos) return;
     const ids = activeSlots as string[];
-    onIniciar({
-      modo,
-      jornada: esPlayoff ? 0 : jornada,
-      equipos: ids.map(buildEquipo),
-    });
+    if (modo === "jornada") {
+      onIniciar({
+        modo: "jornada",
+        jornada,
+        equipos: [buildEquipo(ids[0]), buildEquipo(ids[1]), buildEquipo(ids[2])],
+      });
+    } else {
+      onIniciar({
+        modo,
+        equipos: [buildEquipo(ids[0]), buildEquipo(ids[1])],
+      });
+    }
   }
 
   return (

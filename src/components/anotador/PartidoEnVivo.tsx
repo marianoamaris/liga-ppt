@@ -3,7 +3,7 @@ import { MarcadorVivo } from "./MarcadorVivo";
 import { AmarillaModal } from "./AmarillaModal";
 import {
   getColor,
-  formatCountdown,
+  formatElapsed,
   makeId,
   computeScores,
   amarillasPorJugador,
@@ -155,6 +155,9 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   const scores = computeScores(equipos, eventos);
   const amarillas = amarillasPorJugador(eventos);
 
+  // Elapsed seconds from server's iniciado_en (what the backend expects)
+  const elapsedSec = () => Math.floor((Date.now() - partido.iniciadoEn) / 1000);
+
   function pushEvento(ev: Evento) {
     onUpdatePartido({ ...partido, eventos: [...eventos, ev] });
   }
@@ -162,7 +165,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   function handleGol(goleador: string, equipoGoleadorId: string, equipoArqueroId: string) {
     const data: EventoGol = {
       id: makeId(), goleador, equipoGoleadorId, equipoArqueroId,
-      tiempoEnMarcador: tiempoRestante,
+      tiempoEnMarcador: elapsedSec(),
     };
     pushEvento({ tipo: "gol", data });
 
@@ -188,7 +191,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   function handleAutogol(equipoAutogolId: string, equipoGanadorId: string) {
     const data: EventoAutogol = {
       id: makeId(), equipoAutogolId, equipoGanadorId,
-      tiempoEnMarcador: tiempoRestante,
+      tiempoEnMarcador: elapsedSec(),
     };
     pushEvento({ tipo: "autogol", data });
 
@@ -214,7 +217,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
       id: makeId(),
       equipoAId: equipoA.equipo.id,
       equipoBId: equipoB.equipo.id,
-      tiempoEnMarcador: tiempoRestante,
+      tiempoEnMarcador: elapsedSec(),
     };
     pushEvento({ tipo: "empate", data });
   }
@@ -227,7 +230,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
       jugador: targetAmarilla.jugador,
       equipoId: eq.equipo.id,
       razon,
-      tiempoEnMarcador: tiempoRestante,
+      tiempoEnMarcador: elapsedSec(),
     };
     pushEvento({ tipo: "amarilla", data });
     setTargetAmarilla(null);
@@ -379,7 +382,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                       return (
                         <div key={ev.data.id} className="flex items-center gap-2.5 px-4 py-3">
                           <span className="text-gray-500 text-[11px] w-11 shrink-0 font-mono tabular-nums">
-                            {formatCountdown(ev.data.tiempoEnMarcador)}
+                            {formatElapsed(ev.data.tiempoEnMarcador)}
                           </span>
                           <span className="text-base shrink-0">⚽</span>
                           <div className="min-w-0">
@@ -396,7 +399,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                       return (
                         <div key={ev.data.id} className="flex items-center gap-2.5 px-4 py-3">
                           <span className="text-gray-500 text-[11px] w-11 shrink-0 font-mono tabular-nums">
-                            {formatCountdown(ev.data.tiempoEnMarcador)}
+                            {formatElapsed(ev.data.tiempoEnMarcador)}
                           </span>
                           <span className="text-base shrink-0">🥅</span>
                           <div className="min-w-0">
@@ -413,7 +416,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                       return (
                         <div key={ev.data.id} className="flex items-center gap-2.5 px-4 py-3">
                           <span className="text-gray-500 text-[11px] w-11 shrink-0 font-mono tabular-nums">
-                            {formatCountdown(ev.data.tiempoEnMarcador)}
+                            {formatElapsed(ev.data.tiempoEnMarcador)}
                           </span>
                           <span className="text-base shrink-0">🤝</span>
                           <span className="text-yellow-500 text-sm">
@@ -427,7 +430,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                       return (
                         <div key={ev.data.id} className="flex items-center gap-2.5 px-4 py-3">
                           <span className="text-gray-500 text-[11px] w-11 shrink-0 font-mono tabular-nums">
-                            {formatCountdown(ev.data.tiempoEnMarcador)}
+                            {formatElapsed(ev.data.tiempoEnMarcador)}
                           </span>
                           <span className="text-base shrink-0">🟨</span>
                           <div className="min-w-0">
