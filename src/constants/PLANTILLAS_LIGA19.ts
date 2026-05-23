@@ -1,11 +1,5 @@
-/**
- * Plantillas fijas de la Liga PPT #19 – Edición Mundial.
- * Cada equipo tiene su roster completo y su arquero titular designado.
- * Para modificar: editar jugadores[] y arqueroDesignado de cada entrada.
- */
-
 export interface PlantillaEquipo {
-  equipoId: string; // coincide con Liga19Equipo.id
+  equipoId: string;
   jugadores: string[];
   arqueroDesignado: string;
 }
@@ -13,25 +7,113 @@ export interface PlantillaEquipo {
 export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
   {
     equipoId: "brasil",
-    arqueroDesignado: "Brayan Ospino",
+    arqueroDesignado: "Fernando Gómez",
     jugadores: [
-      "Brayan Ospino",
-      "Juan de la Cruz",
+      "Darío Daza",
       "Eudes Pavajeau",
-      "Keni Contreras",
-      "Fabricio Rizo",
-      "Jeison Santa",
+      "Andrés Paez",
+      "Luis Rico",
+      "Frederick Molina",
+      "José Hernández",
+      "Luis Suárez",
+      "Fernando Gómez",
     ],
   },
   {
     equipoId: "argentina",
-    arqueroDesignado: "Fernando Gómez",
+    arqueroDesignado: "Brayan Ospino",
     jugadores: [
-      "Fernando Gómez",
-      "Mariano Amaris",
+      "Juanse Pinedo",
       "Emanuel Celedón",
+      "Albeiro Gallego",
+      "Carlos Romero",
+      "Juan DLC",
+      "Brayan Ospino",
+      "Cristian Benjumea",
+      "Jesús Bullones",
+    ],
+  },
+  {
+    equipoId: "francia",
+    arqueroDesignado: "Brayan Cadena",
+    jugadores: [
+      "David Carballo",
+      "Brayan Cadena",
+      "Jesús Solano",
+      "Jairo Galván",
+      "Nico Yamal",
+      "Jesús Pertuz",
+      "Ruber Martínez",
+      "Breiner Corzo",
+    ],
+  },
+  {
+    equipoId: "corea-del-sur",
+    arqueroDesignado: "Leonardo Cadena",
+    jugadores: [
+      "Jhon Garcerant",
+      "Jaime Machado",
+      "Leonardo Cadena",
+      "Orlando Díaz",
+      "Andrés Blanco",
+      "Héctor Duque",
+      "Juanda Dybala",
+      "Eduardo Sarmiento",
+    ],
+  },
+  {
+    equipoId: "paises-bajos",
+    arqueroDesignado: "Santiago Sánchez",
+    jugadores: [
+      "Julian Charris",
+      "Santiago Sánchez",
+      "Jesús Vergara",
+      "Narent Rojas",
+      "Emanuel Navarro",
+      "Óscar Mendoza",
+      "Sebastián Castaño",
+      "Keiler Fonseca",
+    ],
+  },
+  {
+    equipoId: "alemania",
+    arqueroDesignado: "Luis Fonseca",
+    jugadores: [
       "Andy Córdoba",
-      "Elias Lacera",
+      "Luis Serje",
+      "Luis Fonseca",
+      "Andrés Valle",
+      "Arnold Castillo",
+      "Camilo Yepes",
+      "Elías Lacera",
+      "Hernán Medrano",
+    ],
+  },
+  {
+    equipoId: "portugal",
+    arqueroDesignado: "Pipe Castillejo",
+    jugadores: [
+      "Pipe Castillejo",
+      "Ernesto Lacera",
+      "Kevin Pineda",
+      "Esteban Hinojosa",
+      "Jesús Cartagena",
+      "Jeison Santa",
+      "Juanse López",
+      "Ronald Rojas",
+    ],
+  },
+  {
+    equipoId: "noruega",
+    arqueroDesignado: "Hernán García",
+    jugadores: [
+      "Camilo Laborde",
+      "José Mosquera",
+      "Henry Hernández",
+      "Jereimy Niebles",
+      "Andrés Farfán",
+      "Hernán García",
+      "Edwin Martínez",
       "Santiago Corzo",
     ],
   },
@@ -39,84 +121,14 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     equipoId: "mexico",
     arqueroDesignado: "Keyner Vides",
     jugadores: [
-      "Keyner Vides",
-      "Ronald Rojas",
-      "Yassir Fuentes",
-      "Jairo Galván",
-      "Esteban Galván",
-      "Nico Yamal",
-    ],
-  },
-  {
-    equipoId: "alemania",
-    arqueroDesignado: "Bryan Cadena",
-    jugadores: [
-      "Bryan Cadena",
+      "Carlos Vega",
+      "Carlos Armenta",
+      "Fabricio Rizo",
       "Juan Mora",
-      "Daniel Cuadros",
-      "Cristian Benjumea",
-      "Frank Ramirez",
-      "Henry Hernández",
-    ],
-  },
-  {
-    equipoId: "noruega",
-    arqueroDesignado: "Pipe Castillejo",
-    jugadores: [
-      "Pipe Castillejo",
-      "Hernán Medrano",
-      "Arnold Castillo",
-      "Juanda Dybala",
-      "Kevin Pineda",
-      "Breiner Corzo",
-    ],
-  },
-  {
-    equipoId: "francia",
-    arqueroDesignado: "Leonardo Cadena",
-    jugadores: [
-      "Leonardo Cadena",
-      "José Hernández",
-      "Víctor Castilla",
-      "Jaime Medrano",
-      "Sergio Barrera",
-      "Jhan Martínez",
-    ],
-  },
-  {
-    equipoId: "corea-del-sur",
-    arqueroDesignado: "Nadim Camall",
-    jugadores: [
-      "Nadim Camall",
-      "José Viña",
-      "Jesús Pertuz",
-      "Carlos Romero",
-      "Jossimar Cujia",
-      "Andrés Valle",
-    ],
-  },
-  {
-    equipoId: "paises-bajos",
-    arqueroDesignado: "Nicolás Baute",
-    jugadores: [
-      "Nicolás Baute",
-      "Andrés Farfán",
-      "Omar Peralta",
-      "Edwin Martínez",
       "Jürgen Hassler",
-      "Alexis Marín",
-    ],
-  },
-  {
-    equipoId: "portugal",
-    arqueroDesignado: "Santiago Sánchez",
-    jugadores: [
-      "Santiago Sánchez",
-      "José Franco",
-      "Steven Cubides",
-      "David Carballo",
-      "Jhan C. Martínez",
-      "Luiska Fonseca",
+      "Héctor Vanegas Jr",
+      "Víctor Castilla",
+      "Keyner Vides",
     ],
   },
 ];
