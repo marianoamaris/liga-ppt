@@ -323,11 +323,11 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
                           <span className="text-white text-sm font-medium">{s.nombre}</span>
                         </div>
                       </td>
-                      <td className="px-3 py-2.5 text-center text-gray-300 tabular-nums text-xs">{s.victorias}</td>
-                      <td className="px-3 py-2.5 text-center text-gray-300 tabular-nums text-xs">{s.empates}</td>
-                      <td className="px-3 py-2.5 text-center text-gray-300 tabular-nums text-xs">{s.derrotas}</td>
-                      <td className="px-3 py-2.5 text-center">
-                        <span className="font-black text-base tabular-nums" style={{ color }}>{s.puntos}</span>
+                      <td className="px-3 py-2.5 text-center text-white tabular-nums text-xs">{s.victorias}</td>
+                      <td className="px-3 py-2.5 text-center text-white tabular-nums text-xs">{s.empates}</td>
+                      <td className="px-3 py-2.5 text-center text-white tabular-nums text-xs">{s.derrotas}</td>
+                      <td className="px-3 py-2.5 text-center text-white font-black text-base tabular-nums">
+                        {s.puntos}
                       </td>
                     </tr>
                   );

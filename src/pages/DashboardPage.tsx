@@ -83,22 +83,17 @@ function TablaClasificacion({
                         <span className="text-white font-medium">{s.nombre}</span>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-center text-gray-300 tabular-nums">
+                    <td className="px-3 py-3 text-center text-white tabular-nums">
                       {s.victorias}
                     </td>
-                    <td className="px-3 py-3 text-center text-gray-300 tabular-nums">
+                    <td className="px-3 py-3 text-center text-white tabular-nums">
                       {s.empates}
                     </td>
-                    <td className="px-3 py-3 text-center text-gray-300 tabular-nums">
+                    <td className="px-3 py-3 text-center text-white tabular-nums">
                       {s.derrotas}
                     </td>
-                    <td className="px-3 py-3 text-center">
-                      <span
-                        className="font-black text-base tabular-nums"
-                        style={{ color }}
-                      >
-                        {s.puntos}
-                      </span>
+                    <td className="px-3 py-3 text-center text-white font-black text-base tabular-nums">
+                      {s.puntos}
                     </td>
                   </tr>
                 );
