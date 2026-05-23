@@ -1,15 +1,15 @@
 import type { EquipoEnCancha, Evento, TeamScore } from "./types";
 
 export const LIGA19_COLORES: Record<string, string> = {
-  brasil:        "#EAB308",
-  argentina:     "#3B82F6",
-  mexico:        "#22C55E",
-  alemania:      "#6B7280",
-  noruega:       "#EC4899",
-  francia:       "#D1D5DB",
-  "corea-del-sur": "#8B5CF6",
-  "paises-bajos":  "#F97316",
-  portugal:      "#EF4444",
+  brasil:          "#FFD700",
+  argentina:       "#1565C0",
+  mexico:          "#2E7D32",
+  alemania:        "#212121",
+  noruega:         "#E91E8C",
+  francia:         "#F5F5F5",
+  "corea-del-sur": "#7B1FA2",
+  "paises-bajos":  "#E65100",
+  portugal:        "#C62828",
 };
 
 export const DURACION_PARTIDO = 7 * 60; // 420 segundos

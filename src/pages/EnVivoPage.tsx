@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { partidosApi, statsApi, type Partido, type Standing } from "../lib/api";
+import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero } from "../lib/api";
 import { supabase } from "../lib/supabase";
-import { getColor, computeScores, formatElapsed } from "../components/anotador/utils";
+import { getColor, getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
 import { LIGA_19_EQUIPOS } from "../constants/liga19";
 import type { EquipoEnCancha, Evento } from "../components/anotador/types";
 
@@ -195,6 +195,92 @@ function CanchaCard({ partido, numero }: { partido: Partido; numero: number }) {
   );
 }
 
+// ── Rankings goleadores / arqueros ────────────────────────────────────────────
+
+function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; loading: boolean }) {
+  return (
+    <div className="bg-gray-900 rounded-2xl overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
+        <span className="text-lg">⚽</span>
+        <h2 className="text-white font-bold text-sm">Goleadores</h2>
+      </div>
+      <div className="divide-y divide-gray-800/40">
+        {loading
+          ? Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 py-2.5 animate-pulse">
+                <div className="w-4 h-3 bg-gray-800 rounded-full" />
+                <div className="flex-1 h-3 bg-gray-800 rounded-full" />
+                <div className="w-4 h-3 bg-gray-800 rounded-full" />
+              </div>
+            ))
+          : goleadores.length === 0
+          ? <p className="text-gray-600 text-xs text-center py-6">Sin goles registrados</p>
+          : goleadores.map((g, i) => {
+              const color = getColor(g.equipoId);
+              const textColor = getTextColor(g.equipoId);
+              return (
+                <div key={`${g.jugador}-${g.equipoId}`} className="flex items-center gap-3 px-4 py-2.5">
+                  <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white text-sm font-medium truncate">{g.jugador}</div>
+                    <div
+                      className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
+                      style={{ backgroundColor: color, color: textColor }}
+                    >
+                      {g.equipo}
+                    </div>
+                  </div>
+                  <span className="text-white font-black text-base tabular-nums shrink-0">{g.goles}</span>
+                </div>
+              );
+            })}
+      </div>
+    </div>
+  );
+}
+
+function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: boolean }) {
+  return (
+    <div className="bg-gray-900 rounded-2xl overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
+        <span className="text-lg">🧤</span>
+        <h2 className="text-white font-bold text-sm">Valla menos vencida</h2>
+      </div>
+      <div className="divide-y divide-gray-800/40">
+        {loading
+          ? Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 py-2.5 animate-pulse">
+                <div className="w-4 h-3 bg-gray-800 rounded-full" />
+                <div className="flex-1 h-3 bg-gray-800 rounded-full" />
+                <div className="w-4 h-3 bg-gray-800 rounded-full" />
+              </div>
+            ))
+          : arqueros.length === 0
+          ? <p className="text-gray-600 text-xs text-center py-6">Sin datos</p>
+          : arqueros.map((a, i) => {
+              const color = getColor(a.equipoId);
+              const textColor = getTextColor(a.equipoId);
+              return (
+                <div key={`${a.arquero}-${a.equipoId}`} className="flex items-center gap-3 px-4 py-2.5">
+                  <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white text-sm font-medium truncate">{a.arquero}</div>
+                    <div
+                      className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
+                      style={{ backgroundColor: color, color: textColor }}
+                    >
+                      {a.equipo}
+                    </div>
+                  </div>
+                  <span className="text-gray-400 text-xs tabular-nums shrink-0">{a.golesRecibidos} <span className="text-gray-600">gc</span></span>
+                </div>
+              );
+            })}
+      </div>
+    </div>
+  );
+}
+
 // ── Clasificación ─────────────────────────────────────────────────────────────
 
 function TablaClasificacion({ standings, loading }: { standings: ReturnType<typeof mergeStandings>; loading: boolean }) {
@@ -258,12 +344,15 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
 type FiltroCancha = "todas" | 1 | 2 | 3;
 
 export function EnVivoPage() {
-  const [partidos, setPartidos]       = useState<Partido[]>([]);
-  const [baseStandings, setBase]      = useState<Standing[]>([]);
-  const [filtro, setFiltro]           = useState<FiltroCancha>("todas");
+  const [partidos, setPartidos]         = useState<Partido[]>([]);
+  const [baseStandings, setBase]        = useState<Standing[]>([]);
+  const [goleadores, setGoleadores]     = useState<Goleador[]>([]);
+  const [arqueros, setArqueros]         = useState<Arquero[]>([]);
+  const [filtro, setFiltro]             = useState<FiltroCancha>("todas");
   const [loadingMatch, setLoadingMatch] = useState(true);
   const [loadingStats, setLoadingStats] = useState(true);
-  const [lastUpdate, setLastUpdate]   = useState<Date | null>(null);
+  const [loadingRankings, setLoadingRankings] = useState(true);
+  const [lastUpdate, setLastUpdate]     = useState<Date | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const channelRef = useRef<any>(null);
 
@@ -293,10 +382,30 @@ export function EnVivoPage() {
     }
   }
 
-  useEffect(() => {
+  async function fetchRankings() {
+    try {
+      const [{ goleadores: g }, { arqueros: a }] = await Promise.all([
+        statsApi.goleadores(19),
+        statsApi.arqueros(19),
+      ]);
+      setGoleadores(g);
+      setArqueros(a);
+    } catch {
+      // silent
+    } finally {
+      setLoadingRankings(false);
+    }
+  }
+
+  function refreshAll() {
     fetchActivos();
     fetchStandings();
-    const interval = setInterval(() => { fetchActivos(); fetchStandings(); }, 10_000);
+    fetchRankings();
+  }
+
+  useEffect(() => {
+    refreshAll();
+    const interval = setInterval(refreshAll, 10_000);
     return () => clearInterval(interval);
   }, []);
 
@@ -304,17 +413,8 @@ export function EnVivoPage() {
     if (!supabase) return;
     channelRef.current?.unsubscribe();
     channelRef.current = supabase
-      .channel("canchas-rt")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "partidos", filter: "finalizado_en=is.null" },
-        () => { fetchActivos(); fetchStandings(); }
-      )
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "partidos" },
-        () => { fetchActivos(); }
-      )
+      .channel("en-vivo")
+      .on("postgres_changes", { event: "*", schema: "public", table: "partidos" }, refreshAll)
       .subscribe();
     return () => channelRef.current?.unsubscribe();
   }, []);
@@ -396,6 +496,12 @@ export function EnVivoPage() {
 
       {/* Live classification */}
       <TablaClasificacion standings={standings} loading={loadingStats} />
+
+      {/* Rankings goleadores / arqueros */}
+      <div className="grid grid-cols-2 gap-4">
+        <TablaGoleadores goleadores={goleadores} loading={loadingRankings} />
+        <TablaArqueros arqueros={arqueros} loading={loadingRankings} />
+      </div>
     </div>
   );
 }
