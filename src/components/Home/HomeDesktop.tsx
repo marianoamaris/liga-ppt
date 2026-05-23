@@ -13,6 +13,7 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Liga19DestacadoCarousel from "./Liga19DestacadoCarousel";
 import Liga18DestacadoCarousel from "./Liga18DestacadoCarousel";
+import EnVivoDestacado from "./EnVivoDestacado";
 
 const HomeDesktop: React.FC = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const HomeDesktop: React.FC = () => {
         </div>
       </Card>
 
+      <EnVivoDestacado />
       <Liga19DestacadoCarousel />
       <Liga18DestacadoCarousel />
 

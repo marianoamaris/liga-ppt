@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "../common/Card";
 import Liga19DestacadoCarousel from "./Liga19DestacadoCarousel";
 import Liga18DestacadoCarousel from "./Liga18DestacadoCarousel";
+import EnVivoDestacado from "./EnVivoDestacado";
 
 const HomeTablet: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ const HomeTablet: React.FC = () => {
           Sigue el avance, consulta estadísticas, historia y más.
         </div>
       </Card>
+      <EnVivoDestacado />
       <Liga19DestacadoCarousel />
       <Liga18DestacadoCarousel />
       {/* Módulos principales */}
