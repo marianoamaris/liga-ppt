@@ -66,8 +66,9 @@ function Marcador({ partido }: { partido: Partido }) {
     return (
       <div className="flex items-center justify-center gap-3 py-5 px-4">
         <div className="flex-1 text-right min-w-0">
-          <div className="font-black text-lg leading-tight" style={{ color: getColor(eqA.equipo.id) }}>
-            {eqA.equipo.nombre}
+          <div className="flex items-center justify-end gap-1.5">
+            <div className="font-black text-lg leading-tight text-white">{eqA.equipo.nombre}</div>
+            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: getColor(eqA.equipo.id) }} />
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -76,8 +77,9 @@ function Marcador({ partido }: { partido: Partido }) {
           <span className="text-white text-4xl font-black tabular-nums leading-none">{gB}</span>
         </div>
         <div className="flex-1 text-left min-w-0">
-          <div className="font-black text-lg leading-tight" style={{ color: getColor(eqB.equipo.id) }}>
-            {eqB.equipo.nombre}
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: getColor(eqB.equipo.id) }} />
+            <div className="font-black text-lg leading-tight text-white">{eqB.equipo.nombre}</div>
           </div>
         </div>
       </div>
@@ -91,7 +93,10 @@ function Marcador({ partido }: { partido: Partido }) {
         const s = scores.get(eq.equipo.id) ?? { victorias: 0, empates: 0, derrotas: 0, puntos: 0 };
         return (
           <div key={eq.equipo.id} className="text-center min-w-0 flex-1">
-            <div className="text-[11px] font-bold truncate leading-tight" style={{ color }}>{eq.equipo.nombre}</div>
+            <div className="flex items-center justify-center gap-1 leading-tight">
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+              <span className="text-white text-[11px] font-bold truncate">{eq.equipo.nombre}</span>
+            </div>
             <div className="text-white text-3xl font-black tabular-nums leading-tight mt-0.5">
               {s.puntos}<span className="text-gray-600 text-[10px] font-normal ml-px">p</span>
             </div>
@@ -116,7 +121,8 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
           return (
             <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
               {t}<span>⚽</span>
-              <span className="font-medium" style={{ color: getColor(ev.data.equipoGoleadorId) }}>{ev.data.goleador}</span>
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(ev.data.equipoGoleadorId) }} />
+              <span className="font-medium text-white">{ev.data.goleador}</span>
               <span className="text-gray-600 text-xs">· {eq?.equipo.nombre}</span>
             </div>
           );
@@ -145,7 +151,8 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
           return (
             <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
               {t}<span>🟨</span>
-              <span className="font-medium" style={{ color: getColor(ev.data.equipoId) }}>{ev.data.jugador}</span>
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(ev.data.equipoId) }} />
+              <span className="font-medium text-white">{ev.data.jugador}</span>
               <span className="text-gray-600 text-xs">· {RAZON[ev.data.razon]}</span>
             </div>
           );
