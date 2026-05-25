@@ -229,7 +229,7 @@ const HistoricoFinalesComponent = () => {
           incluye empates.
         </p>
         <ul className="space-y-2">
-          {resumen.map(({ color, finales }) => (
+          {resumen.map(({ color, ganadas, disputadas }) => (
             <li
               key={color}
               className="flex flex-wrap items-center gap-2 text-base text-gray-800"
@@ -239,10 +239,22 @@ const HistoricoFinalesComponent = () => {
               >
                 {ETIQUETA_COLOR[color]}
               </span>
-              <span>
-                <strong className="font-bold text-gray-900">{finales}</strong>{" "}
-                {finales === 1 ? "final ganada" : "finales ganadas"}
-              </span>
+              {ganadas > 0 ? (
+                <span>
+                  ganó{" "}
+                  <strong className="font-bold text-gray-900">{ganadas}</strong>{" "}
+                  de{" "}
+                  <strong className="font-bold text-gray-900">{disputadas}</strong>{" "}
+                  {disputadas === 1 ? "final disputada" : "finales disputadas"}
+                </span>
+              ) : (
+                <span className="text-gray-500">
+                  no ha ganado{" "}
+                  <span className="text-gray-400 text-sm">
+                    ({disputadas} {disputadas === 1 ? "final disputada" : "finales disputadas"})
+                  </span>
+                </span>
+              )}
             </li>
           ))}
         </ul>

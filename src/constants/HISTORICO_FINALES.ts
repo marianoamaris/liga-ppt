@@ -225,24 +225,24 @@ export const FINALES_HISTORICAS: FinalHistorica[] = [
   },
 ];
 
-/** Cuenta finales ganadas por color de camiseta (no cuenta empates ni partidos pendientes). */
-export function resumenVictoriasPorColor(): { color: ColorCamiseta; finales: number }[] {
-  const map = new Map<ColorCamiseta, number>();
+/** Cuenta finales ganadas y disputadas por color de camiseta. */
+export function resumenVictoriasPorColor(): { color: ColorCamiseta; ganadas: number; disputadas: number }[] {
+  const ganadas = new Map<ColorCamiseta, number>();
+  const disputadas = new Map<ColorCamiseta, number>();
   for (const c of Object.keys(ETIQUETA_COLOR) as ColorCamiseta[]) {
-    map.set(c, 0);
+    ganadas.set(c, 0);
+    disputadas.set(c, 0);
   }
   for (const f of FINALES_HISTORICAS) {
-    if (f.resultado === "empate" || f.resultado === "pendiente") continue;
-    const ganador =
-      f.resultado === "1"
-        ? f.color1
-        : f.resultado === "2"
-          ? f.color2
-          : null;
-    if (ganador) map.set(ganador, (map.get(ganador) ?? 0) + 1);
+    if (f.resultado === "pendiente") continue;
+    disputadas.set(f.color1, (disputadas.get(f.color1) ?? 0) + 1);
+    disputadas.set(f.color2, (disputadas.get(f.color2) ?? 0) + 1);
+    if (f.resultado === "empate") continue;
+    const ganador = f.resultado === "1" ? f.color1 : f.resultado === "2" ? f.color2 : null;
+    if (ganador) ganadas.set(ganador, (ganadas.get(ganador) ?? 0) + 1);
   }
-  return [...map.entries()]
-    .map(([color, finales]) => ({ color, finales }))
-    .filter((x) => x.finales > 0)
-    .sort((a, b) => b.finales - a.finales || a.color.localeCompare(b.color));
+  return [...disputadas.entries()]
+    .filter(([, d]) => d > 0)
+    .map(([color, d]) => ({ color, ganadas: ganadas.get(color) ?? 0, disputadas: d }))
+    .sort((a, b) => b.ganadas - a.ganadas || a.color.localeCompare(b.color));
 }
