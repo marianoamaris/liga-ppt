@@ -12,14 +12,14 @@ export interface UsuarioLiga {
   posicion: Posicion;
 }
 
-// Requisitos para ser fundador -> haber jugado todas las ligas
+
 
 export const USUARIOS_LIGA: UsuarioLiga[] = [
   {
     name: "Mariano Amaris",
     username: "sirama",
     avatar: null,
-    ligasJugadas: 13,
+    ligasJugadas: 17,
     esFundador: true,
     ligasGanadas: 4,
     esAdmin: true,

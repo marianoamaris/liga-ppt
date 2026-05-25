@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero } from "../lib/api";
 import { supabase } from "../lib/supabase";
 import { getColor, getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
@@ -204,6 +205,8 @@ function CanchaCard({ partido, numero }: { partido: Partido; numero: number }) {
 
 // ── Rankings goleadores / arqueros ────────────────────────────────────────────
 
+const LAYOUT_TRANSITION = { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } as const;
+
 function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; loading: boolean }) {
   return (
     <div className="bg-gray-900 rounded-2xl overflow-hidden">
@@ -222,25 +225,34 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
             ))
           : goleadores.length === 0
           ? <p className="text-gray-600 text-xs text-center py-6">Sin goles registrados</p>
-          : goleadores.map((g, i) => {
-              const color = getColor(g.equipoId);
-              const textColor = getTextColor(g.equipoId);
-              return (
-                <div key={`${g.jugador}-${g.equipoId}`} className="flex items-center gap-3 px-4 py-2.5">
-                  <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white text-sm font-medium truncate">{g.jugador}</div>
-                    <div
-                      className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
-                      style={{ backgroundColor: color, color: textColor }}
-                    >
-                      {g.equipo}
+          : (
+            <AnimatePresence initial={false}>
+              {goleadores.map((g, i) => {
+                const color = getColor(g.equipoId);
+                const textColor = getTextColor(g.equipoId);
+                return (
+                  <motion.div
+                    key={`${g.jugador}-${g.equipoId}`}
+                    layout
+                    transition={LAYOUT_TRANSITION}
+                    className="flex items-center gap-3 px-4 py-2.5"
+                  >
+                    <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white text-sm font-medium truncate">{g.jugador}</div>
+                      <div
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
+                        style={{ backgroundColor: color, color: textColor }}
+                      >
+                        {g.equipo}
+                      </div>
                     </div>
-                  </div>
-                  <span className="text-white font-black text-base tabular-nums shrink-0">{g.goles}</span>
-                </div>
-              );
-            })}
+                    <span className="text-white font-black text-base tabular-nums shrink-0">{g.goles}</span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          )}
       </div>
     </div>
   );
@@ -264,31 +276,48 @@ function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: bo
             ))
           : arqueros.length === 0
           ? <p className="text-gray-600 text-xs text-center py-6">Sin datos</p>
-          : arqueros.map((a, i) => {
-              const color = getColor(a.equipoId);
-              const textColor = getTextColor(a.equipoId);
-              return (
-                <div key={`${a.arquero}-${a.equipoId}`} className="flex items-center gap-3 px-4 py-2.5">
-                  <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white text-sm font-medium truncate">{a.arquero}</div>
-                    <div
-                      className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
-                      style={{ backgroundColor: color, color: textColor }}
-                    >
-                      {a.equipo}
+          : (
+            <AnimatePresence initial={false}>
+              {arqueros.map((a, i) => {
+                const color = getColor(a.equipoId);
+                const textColor = getTextColor(a.equipoId);
+                return (
+                  <motion.div
+                    key={`${a.arquero}-${a.equipoId}`}
+                    layout
+                    transition={LAYOUT_TRANSITION}
+                    className="flex items-center gap-3 px-4 py-2.5"
+                  >
+                    <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white text-sm font-medium truncate">{a.arquero}</div>
+                      <div
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
+                        style={{ backgroundColor: color, color: textColor }}
+                      >
+                        {a.equipo}
+                      </div>
                     </div>
-                  </div>
-                  <span className="text-gray-400 text-xs tabular-nums shrink-0">{a.golesRecibidos} <span className="text-gray-600">gc</span></span>
-                </div>
-              );
-            })}
+                    <span className="text-gray-400 text-xs tabular-nums shrink-0">{a.golesRecibidos} <span className="text-gray-600">gc</span></span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          )}
       </div>
     </div>
   );
 }
 
 // ── Clasificación ─────────────────────────────────────────────────────────────
+
+// Anchos de columna fijos para que el layout div replique la alineación de tabla
+const COL = {
+  pos:     "w-7 shrink-0",
+  equipo:  "flex-1 min-w-0",
+  stat:    "w-8 shrink-0 text-center",
+  pts:     "w-10 shrink-0 text-center",
+};
 
 function TablaClasificacion({ standings, loading }: { standings: ReturnType<typeof mergeStandings>; loading: boolean }) {
   return (
@@ -298,49 +327,55 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
         <h2 className="text-white font-bold text-sm">Clasificación en vivo</h2>
         <span className="text-gray-600 text-xs ml-auto">Temporada 19</span>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-800/50">
-              <th className="text-gray-600 text-xs font-semibold px-3 py-2 text-left w-7">#</th>
-              <th className="text-gray-600 text-xs font-semibold px-3 py-2 text-left">Equipo</th>
-              <th className="text-gray-600 text-xs font-semibold px-3 py-2 text-center">V</th>
-              <th className="text-gray-600 text-xs font-semibold px-3 py-2 text-center">E</th>
-              <th className="text-gray-600 text-xs font-semibold px-3 py-2 text-center">D</th>
-              <th className="text-gray-500 text-xs font-black px-3 py-2 text-center">Pts</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800/40">
-            {loading
-              ? Array.from({ length: 9 }).map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    {Array.from({ length: 6 }).map((_, j) => (
-                      <td key={j} className="px-3 py-2.5"><div className="h-3 bg-gray-800 rounded-full" /></td>
-                    ))}
-                  </tr>
-                ))
-              : standings.map((s) => {
-                  const color = getColor(s.equipoId);
-                  return (
-                    <tr key={s.equipoId} className="hover:bg-gray-800/30 transition-colors">
-                      <td className="px-3 py-2.5 text-gray-500 text-xs text-center tabular-nums">{s.pos}</td>
-                      <td className="px-3 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                          <span className="text-white text-sm font-medium">{s.nombre}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-2.5 text-center text-white tabular-nums text-xs">{s.victorias}</td>
-                      <td className="px-3 py-2.5 text-center text-white tabular-nums text-xs">{s.empates}</td>
-                      <td className="px-3 py-2.5 text-center text-white tabular-nums text-xs">{s.derrotas}</td>
-                      <td className="px-3 py-2.5 text-center text-white font-black text-base tabular-nums">
-                        {s.puntos}
-                      </td>
-                    </tr>
-                  );
-                })}
-          </tbody>
-        </table>
+
+      {/* Header fijo (no anima) */}
+      <div className="flex items-center gap-0 px-3 py-2 border-b border-gray-800/50">
+        <span className={`${COL.pos} text-gray-600 text-xs font-semibold text-left`}>#</span>
+        <span className={`${COL.equipo} text-gray-600 text-xs font-semibold`}>Equipo</span>
+        <span className={`${COL.stat} text-gray-600 text-xs font-semibold`}>V</span>
+        <span className={`${COL.stat} text-gray-600 text-xs font-semibold`}>E</span>
+        <span className={`${COL.stat} text-gray-600 text-xs font-semibold`}>D</span>
+        <span className={`${COL.pts} text-gray-500 text-xs font-black`}>Pts</span>
+      </div>
+
+      {/* Filas animadas */}
+      <div className="divide-y divide-gray-800/40">
+        {loading
+          ? Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-0 px-3 py-2.5 animate-pulse">
+                <div className={`${COL.pos}`}><div className="h-3 w-3 bg-gray-800 rounded-full mx-auto" /></div>
+                <div className={`${COL.equipo} pr-2`}><div className="h-3 bg-gray-800 rounded-full" /></div>
+                <div className={`${COL.stat}`}><div className="h-3 w-4 bg-gray-800 rounded-full mx-auto" /></div>
+                <div className={`${COL.stat}`}><div className="h-3 w-4 bg-gray-800 rounded-full mx-auto" /></div>
+                <div className={`${COL.stat}`}><div className="h-3 w-4 bg-gray-800 rounded-full mx-auto" /></div>
+                <div className={`${COL.pts}`}><div className="h-4 w-5 bg-gray-800 rounded-full mx-auto" /></div>
+              </div>
+            ))
+          : (
+            <AnimatePresence initial={false}>
+              {standings.map((s) => {
+                const color = getColor(s.equipoId);
+                return (
+                  <motion.div
+                    key={s.equipoId}
+                    layout
+                    transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="flex items-center gap-0 px-3 py-2.5 hover:bg-gray-800/30"
+                  >
+                    <span className={`${COL.pos} text-gray-500 text-xs tabular-nums`}>{s.pos}</span>
+                    <div className={`${COL.equipo} flex items-center gap-2 pr-2`}>
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                      <span className="text-white text-sm font-medium truncate">{s.nombre}</span>
+                    </div>
+                    <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.victorias}</span>
+                    <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.empates}</span>
+                    <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.derrotas}</span>
+                    <span className={`${COL.pts} text-white font-black text-base tabular-nums`}>{s.puntos}</span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          )}
       </div>
     </div>
   );
