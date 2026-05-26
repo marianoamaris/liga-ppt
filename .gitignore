@@ -25,3 +25,7 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# Variables de entorno — nunca subir al repo
+.env
+.env.*

@@ -10,6 +10,7 @@ import {
   FaBullhorn,
   FaHandshake,
   FaUserPen,
+  FaUserPlus,
   FaSignal,
   FaChartBar,
 } from "react-icons/fa6";
@@ -28,6 +29,7 @@ const ICONS: Record<
   FaBullhorn,
   FaHandshake,
   FaUserPen,
+  FaUserPlus,
   FaRegCalendarAlt,
   FaSignal,
   FaChartBar,

@@ -52,15 +52,16 @@
   <body>
     <!-- Netlify Forms: detección en build (nombres de campos = formulario React). -->
     <form
-      name="actualizacion-datos-jugador"
+      name="grupo-reservas"
       netlify
       netlify-honeypot="bot-field"
       hidden
     >
-      <input type="text" name="nombreEnLiga" />
-      <input type="email" name="email" />
-      <input type="text" name="jugadorDesde" />
-      <textarea name="mensaje"></textarea>
+      <input type="text" name="nombre" />
+      <input type="number" name="edad" />
+      <input type="tel" name="whatsapp" />
+      <input type="text" name="posiciones" />
+      <input type="checkbox" name="disponibilidad_jueves" />
       <input type="text" name="bot-field" />
     </form>
     <div id="root"></div>

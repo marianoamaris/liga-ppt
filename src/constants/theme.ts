@@ -72,9 +72,9 @@ export const SIDEBAR_ITEMS = [
   },
   {
     id: "actualizacion-datos",
-    label: "Actualizar mis datos",
+    label: "Participar en la liga",
     path: "/actualizacion-datos",
-    icon: "FaUserPen",
+    icon: "FaUserPlus",
   },
   {
     id: "contacto",
