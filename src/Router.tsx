@@ -28,7 +28,7 @@ export const AppRouter = () => (
         <Route path="/anuncios" element={<AnunciosPage />} />
         <Route path="/calendario" element={<CalendarioPage />} />
         <Route path="/patrocinadores" element={<PatrocinadoresPage />} />
-        <Route path="/actualizacion-datos" element={<ActualizacionDatosJugadorPage />} />
+        <Route path="/participa-en-la-liga-ppt" element={<ActualizacionDatosJugadorPage />} />
 
         {/* En Vivo es pública — cualquiera puede ver los partidos */}
         <Route path="/en-vivo" element={<EnVivoPage />} />

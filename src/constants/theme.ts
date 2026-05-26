@@ -73,7 +73,7 @@ export const SIDEBAR_ITEMS = [
   {
     id: "actualizacion-datos",
     label: "Participar en la liga",
-    path: "/actualizacion-datos",
+    path: "/participa-en-la-liga-ppt",
     icon: "FaUserPlus",
   },
   {
