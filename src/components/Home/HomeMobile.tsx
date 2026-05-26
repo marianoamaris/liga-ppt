@@ -5,6 +5,7 @@ import {
   FaGavel,
   FaBullhorn,
   FaHandshake,
+  FaUserPlus,
 } from "react-icons/fa6";
 import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
@@ -221,6 +222,25 @@ const HomeMobile: React.FC = () => {
             </div>
             <span className="text-xs font-semibold text-pink-600 cursor-pointer hover:underline">
               contacto@ligappt.com
+            </span>
+          </div>
+          <div
+            className="flex flex-col items-start p-3 shadow rounded-xl bg-green-50 border border-green-200 hover:scale-[1.02] transition-transform cursor-pointer"
+            onClick={() => navigate("/participa-en-la-liga-ppt")}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <FaUserPlus className="text-green-600" size={20} />
+              <span className="text-xs font-bold text-green-800">¿Quieres jugar?</span>
+              <span className="ml-auto rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                NUEVO
+              </span>
+            </div>
+            <div className="mb-2 text-xs text-gray-700">
+              Únete al <strong>Grupo de Reservas</strong> y entra a la lista de
+              espera para participar en la liga.
+            </div>
+            <span className="text-xs font-semibold text-green-700 cursor-pointer hover:underline">
+              Inscribirme →
             </span>
           </div>
         </div>
