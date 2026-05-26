@@ -9,6 +9,7 @@ import { FaShareAlt, FaWhatsapp, FaFacebookF } from "react-icons/fa";
 import { AnnouncementCard } from "../components/common/AnnouncementCard";
 import { Liga19MundialAnnouncement } from "../components/anuncios/Liga19MundialAnnouncement";
 import { EnVivoAnuncio } from "../components/anuncios/EnVivoAnuncio";
+import { GrupoReservasAnuncio } from "../components/anuncios/GrupoReservasAnuncio";
 
 const getBadgeClass = (type: ChangeType) => {
   switch (type) {
@@ -155,6 +156,7 @@ export const AnunciosPage: React.FC = () => {
             el historial de cambios y anuncios anteriores.
           </p>
         </div>
+        <GrupoReservasAnuncio />
         <EnVivoAnuncio />
         <Liga19MundialAnnouncement />
         {CHANGELOG_DATA.map((entry) => (
