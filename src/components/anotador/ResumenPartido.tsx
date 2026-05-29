@@ -213,6 +213,19 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
           };
         })
         .filter(Boolean),
+      empates: eventos
+        .filter((e) => e.tipo === "empate")
+        .map((ev) => {
+          if (ev.tipo !== "empate") return null;
+          const eqA = equipos.find((e) => e.equipo.id === ev.data.equipoAId);
+          const eqB = equipos.find((e) => e.equipo.id === ev.data.equipoBId);
+          return {
+            tiempoEnMarcador: ev.data.tiempoEnMarcador,
+            equipoA: eqA?.equipo.nombre,
+            equipoB: eqB?.equipo.nombre,
+          };
+        })
+        .filter(Boolean),
       amarillas: amarillasData,
       rojas: rojasData,
     },
