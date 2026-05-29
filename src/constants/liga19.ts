@@ -43,15 +43,6 @@ export const LIGA_19_DESTACADO = {
 
 const EQUIPOS_L19 = LIGA_19_EQUIPOS.map((e) => e.nombre);
 
-const filaTablaCero = (equipo: string) => ({
-  equipo,
-  pj: 0,
-  victorias: 0,
-  empates: 0,
-  derrotas: 0,
-  porcentajeVictorias: 0,
-  puntos: 0,
-});
 
 const filaJornadaCero = (equipo: string) => ({
   equipo,
@@ -63,9 +54,19 @@ const filaJornadaCero = (equipo: string) => ({
   porcentajeVictorias: 0,
 });
 
-/** Datos de clasificación Liga #19 (inicio de temporada — todo en cero). */
+/** Datos de clasificación Liga #19 — actualizado tras Jornada 1. */
 export const LIGA_19 = {
-  tablaGeneral: EQUIPOS_L19.map(filaTablaCero),
+  tablaGeneral: [
+    { equipo: "Brasil",        pj: 20, victorias: 11, empates: 4, derrotas: 5, puntos: 26, porcentajeVictorias: 55.0 },
+    { equipo: "Corea del Sur", pj: 18, victorias:  9, empates: 1, derrotas: 8, puntos: 19, porcentajeVictorias: 50.0 },
+    { equipo: "Francia",       pj: 15, victorias:  8, empates: 2, derrotas: 5, puntos: 18, porcentajeVictorias: 53.3 },
+    { equipo: "Argentina",     pj: 16, victorias:  8, empates: 1, derrotas: 7, puntos: 17, porcentajeVictorias: 50.0 },
+    { equipo: "México",        pj: 18, victorias:  7, empates: 2, derrotas: 9, puntos: 16, porcentajeVictorias: 38.9 },
+    { equipo: "Alemania",      pj: 16, victorias:  6, empates: 4, derrotas: 6, puntos: 16, porcentajeVictorias: 37.5 },
+    { equipo: "Noruega",       pj: 16, victorias:  7, empates: 1, derrotas: 8, puntos: 15, porcentajeVictorias: 43.8 },
+    { equipo: "Portugal",      pj: 15, victorias:  5, empates: 2, derrotas: 8, puntos: 12, porcentajeVictorias: 33.3 },
+    { equipo: "Países Bajos",  pj: 14, victorias:  3, empates: 3, derrotas: 8, puntos:  9, porcentajeVictorias: 21.4 },
+  ],
   jornadas: Array.from({ length: 6 }, (_, i) => ({
     nombre: `Jornada ${i + 1}`,
     resultados: EQUIPOS_L19.map(filaJornadaCero),
