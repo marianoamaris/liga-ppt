@@ -1,4 +1,5 @@
 import type { Evento } from "../components/anotador/types";
+import { supabase } from "./supabase";
 
 const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 const TOKEN_KEY = "ligappt_token";
@@ -13,16 +14,48 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+/** Intenta renovar el JWT via Supabase. Devuelve el nuevo token o null. */
+async function tryRefreshToken(): Promise<string | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase.auth.refreshSession();
+  if (error || !data.session) return null;
+  storeToken(data.session.access_token);
+  return data.session.access_token;
+}
+
+function buildHeaders(token: string | null, extra?: HeadersInit): HeadersInit {
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(extra ?? {}),
+  };
+}
+
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken();
   const res = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init.headers ?? {}),
-    },
+    headers: buildHeaders(token, init.headers),
   });
+
+  // Token expirado → refrescar y reintentar una sola vez
+  if (res.status === 401) {
+    const newToken = await tryRefreshToken();
+    if (!newToken) {
+      clearToken();
+      throw new Error("Sesión expirada. Inicia sesión nuevamente.");
+    }
+    const retry = await fetch(`${BASE}${path}`, {
+      ...init,
+      headers: buildHeaders(newToken, init.headers),
+    });
+    if (!retry.ok) {
+      const body = await retry.json().catch(() => ({}));
+      throw new Error(body.error ?? body.message ?? `HTTP ${retry.status}`);
+    }
+    return retry.json() as T;
+  }
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? body.message ?? `HTTP ${res.status}`);
