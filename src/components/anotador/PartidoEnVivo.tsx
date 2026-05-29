@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { MarcadorVivo } from "./MarcadorVivo";
 import { AmarillaModal } from "./AmarillaModal";
+import { RojaModal } from "./RojaModal";
 import {
   getColor,
   formatElapsed,
@@ -16,6 +17,7 @@ import type {
   EventoAutogol,
   EventoEmpate,
   EventoAmarilla,
+  EventoRoja,
   ModoPartido,
   RazonAmarilla,
   PartidoVivo,
@@ -24,9 +26,12 @@ import type {
 const PAIRS: [number, number][] = [[0, 1], [0, 2], [1, 2]];
 
 const RAZON_LABEL: Record<RazonAmarilla, string> = {
-  "llegada-tarde": "Llegada tarde",
-  falta: "Falta",
-  "falta-respeto": "Falta de respeto",
+  "halar-peto":      "Halar peto",
+  "falta-temeraria": "Falta temeraria",
+  "falta-tactica":   "Falta táctica o normal",
+  "llegada-tarde":   "Llegada tarde",
+  "falta":           "Falta",
+  "falta-respeto":   "Falta de respeto",
 };
 
 interface Props {
@@ -35,7 +40,7 @@ interface Props {
   onFinalizar: () => void;
 }
 
-type TargetAmarilla = { jugador: string; equipoIdx: number } | null;
+type TargetCard = { jugador: string; equipoIdx: number } | null;
 
 // ── Player column ─────────────────────────────────────────────────────────────
 interface ColProps {
@@ -48,9 +53,10 @@ interface ColProps {
   onGol: (goleador: string, goleadorEquipoId: string, arqueroEquipoId: string) => void;
   onAutogol: (equipoAutogolId: string, equipoGanadorId: string) => void;
   onAmarilla: (jugador: string, eqIdx: number) => void;
+  onRoja: (jugador: string, eqIdx: number) => void;
 }
 
-function PlayerColumn({ eq, eqIdx, contrarioId, modo, scores, amarillas, onGol, onAutogol, onAmarilla }: ColProps) {
+function PlayerColumn({ eq, eqIdx, contrarioId, modo, scores, amarillas, onGol, onAutogol, onAmarilla, onRoja }: ColProps) {
   const color = getColor(eq.equipo.id);
   const s = scores.get(eq.equipo.id) ?? { victorias: 0, empates: 0, derrotas: 0, puntos: 0 };
   const esPlayoff = modo !== "jornada";
@@ -100,13 +106,22 @@ function PlayerColumn({ eq, eqIdx, contrarioId, modo, scores, amarillas, onGol, 
                 <div className="text-xs mt-0.5">{"🟨".repeat(Math.min(cards, 3))}</div>
               )}
             </button>
-            <button
-              onClick={() => onAmarilla(j.nombre, eqIdx)}
-              className="min-h-[52px] w-11 shrink-0 flex items-center justify-center bg-gray-900 hover:bg-yellow-600/20 active:bg-yellow-600/35 rounded-xl transition-colors border border-transparent hover:border-yellow-600/30 text-lg"
-              aria-label={`Tarjeta a ${j.nombre}`}
-            >
-              🟨
-            </button>
+            <div className="flex flex-col gap-1 shrink-0">
+              <button
+                onClick={() => onAmarilla(j.nombre, eqIdx)}
+                className="h-[24px] w-10 flex items-center justify-center bg-gray-900 hover:bg-yellow-600/20 active:bg-yellow-600/35 rounded-lg transition-colors border border-transparent hover:border-yellow-600/30 text-sm"
+                aria-label={`Amarilla a ${j.nombre}`}
+              >
+                🟨
+              </button>
+              <button
+                onClick={() => onRoja(j.nombre, eqIdx)}
+                className="h-[24px] w-10 flex items-center justify-center bg-gray-900 hover:bg-red-600/20 active:bg-red-600/35 rounded-lg transition-colors border border-transparent hover:border-red-600/30 text-sm"
+                aria-label={`Roja a ${j.nombre}`}
+              >
+                🟥
+              </button>
+            </div>
           </div>
         );
       })}
@@ -127,7 +142,8 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   const [pairIdx, setPairIdx] = useState(0);
   const [tiempoRestante, setTiempoRestante] = useState(DURACION_PARTIDO);
   const [corriendo, setCorriendo] = useState(false);
-  const [targetAmarilla, setTargetAmarilla] = useState<TargetAmarilla>(null);
+  const [targetAmarilla, setTargetAmarilla] = useState<TargetCard>(null);
+  const [targetRoja, setTargetRoja] = useState<TargetCard>(null);
   const [logAbierto, setLogAbierto] = useState(false);
   const [confirmFinalizar, setConfirmFinalizar] = useState(false);
 
@@ -155,8 +171,12 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   const scores = computeScores(equipos, eventos);
   const amarillas = amarillasPorJugador(eventos);
 
-  // Elapsed seconds from server's iniciado_en (what the backend expects)
-  const elapsedSec = () => Math.floor((Date.now() - partido.iniciadoEn) / 1000);
+  // Para jornada: tiempo transcurrido en el mini-partido actual (0–480s).
+  // Para playoff: reloj de pared desde iniciadoEn (sin cronómetro propio).
+  const elapsedSec = () =>
+    esPlayoff
+      ? Math.floor((Date.now() - partido.iniciadoEn) / 1000)
+      : DURACION_PARTIDO - tiempoRestante;
 
   function pushEvento(ev: Evento) {
     onUpdatePartido({ ...partido, eventos: [...eventos, ev] });
@@ -236,6 +256,19 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
     setTargetAmarilla(null);
   }
 
+  function handleRoja() {
+    if (!targetRoja) return;
+    const eq = equipos[targetRoja.equipoIdx];
+    const data: EventoRoja = {
+      id: makeId(),
+      jugador: targetRoja.jugador,
+      equipoId: eq.equipo.id,
+      tiempoEnMarcador: elapsedSec(),
+    };
+    pushEvento({ tipo: "roja", data });
+    setTargetRoja(null);
+  }
+
   function handleDeshacer() {
     if (!eventos.length) return;
     onUpdatePartido({ ...partido, eventos: eventos.slice(0, -1) });
@@ -243,6 +276,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
 
   const golesCount = eventos.filter((e) => e.tipo === "gol" || e.tipo === "autogol").length;
   const amarillasCount = eventos.filter((e) => e.tipo === "amarilla").length;
+  const rojasCount = eventos.filter((e) => e.tipo === "roja").length;
   const empatesCount = eventos.filter((e) => e.tipo === "empate").length;
 
   return (
@@ -322,6 +356,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
               onGol={handleGol}
               onAutogol={handleAutogol}
               onAmarilla={(jugador, eqIdx) => setTargetAmarilla({ jugador, equipoIdx: eqIdx })}
+              onRoja={(jugador, eqIdx) => setTargetRoja({ jugador, equipoIdx: eqIdx })}
             />
             <PlayerColumn
               eq={equipoB} eqIdx={idxB} contrarioId={equipoA.equipo.id}
@@ -329,6 +364,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
               onGol={handleGol}
               onAutogol={handleAutogol}
               onAmarilla={(jugador, eqIdx) => setTargetAmarilla({ jugador, equipoIdx: eqIdx })}
+              onRoja={(jugador, eqIdx) => setTargetRoja({ jugador, equipoIdx: eqIdx })}
             />
           </div>
 
@@ -358,6 +394,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                     {golesCount > 0 && <span>⚽{golesCount}</span>}
                     {empatesCount > 0 && <span>🤝{empatesCount}</span>}
                     {amarillasCount > 0 && <span>🟨{amarillasCount}</span>}
+                    {rojasCount > 0 && <span>🟥{rojasCount}</span>}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -424,7 +461,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                           </span>
                         </div>
                       );
-                    } else {
+                    } else if (ev.tipo === "amarilla") {
                       const eqAm = equipos.find((e) => e.equipo.id === ev.data.equipoId);
                       const color = getColor(ev.data.equipoId);
                       return (
@@ -439,6 +476,24 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                             </span>
                             <span className="text-gray-600 text-xs"> · {eqAm?.equipo.nombre}</span>
                             <div className="text-gray-600 text-xs">{RAZON_LABEL[ev.data.razon]}</div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      const eqRoja = equipos.find((e) => e.equipo.id === ev.data.equipoId);
+                      const color = getColor(ev.data.equipoId);
+                      return (
+                        <div key={ev.data.id} className="flex items-center gap-2.5 px-4 py-3">
+                          <span className="text-gray-500 text-[11px] w-11 shrink-0 font-mono tabular-nums">
+                            {formatElapsed(ev.data.tiempoEnMarcador)}
+                          </span>
+                          <span className="text-base shrink-0">🟥</span>
+                          <div className="min-w-0">
+                            <span className="font-semibold text-sm" style={{ color }}>
+                              {ev.data.jugador}
+                            </span>
+                            <span className="text-gray-600 text-xs"> · {eqRoja?.equipo.nombre}</span>
+                            <div className="text-red-500 text-xs font-semibold">Expulsión</div>
                           </div>
                         </div>
                       );
@@ -486,6 +541,16 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
           equipoNombre={equipos[targetAmarilla.equipoIdx].equipo.nombre}
           onConfirmar={handleAmarilla}
           onCancelar={() => setTargetAmarilla(null)}
+        />
+      )}
+
+      {targetRoja && (
+        <RojaModal
+          jugador={targetRoja.jugador}
+          equipoId={equipos[targetRoja.equipoIdx].equipo.id}
+          equipoNombre={equipos[targetRoja.equipoIdx].equipo.nombre}
+          onConfirmar={handleRoja}
+          onCancelar={() => setTargetRoja(null)}
         />
       )}
     </div>

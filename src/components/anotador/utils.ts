@@ -12,7 +12,7 @@ export const LIGA19_COLORES: Record<string, string> = {
   portugal:        "#C62828",
 };
 
-export const DURACION_PARTIDO = 7 * 60; // 420 segundos
+export const DURACION_PARTIDO = 8 * 60; // 480 segundos
 
 export function getColor(id: string): string {
   return LIGA19_COLORES[id] ?? "#4B5563";

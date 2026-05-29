@@ -51,7 +51,9 @@ function mergeStandings(base: Standing[], partidos: Partido[]) {
 }
 
 const RAZON: Record<string, string> = {
-  "llegada-tarde": "Llegada tarde", falta: "Falta", "falta-respeto": "Falta de respeto",
+  "halar-peto": "Halar peto", "falta-temeraria": "Falta temeraria",
+  "falta-tactica": "Falta táctica o normal", "llegada-tarde": "Llegada tarde",
+  falta: "Falta", "falta-respeto": "Falta de respeto",
 };
 
 // ── Marcador ──────────────────────────────────────────────────────────────────
@@ -155,6 +157,16 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
               <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(ev.data.equipoId) }} />
               <span className="font-medium text-white">{ev.data.jugador}</span>
               <span className="text-gray-600 text-xs">· {RAZON[ev.data.razon]}</span>
+            </div>
+          );
+        }
+        if (ev.tipo === "roja") {
+          return (
+            <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
+              {t}<span>🟥</span>
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(ev.data.equipoId) }} />
+              <span className="font-medium text-white">{ev.data.jugador}</span>
+              <span className="text-red-500 text-xs font-semibold">· Expulsión</span>
             </div>
           );
         }
@@ -447,18 +459,22 @@ export function EnVivoPage() {
 
   useEffect(() => {
     refreshAll();
-    const interval = setInterval(refreshAll, 10_000);
-    return () => clearInterval(interval);
-  }, []);
 
-  useEffect(() => {
-    if (!supabase) return;
-    channelRef.current?.unsubscribe();
-    channelRef.current = supabase
-      .channel("en-vivo")
-      .on("postgres_changes", { event: "*", schema: "public", table: "partidos" }, refreshAll)
-      .subscribe();
-    return () => channelRef.current?.unsubscribe();
+    // Polling fallback cada 8s — garantiza actualizaciones aunque Realtime se caiga
+    const intervalo = setInterval(refreshAll, 8_000);
+
+    // Realtime: notifica cambios al instante cuando el canal está estable
+    if (supabase) {
+      channelRef.current = supabase
+        .channel("en-vivo")
+        .on("postgres_changes", { event: "*", schema: "public", table: "partidos" }, refreshAll)
+        .subscribe();
+    }
+
+    return () => {
+      clearInterval(intervalo);
+      channelRef.current?.unsubscribe();
+    };
   }, []);
 
   // Canchas numeradas por orden de inicio

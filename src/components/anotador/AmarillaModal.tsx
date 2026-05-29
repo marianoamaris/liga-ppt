@@ -10,9 +10,11 @@ interface Props {
 }
 
 const RAZONES: { key: RazonAmarilla; label: string; icon: string }[] = [
-  { key: "llegada-tarde", label: "Llegada tarde", icon: "⏰" },
-  { key: "falta", label: "Falta", icon: "🦵" },
-  { key: "falta-respeto", label: "Falta de respeto al anotador", icon: "😤" },
+  { key: "halar-peto",      label: "Halar peto",              icon: "👕" },
+  { key: "falta-temeraria", label: "Falta temeraria",         icon: "⚡" },
+  { key: "falta-tactica",   label: "Falta táctica o normal",  icon: "🎯" },
+  { key: "llegada-tarde",   label: "Llegada tarde",           icon: "⏰" },
+  { key: "falta-respeto",   label: "Falta de respeto",        icon: "😤" },
 ];
 
 export function AmarillaModal({

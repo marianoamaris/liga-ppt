@@ -27,13 +27,26 @@ export interface EventoEmpate {
   tiempoEnMarcador: number;
 }
 
-export type RazonAmarilla = "llegada-tarde" | "falta" | "falta-respeto";
+export type RazonAmarilla =
+  | "llegada-tarde"
+  | "halar-peto"
+  | "falta-temeraria"
+  | "falta-tactica"
+  | "falta"
+  | "falta-respeto";
 
 export interface EventoAmarilla {
   id: string;
   jugador: string;
   equipoId: string;
   razon: RazonAmarilla;
+  tiempoEnMarcador: number;
+}
+
+export interface EventoRoja {
+  id: string;
+  jugador: string;
+  equipoId: string;
   tiempoEnMarcador: number;
 }
 
@@ -48,7 +61,8 @@ export type Evento =
   | { tipo: "gol"; data: EventoGol }
   | { tipo: "autogol"; data: EventoAutogol }
   | { tipo: "empate"; data: EventoEmpate }
-  | { tipo: "amarilla"; data: EventoAmarilla };
+  | { tipo: "amarilla"; data: EventoAmarilla }
+  | { tipo: "roja"; data: EventoRoja };
 
 export interface TeamScore {
   victorias: number;

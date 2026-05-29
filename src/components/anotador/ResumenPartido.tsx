@@ -3,9 +3,12 @@ import { getColor, computeScores } from "./utils";
 import type { ModoPartido, PartidoVivo, RazonAmarilla } from "./types";
 
 const RAZON_LABEL: Record<RazonAmarilla, string> = {
-  "llegada-tarde": "Llegada tarde",
-  falta: "Falta",
-  "falta-respeto": "Falta de respeto al anotador",
+  "halar-peto":      "Halar peto",
+  "falta-temeraria": "Falta temeraria",
+  "falta-tactica":   "Falta táctica o normal",
+  "llegada-tarde":   "Llegada tarde",
+  "falta":           "Falta",
+  "falta-respeto":   "Falta de respeto al anotador",
 };
 
 const MODO_LABEL: Record<ModoPartido, string> = {
@@ -39,6 +42,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
   const golesPorJugador: Record<string, number> = {};
   const golesRecibidosPorArquero: Record<string, number> = {};
   const amarillasData: { jugador: string; equipo: string; razon: RazonAmarilla }[] = [];
+  const rojasData: { jugador: string; equipo: string }[] = [];
 
   for (const ev of eventos) {
     if (ev.tipo === "gol") {
@@ -64,6 +68,12 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
         jugador: ev.data.jugador,
         equipo: eqAm?.equipo.nombre ?? "",
         razon: ev.data.razon,
+      });
+    } else if (ev.tipo === "roja") {
+      const eqRoja = equipos.find((e) => e.equipo.id === ev.data.equipoId);
+      rojasData.push({
+        jugador: ev.data.jugador,
+        equipo: eqRoja?.equipo.nombre ?? "",
       });
     }
   }
@@ -204,6 +214,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
         })
         .filter(Boolean),
       amarillas: amarillasData,
+      rojas: rojasData,
     },
     null,
     2
@@ -312,6 +323,32 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
                       <div className="text-gray-600 text-xs">{RAZON_LABEL[a.razon]}</div>
                     </div>
                     <span className="text-gray-500 text-xs shrink-0 ml-2">{a.equipo}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Rojas */}
+        {rojasData.length > 0 && (
+          <div className="bg-gray-900 rounded-2xl p-4">
+            <h2 className="text-white font-bold mb-3">🟥 Tarjetas Rojas</h2>
+            <div className="space-y-2">
+              {rojasData.map((r, i) => {
+                const eq = equipos.find((e) =>
+                  e.jugadores.some((j) => j.nombre === r.jugador)
+                );
+                const color = eq ? getColor(eq.equipo.id) : "#9ca3af";
+                return (
+                  <div key={i} className="flex justify-between items-center py-1">
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium" style={{ color }}>
+                        {r.jugador}
+                      </span>
+                      <div className="text-red-500 text-xs font-semibold">Expulsión</div>
+                    </div>
+                    <span className="text-gray-500 text-xs shrink-0 ml-2">{r.equipo}</span>
                   </div>
                 );
               })}
