@@ -98,7 +98,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
       "Kevin Pineda",
       "Esteban Hinojosa",
       "Jesús Cartagena",
-      "Jeison Santa",
+      "Matias Ojeda",
       "Juanse López",
       "Ronald Rojas",
     ],
@@ -107,7 +107,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
     equipoId: "noruega",
     arqueroDesignado: "Hernán García",
     jugadores: [
-      "Camilo Laborde",
+      "Ian Nedd",
       "José Mosquera",
       "Henry Hernández",
       "Jereimy Niebles",
