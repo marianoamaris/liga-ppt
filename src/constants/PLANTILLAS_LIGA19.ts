@@ -69,7 +69,7 @@ export const PLANTILLAS_LIGA19: PlantillaEquipo[] = [
       "Santiago Sánchez",
       "Jesús Vergara",
       "Narent Rojas",
-      "Emanuel Navarro",
+      "Victor Lopez",
       "Óscar Mendoza",
       "Sebastián Castaño",
       "Keiler Fonseca",
