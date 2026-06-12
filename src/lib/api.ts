@@ -91,6 +91,12 @@ export interface ApiEquipo {
   arqueroDesignado?: string;
 }
 
+export interface VsRival {
+  victorias: number;
+  empates: number;
+  derrotas: number;
+}
+
 export interface Standing {
   equipoId: string;
   nombre: string;
@@ -98,6 +104,7 @@ export interface Standing {
   empates: number;
   derrotas: number;
   puntos: number;
+  vsRivales?: Record<string, VsRival>;
 }
 
 export interface Goleador {
@@ -105,6 +112,7 @@ export interface Goleador {
   equipo: string;
   equipoId: string;
   goles: number;
+  golesVs?: Record<string, number>;
 }
 
 export interface Arquero {
@@ -112,6 +120,8 @@ export interface Arquero {
   equipo: string;
   equipoId: string;
   golesRecibidos: number;
+  autogoles?: number;
+  golesDe?: Record<string, number>;
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────

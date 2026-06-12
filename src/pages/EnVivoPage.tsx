@@ -220,6 +220,8 @@ function CanchaCard({ partido, numero }: { partido: Partido; numero: number }) {
 const LAYOUT_TRANSITION = { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } as const;
 
 function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; loading: boolean }) {
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+
   return (
     <div className="bg-gray-900 rounded-2xl overflow-hidden">
       <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
@@ -242,24 +244,72 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
               {goleadores.map((g, i) => {
                 const color = getColor(g.equipoId);
                 const textColor = getTextColor(g.equipoId);
+                const hasVs = g.golesVs && Object.keys(g.golesVs).length > 0;
+                const isOpen = expandedIdx === i;
+                const vsEntries = hasVs
+                  ? Object.entries(g.golesVs!).sort(([, a], [, b]) => b - a)
+                  : [];
+
                 return (
                   <motion.div
                     key={`${g.jugador}-${g.equipoId}`}
                     layout
                     transition={LAYOUT_TRANSITION}
-                    className="flex items-center gap-3 px-4 py-2.5"
+                    className="border-b border-gray-800/40 last:border-0"
                   >
-                    <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-white text-sm font-medium truncate">{g.jugador}</div>
-                      <div
-                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
-                        style={{ backgroundColor: color, color: textColor }}
-                      >
-                        {g.equipo}
+                    {/* Fila principal */}
+                    <div
+                      className={`flex items-center gap-3 px-4 py-2.5 ${hasVs ? "cursor-pointer hover:bg-gray-800/30 active:bg-gray-800/50" : ""} transition-colors`}
+                      onClick={() => hasVs && setExpandedIdx(isOpen ? null : i)}
+                    >
+                      <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white text-sm font-medium truncate">{g.jugador}</div>
+                        <div
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
+                          style={{ backgroundColor: color, color: textColor }}
+                        >
+                          {g.equipo}
+                        </div>
                       </div>
+                      <span className="text-white font-black text-base tabular-nums shrink-0">{g.goles}</span>
+                      {hasVs && (
+                        <span
+                          className="text-gray-600 text-xs ml-1 shrink-0 transition-transform duration-200"
+                          style={{ display: "inline-block", transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                        >
+                          ▸
+                        </span>
+                      )}
                     </div>
-                    <span className="text-white font-black text-base tabular-nums shrink-0">{g.goles}</span>
+
+                    {/* Desglose golesVs */}
+                    <AnimatePresence initial={false}>
+                      {isOpen && hasVs && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-2.5 pt-0.5 space-y-1 border-t border-gray-800/40">
+                            <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-1.5">Goles por rival</p>
+                            {vsEntries.map(([rival, golesContra]) => {
+                              const rivalEq = LIGA_19_EQUIPOS.find((e) => e.nombre === rival);
+                              const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
+                              return (
+                                <div key={rival} className="flex items-center gap-2">
+                                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: rivalColor }} />
+                                  <span className="text-gray-400 text-xs flex-1 truncate">{rival}</span>
+                                  <span className="text-white text-xs font-bold tabular-nums">{golesContra}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 );
               })}
@@ -271,6 +321,8 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
 }
 
 function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: boolean }) {
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+
   return (
     <div className="bg-gray-900 rounded-2xl overflow-hidden">
       <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
@@ -293,24 +345,77 @@ function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: bo
               {arqueros.map((a, i) => {
                 const color = getColor(a.equipoId);
                 const textColor = getTextColor(a.equipoId);
+                const hasVs = a.golesDe && Object.keys(a.golesDe).length > 0;
+                const isOpen = expandedIdx === i;
+                const vsEntries = hasVs
+                  ? Object.entries(a.golesDe!).sort(([, x], [, y]) => y - x)
+                  : [];
+
                 return (
                   <motion.div
                     key={`${a.arquero}-${a.equipoId}`}
                     layout
                     transition={LAYOUT_TRANSITION}
-                    className="flex items-center gap-3 px-4 py-2.5"
+                    className="border-b border-gray-800/40 last:border-0"
                   >
-                    <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-white text-sm font-medium truncate">{a.arquero}</div>
-                      <div
-                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
-                        style={{ backgroundColor: color, color: textColor }}
-                      >
-                        {a.equipo}
+                    {/* Fila principal */}
+                    <div
+                      className={`flex items-center gap-3 px-4 py-2.5 ${hasVs ? "cursor-pointer hover:bg-gray-800/30 active:bg-gray-800/50" : ""} transition-colors`}
+                      onClick={() => hasVs && setExpandedIdx(isOpen ? null : i)}
+                    >
+                      <span className="text-gray-600 text-xs tabular-nums w-4 text-center shrink-0">{i + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white text-sm font-medium truncate">{a.arquero}</div>
+                        <div
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block mt-0.5"
+                          style={{ backgroundColor: color, color: textColor }}
+                        >
+                          {a.equipo}
+                        </div>
                       </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-gray-400 text-xs tabular-nums">{a.golesRecibidos} <span className="text-gray-600">gc</span></span>
+                        {a.autogoles != null && a.autogoles > 0 && (
+                          <div className="text-gray-600 text-[10px]">{a.autogoles} ag</div>
+                        )}
+                      </div>
+                      {hasVs && (
+                        <span
+                          className="text-gray-600 text-xs ml-1 shrink-0 transition-transform duration-200"
+                          style={{ display: "inline-block", transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                        >
+                          ▸
+                        </span>
+                      )}
                     </div>
-                    <span className="text-gray-400 text-xs tabular-nums shrink-0">{a.golesRecibidos} <span className="text-gray-600">gc</span></span>
+
+                    {/* Desglose golesDe */}
+                    <AnimatePresence initial={false}>
+                      {isOpen && hasVs && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-2.5 pt-0.5 space-y-1 border-t border-gray-800/40">
+                            <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-1.5">Goles recibidos de</p>
+                            {vsEntries.map(([rival, golesContra]) => {
+                              const rivalEq = LIGA_19_EQUIPOS.find((e) => e.nombre === rival);
+                              const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
+                              return (
+                                <div key={rival} className="flex items-center gap-2">
+                                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: rivalColor }} />
+                                  <span className="text-gray-400 text-xs flex-1 truncate">{rival}</span>
+                                  <span className="text-white text-xs font-bold tabular-nums">{golesContra}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 );
               })}
@@ -332,6 +437,8 @@ const COL = {
 };
 
 function TablaClasificacion({ standings, loading }: { standings: ReturnType<typeof mergeStandings>; loading: boolean }) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   return (
     <div className="bg-gray-900 rounded-2xl overflow-hidden">
       <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
@@ -340,7 +447,7 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
         <span className="text-gray-600 text-xs ml-auto">Temporada 19</span>
       </div>
 
-      {/* Header fijo (no anima) */}
+      {/* Header fijo */}
       <div className="flex items-center gap-0 px-3 py-2 border-b border-gray-800/50">
         <span className={`${COL.pos} text-gray-600 text-xs font-semibold text-left`}>#</span>
         <span className={`${COL.equipo} text-gray-600 text-xs font-semibold`}>Equipo</span>
@@ -367,22 +474,79 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
             <AnimatePresence initial={false}>
               {standings.map((s) => {
                 const color = getColor(s.equipoId);
+                const hasVs = s.vsRivales && Object.keys(s.vsRivales).length > 0;
+                const isOpen = expandedId === s.equipoId;
+                const vsEntries = hasVs
+                  ? Object.entries(s.vsRivales!).sort(([, a], [, b]) => b.victorias - a.victorias || b.empates - a.empates)
+                  : [];
+
                 return (
                   <motion.div
                     key={s.equipoId}
                     layout
                     transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="flex items-center gap-0 px-3 py-2.5 hover:bg-gray-800/30"
+                    className="border-b border-gray-800/40 last:border-0"
                   >
-                    <span className={`${COL.pos} text-gray-500 text-xs tabular-nums`}>{s.pos}</span>
-                    <div className={`${COL.equipo} flex items-center gap-2 pr-2`}>
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                      <span className="text-white text-sm font-medium truncate">{s.nombre}</span>
+                    {/* Fila principal */}
+                    <div
+                      className={`flex items-center gap-0 px-3 py-2.5 ${hasVs ? "cursor-pointer hover:bg-gray-800/30 active:bg-gray-800/50" : ""} transition-colors`}
+                      onClick={() => hasVs && setExpandedId(isOpen ? null : s.equipoId)}
+                    >
+                      <span className={`${COL.pos} text-gray-500 text-xs tabular-nums`}>{s.pos}</span>
+                      <div className={`${COL.equipo} flex items-center gap-2 pr-1`}>
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                        <span className="text-white text-sm font-medium truncate">{s.nombre}</span>
+                        {hasVs && (
+                          <span
+                            className="text-gray-600 text-[10px] shrink-0 transition-transform duration-200"
+                            style={{ display: "inline-block", transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                          >
+                            ▸
+                          </span>
+                        )}
+                      </div>
+                      <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.victorias}</span>
+                      <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.empates}</span>
+                      <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.derrotas}</span>
+                      <span className={`${COL.pts} text-white font-black text-base tabular-nums`}>{s.puntos}</span>
                     </div>
-                    <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.victorias}</span>
-                    <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.empates}</span>
-                    <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.derrotas}</span>
-                    <span className={`${COL.pts} text-white font-black text-base tabular-nums`}>{s.puntos}</span>
+
+                    {/* Desglose vsRivales */}
+                    <AnimatePresence initial={false}>
+                      {isOpen && hasVs && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-3 pb-2.5 pt-1 border-t border-gray-800/40">
+                            <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-2">Head to head</p>
+                            {/* Sub-header */}
+                            <div className="flex items-center gap-2 mb-1 px-1">
+                              <span className="flex-1 text-gray-600 text-[10px]">Rival</span>
+                              <span className="w-5 text-center text-green-600 text-[10px] font-bold">V</span>
+                              <span className="w-5 text-center text-yellow-600 text-[10px] font-bold">E</span>
+                              <span className="w-5 text-center text-red-600 text-[10px] font-bold">D</span>
+                            </div>
+                            {vsEntries.map(([rival, rec]) => {
+                              const rivalEq = LIGA_19_EQUIPOS.find((e) => e.nombre === rival);
+                              const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
+                              return (
+                                <div key={rival} className="flex items-center gap-2 py-0.5 px-1">
+                                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: rivalColor }} />
+                                  <span className="text-gray-400 text-xs flex-1 truncate">{rival}</span>
+                                  <span className="w-5 text-center text-green-400 text-xs font-bold tabular-nums">{rec.victorias}</span>
+                                  <span className="w-5 text-center text-yellow-400 text-xs tabular-nums">{rec.empates}</span>
+                                  <span className="w-5 text-center text-red-400 text-xs tabular-nums">{rec.derrotas}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 );
               })}
