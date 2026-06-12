@@ -97,6 +97,13 @@ export interface VsRival {
   derrotas: number;
 }
 
+export interface JornadaStat {
+  victorias: number;
+  empates: number;
+  derrotas: number;
+  puntos: number;
+}
+
 export interface Standing {
   equipoId: string;
   nombre: string;
@@ -104,7 +111,16 @@ export interface Standing {
   empates: number;
   derrotas: number;
   puntos: number;
+  porJornada?: Record<string, JornadaStat>;
   vsRivales?: Record<string, VsRival>;
+}
+
+export interface GoalDetail {
+  tiempo: number;
+  tiempoFormato: string;
+  vs: string;
+  jornada: number;
+  partidoId: string;
 }
 
 export interface Goleador {
@@ -113,6 +129,7 @@ export interface Goleador {
   equipoId: string;
   goles: number;
   golesVs?: Record<string, number>;
+  detalle?: GoalDetail[];
 }
 
 export interface Arquero {
@@ -173,6 +190,21 @@ export const partidosApi = {
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
 
+export interface DetalleTarjeta {
+  razon: string;
+  jornada?: number;
+  partidoId: string;
+}
+
+export interface JugadorDisciplina {
+  jugador: string;
+  equipo: string;
+  equipoId: string;
+  amarillas: number;
+  rojas: number;
+  detalle: DetalleTarjeta[];
+}
+
 export const statsApi = {
   clasificacion: (temporada = 19) =>
     req<{ temporada: number; standings: Standing[] }>(
@@ -185,5 +217,9 @@ export const statsApi = {
   arqueros: (temporada = 19) =>
     req<{ temporada: number; arqueros: Arquero[] }>(
       `/arqueros?temporada=${temporada}`
+    ),
+  disciplina: (temporada = 19) =>
+    req<{ disciplina: JugadorDisciplina[] }>(
+      `/disciplina?temporada=${temporada}`
     ),
 };
