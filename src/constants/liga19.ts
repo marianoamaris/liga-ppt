@@ -82,8 +82,36 @@ export const LIGA_19 = {
         { equipo: "Países Bajos",  pj: 14, v:  3, e: 3, d: 8, puntos:  9, porcentajeVictorias: 21.4 },
       ],
     },
-    ...Array.from({ length: 5 }, (_, i) => ({
-      nombre: `Jornada ${i + 2}`,
+    {
+      nombre: "Jornada 2",
+      resultados: [
+        { equipo: "México",        pj: 25, v: 15, e: 1, d:  9, puntos: 31, porcentajeVictorias: 60.0 },
+        { equipo: "Noruega",       pj: 23, v: 10, e: 3, d: 10, puntos: 23, porcentajeVictorias: 43.5 },
+        { equipo: "Brasil",        pj: 20, v: 10, e: 2, d:  8, puntos: 22, porcentajeVictorias: 50.0 },
+        { equipo: "Portugal",      pj: 19, v:  9, e: 1, d:  9, puntos: 19, porcentajeVictorias: 47.4 },
+        { equipo: "Corea del Sur", pj: 15, v:  7, e: 4, d:  4, puntos: 18, porcentajeVictorias: 46.7 },
+        { equipo: "Argentina",     pj: 19, v:  8, e: 1, d: 10, puntos: 17, porcentajeVictorias: 42.1 },
+        { equipo: "Alemania",      pj: 14, v:  6, e: 4, d:  4, puntos: 16, porcentajeVictorias: 42.9 },
+        { equipo: "Francia",       pj: 22, v:  7, e: 2, d: 13, puntos: 16, porcentajeVictorias: 31.8 },
+        { equipo: "Países Bajos",  pj: 13, v:  2, e: 4, d:  7, puntos:  8, porcentajeVictorias: 15.4 },
+      ],
+    },
+    {
+      nombre: "Jornada 3",
+      resultados: [
+        { equipo: "Corea del Sur", pj: 18, v: 11, e: 4, d:  3, puntos: 26, porcentajeVictorias: 61.1 },
+        { equipo: "Argentina",     pj: 19, v:  8, e: 4, d:  7, puntos: 20, porcentajeVictorias: 42.1 },
+        { equipo: "Noruega",       pj: 17, v: 10, e: 0, d:  7, puntos: 20, porcentajeVictorias: 58.8 },
+        { equipo: "Francia",       pj: 17, v:  7, e: 3, d:  7, puntos: 17, porcentajeVictorias: 41.2 },
+        { equipo: "México",        pj: 13, v:  5, e: 5, d:  3, puntos: 15, porcentajeVictorias: 38.5 },
+        { equipo: "Países Bajos",  pj: 16, v:  6, e: 3, d:  7, puntos: 15, porcentajeVictorias: 37.5 },
+        { equipo: "Brasil",        pj: 13, v:  4, e: 6, d:  3, puntos: 14, porcentajeVictorias: 30.8 },
+        { equipo: "Alemania",      pj: 10, v:  1, e: 5, d:  4, puntos:  7, porcentajeVictorias: 10.0 },
+        { equipo: "Portugal",      pj: 13, v:  2, e: 1, d: 10, puntos:  5, porcentajeVictorias: 15.4 },
+      ],
+    },
+    ...Array.from({ length: 3 }, (_, i) => ({
+      nombre: `Jornada ${i + 4}`,
       resultados: EQUIPOS_L19.map(filaJornadaCero),
     })),
   ],
