@@ -3,6 +3,7 @@ import { supabase } from "./supabase";
 
 const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 const TOKEN_KEY = "ligappt_token";
+const REFRESH_TOKEN_KEY = "ligappt_refresh_token";
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -14,21 +15,42 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+export function getRefreshToken(): string | null {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+export function storeRefreshToken(t: string): void {
+  localStorage.setItem(REFRESH_TOKEN_KEY, t);
+}
+export function clearRefreshToken(): void {
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+}
+
 /** Intenta renovar el JWT via Supabase. Devuelve el nuevo token o null. */
 async function tryRefreshToken(): Promise<string | null> {
   if (!supabase) return null;
   const { data, error } = await supabase.auth.refreshSession();
   if (error || !data.session) return null;
   storeToken(data.session.access_token);
+  if (data.session.refresh_token) storeRefreshToken(data.session.refresh_token);
   return data.session.access_token;
 }
 
 function buildHeaders(token: string | null, extra?: HeadersInit): HeadersInit {
+  const refreshToken = getRefreshToken();
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(refreshToken ? { "X-Refresh-Token": refreshToken } : {}),
     ...(extra ?? {}),
   };
+}
+
+/** Si el backend renovó la sesión sola, guarda los nuevos tokens sin avisar al usuario. */
+function syncRenewedTokens(headers: Headers): void {
+  const newAccess = headers.get("X-New-Access-Token");
+  const newRefresh = headers.get("X-New-Refresh-Token");
+  if (newAccess) storeToken(newAccess);
+  if (newRefresh) storeRefreshToken(newRefresh);
 }
 
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -37,18 +59,21 @@ async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
     ...init,
     headers: buildHeaders(token, init.headers),
   });
+  syncRenewedTokens(res.headers);
 
   // Token expirado → refrescar y reintentar una sola vez
   if (res.status === 401) {
     const newToken = await tryRefreshToken();
     if (!newToken) {
       clearToken();
+      clearRefreshToken();
       throw new Error("Sesión expirada. Inicia sesión nuevamente.");
     }
     const retry = await fetch(`${BASE}${path}`, {
       ...init,
       headers: buildHeaders(newToken, init.headers),
     });
+    syncRenewedTokens(retry.headers);
     if (!retry.ok) {
       const body = await retry.json().catch(() => ({}));
       throw new Error(body.error ?? body.message ?? `HTTP ${retry.status}`);
@@ -145,7 +170,10 @@ export interface Arquero {
 
 export const authApi = {
   login: (email: string, password: string) =>
-    req<{ session: { access_token: string }; profile: Profile }>("/auth/login", {
+    req<{
+      session: { access_token: string; refresh_token: string };
+      profile: Profile;
+    }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     }),

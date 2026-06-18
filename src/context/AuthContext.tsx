@@ -6,7 +6,15 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { authApi, storeToken, clearToken, getToken, type Profile } from "../lib/api";
+import {
+  authApi,
+  storeToken,
+  storeRefreshToken,
+  clearToken,
+  clearRefreshToken,
+  getToken,
+  type Profile,
+} from "../lib/api";
 
 interface AuthState {
   profile: Profile | null;
@@ -41,12 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const { session, profile } = await authApi.login(email, password);
     storeToken(session.access_token);
+    storeRefreshToken(session.refresh_token);
     setState({ profile, loading: false });
   }, []);
 
   const logout = useCallback(async () => {
     await authApi.logout().catch(() => {});
     clearToken();
+    clearRefreshToken();
     setState({ profile: null, loading: false });
   }, []);
 
