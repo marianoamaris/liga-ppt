@@ -585,6 +585,7 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
       <div className="flex items-center gap-0 px-3 py-2 border-b border-gray-800/50">
         <span className={`${COL.pos} text-gray-600 text-xs font-semibold text-left`}>#</span>
         <span className={`${COL.equipo} text-gray-600 text-xs font-semibold`}>Equipo</span>
+        <span className={`${COL.stat} text-gray-600 text-xs font-semibold`}>PJ</span>
         <span className={`${COL.stat} text-gray-600 text-xs font-semibold`}>V</span>
         <span className={`${COL.stat} text-gray-600 text-xs font-semibold`}>E</span>
         <span className={`${COL.stat} text-gray-600 text-xs font-semibold`}>D</span>
@@ -598,6 +599,7 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
               <div key={i} className="flex items-center gap-0 px-3 py-2.5 animate-pulse">
                 <div className={`${COL.pos}`}><div className="h-3 w-3 bg-gray-800 rounded-full mx-auto" /></div>
                 <div className={`${COL.equipo} pr-2`}><div className="h-3 bg-gray-800 rounded-full" /></div>
+                <div className={`${COL.stat}`}><div className="h-3 w-4 bg-gray-800 rounded-full mx-auto" /></div>
                 <div className={`${COL.stat}`}><div className="h-3 w-4 bg-gray-800 rounded-full mx-auto" /></div>
                 <div className={`${COL.stat}`}><div className="h-3 w-4 bg-gray-800 rounded-full mx-auto" /></div>
                 <div className={`${COL.stat}`}><div className="h-3 w-4 bg-gray-800 rounded-full mx-auto" /></div>
@@ -641,6 +643,7 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
                           </span>
                         )}
                       </div>
+                      <span className={`${COL.stat} text-gray-400 tabular-nums text-xs`}>{s.victorias + s.empates + s.derrotas}</span>
                       <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.victorias}</span>
                       <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.empates}</span>
                       <span className={`${COL.stat} text-white tabular-nums text-xs`}>{s.derrotas}</span>
