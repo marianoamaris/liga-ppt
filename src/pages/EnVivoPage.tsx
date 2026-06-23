@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
 import { supabase } from "../lib/supabase";
 import { getColor, getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
-import { LIGA_19_EQUIPOS } from "../constants/liga19";
+import { LIGA_19_EQUIPOS, type Liga19Equipo } from "../constants/liga19";
+import { PROXIMA_JORNADA_LIGA19, type FixtureGrupo } from "../constants/PROXIMA_JORNADA_LIGA19";
 import type { EquipoEnCancha, Evento } from "../components/anotador/types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -861,11 +862,140 @@ function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplin
   );
 }
 
+// ── Próxima jornada ───────────────────────────────────────────────────────────
+
+type Standings = ReturnType<typeof mergeStandings>;
+
+function MatchupGroupCard({
+  grupo,
+  standings,
+}: {
+  grupo: FixtureGrupo;
+  standings: Standings;
+}) {
+  const equipos = grupo.equiposIds
+    .map((id) => LIGA_19_EQUIPOS.find((e) => e.id === id))
+    .filter((e): e is Liga19Equipo => !!e);
+
+  const conStats = equipos.map((eq) => ({
+    eq,
+    st: standings.find((s) => s.equipoId === eq.id),
+  }));
+
+  const maxPuntos = Math.max(...conStats.map((c) => c.st?.puntos ?? -1));
+  const favoritos = conStats.filter((c) => (c.st?.puntos ?? -1) === maxPuntos);
+  const favoritoId = favoritos.length === 1 ? favoritos[0].eq.id : null;
+
+  const pares: { a: Liga19Equipo; b: Liga19Equipo; h2h?: NonNullable<Standing["vsRivales"]>[string] }[] = [];
+  for (let i = 0; i < conStats.length; i++) {
+    for (let j = i + 1; j < conStats.length; j++) {
+      const a = conStats[i];
+      const b = conStats[j];
+      const directo = a.st?.vsRivales?.[b.eq.nombre];
+      const inverso = b.st?.vsRivales?.[a.eq.nombre];
+      const h2h = directo ?? (inverso ? { victorias: inverso.derrotas, empates: inverso.empates, derrotas: inverso.victorias } : undefined);
+      pares.push({ a: a.eq, b: b.eq, h2h });
+    }
+  }
+
+  return (
+    <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
+      <div className="px-4 py-2.5 border-b border-gray-800 flex items-center gap-2">
+        <span className="bg-gray-700 text-white text-xs font-black px-2 py-0.5 rounded-lg">
+          Cancha {grupo.cancha}
+        </span>
+        {grupo.lugar && <span className="text-gray-500 text-xs">{grupo.lugar}</span>}
+      </div>
+
+      <div className="flex items-center justify-around py-4 px-3 flex-wrap gap-y-2">
+        {conStats.map(({ eq, st }, i) => (
+          <div key={eq.id} className="flex items-center">
+            {i > 0 && <span className="text-gray-600 text-sm font-light px-2 shrink-0">vs</span>}
+            <div className="text-center min-w-0">
+              <div className="flex items-center justify-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(eq.id) }} />
+                <span className="text-white text-sm font-bold truncate">{eq.nombre}</span>
+              </div>
+              {st && (
+                <div className="text-gray-500 text-[11px] mt-1 tabular-nums">#{st.pos} · {st.puntos} pts</div>
+              )}
+              {favoritoId === eq.id && (
+                <span
+                  className="inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+                  style={{ backgroundColor: getColor(eq.id), color: getTextColor(eq.id) }}
+                >
+                  Líder de cancha
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {pares.length > 0 && (
+        <div className="px-4 py-2.5 border-t border-gray-800 space-y-1.5">
+          <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold">Cara a cara</p>
+          {pares.map(({ a, b, h2h }) => (
+            <div key={`${a.id}-${b.id}`} className="flex items-center justify-between gap-2 text-[11px]">
+              <span className="text-gray-400 truncate">{a.nombre} vs {b.nombre}</span>
+              <span className="shrink-0 tabular-nums">
+                <span className="text-green-400 font-bold">{h2h?.victorias ?? 0}V</span>{" "}
+                <span className="text-yellow-400 font-bold">{h2h?.empates ?? 0}E</span>{" "}
+                <span className="text-red-400 font-bold">{h2h?.derrotas ?? 0}D</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProximaJornadaSection({ standings, loading }: { standings: Standings; loading: boolean }) {
+  const { jornada, fecha, grupos } = PROXIMA_JORNADA_LIGA19;
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-gray-900 rounded-2xl overflow-hidden">
+        <div className="px-4 py-3 flex items-center gap-2 flex-wrap">
+          {fecha && (
+            <span className="text-gray-900 bg-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg">
+              {fecha}
+            </span>
+          )}
+          <h2 className="text-white font-bold text-sm">
+            {jornada ? `Próxima jornada · J${jornada}` : "Próxima jornada"}
+          </h2>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2].map((i) => <div key={i} className="h-28 bg-gray-900 rounded-2xl animate-pulse" />)}
+        </div>
+      ) : grupos.length === 0 ? (
+        <div className="bg-gray-900 rounded-2xl py-10 text-center">
+          <p className="text-gray-500 text-sm">Aún no se ha definido el fixture de la próxima jornada.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {grupos.map((g) => (
+            <MatchupGroupCard key={g.cancha} grupo={g} standings={standings} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 type FiltroCancha = "todas" | 1 | 2 | 3;
 
+type Tab = "en-vivo" | "proxima-jornada";
+
 export function EnVivoPage() {
+  const [tab, setTab]                   = useState<Tab>("en-vivo");
   const [partidos, setPartidos]         = useState<Partido[]>([]);
   const [baseStandings, setBase]        = useState<Standing[]>([]);
   const [goleadores, setGoleadores]     = useState<Goleador[]>([]);
@@ -996,66 +1126,94 @@ export function EnVivoPage() {
     </div>
   ) : null;
 
+  const Tabs = (
+    <div className="flex gap-1 bg-white rounded-xl p-1 border border-gray-200 shadow-sm w-fit">
+      <button
+        onClick={() => setTab("en-vivo")}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          tab === "en-vivo" ? "bg-gray-900 text-white shadow" : "text-gray-600 hover:text-gray-900"
+        }`}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        En Vivo
+      </button>
+      <button
+        onClick={() => setTab("proxima-jornada")}
+        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          tab === "proxima-jornada" ? "bg-gray-900 text-white shadow" : "text-gray-600 hover:text-gray-900"
+        }`}
+      >
+        Próxima Jornada
+      </button>
+    </div>
+  );
+
   return (
     <div className="min-h-full bg-gray-100 p-4 md:p-6 space-y-4">
 
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-gray-700 font-bold uppercase tracking-wider text-sm">En Vivo</span>
-          {lastUpdate && (
-            <span className="text-gray-400 text-xs">
-              · {lastUpdate.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-            </span>
-          )}
-        </div>
-        {/* Filtro visible solo en mobile cuando hay partidos */}
-        {hayPartidos && <div className="lg:hidden">{CanchaFilter}</div>}
-      </div>
-
-      {/* ── Mobile / Tablet: columna única ── */}
-      <div className="flex flex-col gap-4 lg:hidden">
-        {hayPartidos && MatchCards}
-        <TablaClasificacion standings={standings} loading={loadingStats} />
-        <div className="grid grid-cols-2 gap-4">
-          <TablaGoleadores goleadores={goleadores} loading={loadingRankings} />
-          <TablaArqueros   arqueros={arqueros}     loading={loadingRankings} />
-        </div>
-        <TopGolesRapidos    goleadores={goleadores} loading={loadingRankings} />
-        <TopGolesSalvadores goleadores={goleadores} loading={loadingRankings} />
-        <TablaDisciplina    disciplina={disciplina} loading={loadingRankings} />
-      </div>
-
-      {/* ── Desktop: 3 cols con partidos / 2 cols sin partidos ── */}
-      <div className={`hidden lg:grid lg:gap-5 lg:items-start ${hayPartidos ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
-
-        {/* Col 1 — Clasificación + Disciplina */}
-        <div className="space-y-4">
-          <TablaClasificacion standings={standings} loading={loadingStats} />
-          <TablaDisciplina disciplina={disciplina} loading={loadingRankings} />
-        </div>
-
-        {/* Col 2 — Partidos en vivo (solo cuando hay) */}
-        {hayPartidos && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Partidos</span>
-              {CanchaFilter}
-            </div>
-            {MatchCards}
-          </div>
+        {Tabs}
+        {tab === "en-vivo" && lastUpdate && (
+          <span className="text-gray-400 text-xs">
+            Actualizado · {lastUpdate.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+          </span>
         )}
-
-        {/* Col 3 (o Col 2 sin partidos) — Goleadores + Top rápidos + Arqueros */}
-        <div className="space-y-4">
-          <TablaGoleadores  goleadores={goleadores} loading={loadingRankings} />
-          <TopGolesRapidos    goleadores={goleadores} loading={loadingRankings} />
-          <TopGolesSalvadores goleadores={goleadores} loading={loadingRankings} />
-          <TablaArqueros      arqueros={arqueros}     loading={loadingRankings} />
-        </div>
-
       </div>
+
+      {tab === "en-vivo" && (
+        <>
+          {/* Filtro visible solo en mobile cuando hay partidos */}
+          {hayPartidos && <div className="lg:hidden">{CanchaFilter}</div>}
+
+          {/* ── Mobile / Tablet: columna única ── */}
+          <div className="flex flex-col gap-4 lg:hidden">
+            {hayPartidos && MatchCards}
+            <TablaClasificacion standings={standings} loading={loadingStats} />
+            <div className="grid grid-cols-2 gap-4">
+              <TablaGoleadores goleadores={goleadores} loading={loadingRankings} />
+              <TablaArqueros   arqueros={arqueros}     loading={loadingRankings} />
+            </div>
+            <TopGolesRapidos    goleadores={goleadores} loading={loadingRankings} />
+            <TopGolesSalvadores goleadores={goleadores} loading={loadingRankings} />
+            <TablaDisciplina    disciplina={disciplina} loading={loadingRankings} />
+          </div>
+
+          {/* ── Desktop: 3 cols con partidos / 2 cols sin partidos ── */}
+          <div className={`hidden lg:grid lg:gap-5 lg:items-start ${hayPartidos ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
+
+            {/* Col 1 — Clasificación + Disciplina */}
+            <div className="space-y-4">
+              <TablaClasificacion standings={standings} loading={loadingStats} />
+              <TablaDisciplina disciplina={disciplina} loading={loadingRankings} />
+            </div>
+
+            {/* Col 2 — Partidos en vivo (solo cuando hay) */}
+            {hayPartidos && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Partidos</span>
+                  {CanchaFilter}
+                </div>
+                {MatchCards}
+              </div>
+            )}
+
+            {/* Col 3 (o Col 2 sin partidos) — Goleadores + Top rápidos + Arqueros */}
+            <div className="space-y-4">
+              <TablaGoleadores  goleadores={goleadores} loading={loadingRankings} />
+              <TopGolesRapidos    goleadores={goleadores} loading={loadingRankings} />
+              <TopGolesSalvadores goleadores={goleadores} loading={loadingRankings} />
+              <TablaArqueros      arqueros={arqueros}     loading={loadingRankings} />
+            </div>
+
+          </div>
+        </>
+      )}
+
+      {tab === "proxima-jornada" && (
+        <ProximaJornadaSection standings={standings} loading={loadingStats} />
+      )}
     </div>
   );
 }
