@@ -24,6 +24,7 @@ import {
   TEAM_COLORS,
 } from "../../constants/DATOS_LIGAS";
 import { getArquerosMap, getEquipoStats } from "../../utils/utilities";
+import { useTablaGeneralLiga19 } from "../../hooks/useTablaGeneralLiga19";
 import { Tabs } from "../sections/Tabs";
 import { TablaGeneral } from "../sections/TablaGeneral";
 import { Jornadas } from "../sections/Jornadas";
@@ -76,6 +77,10 @@ const ClasificacionDesktop: React.FC = () => {
     ? getArquerosMap(datosLiga.arqueros)
     : undefined;
 
+  const esLigaActual = ligaSeleccionada === TOTAL_LIGAS;
+  const { tablaGeneral: tablaGeneralEnVivo, loading: loadingTablaGeneral } =
+    useTablaGeneralLiga19(esLigaActual);
+
   const content = (
     <div className="flex-1 h-full max-h-full pb-4 pr-2 overflow-y-auto">
       <Tabs
@@ -95,13 +100,17 @@ const ClasificacionDesktop: React.FC = () => {
                   <h3 className="mb-2 font-semibold text-gray-700">
                     Tabla General
                   </h3>
-                  <TablaGeneral
-                    tablaGeneral={datosLiga.tablaGeneral}
-                    TEAM_COLORS={TEAM_COLORS}
-                    getEquipoStats={getEquipoStats}
-                    arquerosMap={arquerosMap}
-                    arquerosEquipoMap={arquerosEquipoMap}
-                  />
+                  {esLigaActual && loadingTablaGeneral ? (
+                    <p className="text-sm text-gray-500">Cargando clasificación en vivo…</p>
+                  ) : (
+                    <TablaGeneral
+                      tablaGeneral={esLigaActual ? tablaGeneralEnVivo : datosLiga.tablaGeneral}
+                      TEAM_COLORS={TEAM_COLORS}
+                      getEquipoStats={esLigaActual ? undefined : getEquipoStats}
+                      arquerosMap={esLigaActual ? undefined : arquerosMap}
+                      arquerosEquipoMap={esLigaActual ? undefined : arquerosEquipoMap}
+                    />
+                  )}
                 </div>
                 <div className="mb-6">
                   <h3 className="mb-2 font-semibold text-gray-700">Jornadas</h3>

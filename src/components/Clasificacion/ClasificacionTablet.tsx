@@ -23,6 +23,7 @@ import {
   TEAM_COLORS,
 } from "../../constants/DATOS_LIGAS";
 import { getArquerosMap, getEquipoStats } from "../../utils/utilities";
+import { useTablaGeneralLiga19 } from "../../hooks/useTablaGeneralLiga19";
 import { Tabs } from "../sections/Tabs";
 import { TablaGeneral } from "../sections/TablaGeneral";
 import { Jornadas } from "../sections/Jornadas";
@@ -75,6 +76,10 @@ const ClasificacionTablet: React.FC = () => {
     ? getArquerosMap(datosLiga.arqueros)
     : undefined;
 
+  const esLigaActual = ligaSeleccionada === TOTAL_LIGAS;
+  const { tablaGeneral: tablaGeneralEnVivo, loading: loadingTablaGeneral } =
+    useTablaGeneralLiga19(esLigaActual);
+
   return (
     <div className="flex flex-col w-screen min-h-screen max-w-none bg-gray-100">
       {/* Dropdown de ligas */}
@@ -108,13 +113,17 @@ const ClasificacionTablet: React.FC = () => {
                     <h3 className="mb-4 font-semibold text-gray-700 text-lg">
                       Tabla General
                     </h3>
-                    <TablaGeneral
-                      tablaGeneral={datosLiga.tablaGeneral}
-                      TEAM_COLORS={TEAM_COLORS}
-                      getEquipoStats={getEquipoStats}
-                      arquerosMap={arquerosMap}
-                      arquerosEquipoMap={arquerosEquipoMap}
-                    />
+                    {esLigaActual && loadingTablaGeneral ? (
+                      <p className="text-sm text-gray-500">Cargando clasificación en vivo…</p>
+                    ) : (
+                      <TablaGeneral
+                        tablaGeneral={esLigaActual ? tablaGeneralEnVivo : datosLiga.tablaGeneral}
+                        TEAM_COLORS={TEAM_COLORS}
+                        getEquipoStats={esLigaActual ? undefined : getEquipoStats}
+                        arquerosMap={esLigaActual ? undefined : arquerosMap}
+                        arquerosEquipoMap={esLigaActual ? undefined : arquerosEquipoMap}
+                      />
+                    )}
                   </div>
                   <div className="mb-8 w-full">
                     <h3 className="mb-4 font-semibold text-gray-700 text-lg">

@@ -900,6 +900,11 @@ function MatchupGroupCard({
       pares.push({ a: a.eq, b: b.eq, h2h });
     }
   }
+  pares.sort((p1, p2) => {
+    const p1TieneLider = p1.a.id === favoritoId || p1.b.id === favoritoId;
+    const p2TieneLider = p2.a.id === favoritoId || p2.b.id === favoritoId;
+    return Number(p2TieneLider) - Number(p1TieneLider);
+  });
 
   return (
     <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
