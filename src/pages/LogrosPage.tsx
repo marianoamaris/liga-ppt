@@ -103,10 +103,10 @@ const RECORDS: Record<RecordId, UserRecord | EquipoRecord> = {
     type: "equipo",
     podium: [
       { equipo: "Países Bajos", color: "#F97316", puntos: 41, temporada: 19, victorias: 20, empates: 1, derrotas: 13 },
-      { equipo: "México",       color: "#22C55E", puntos: 34, temporada: 19, victorias: 17, empates: 0, derrotas: 15 },
-      { equipo: "Brasil",       color: "#FDB913", puntos: 34, temporada: 19, victorias: 15, empates: 4, derrotas:  5 },
+      { equipo: "Greenworld",   color: "#22C55E", puntos: 39, temporada:  7, victorias: 18, empates: 3, derrotas:  3 },
+      { equipo: "Chelsea FC",   color: "#1E40AF", puntos: 38, temporada: 10, victorias: 18, empates: 2, derrotas:  4 },
     ],
-    stats: [41, 34, 34],
+    stats: [41, 39, 38],
   },
   menos_puntos_jornada: {
     label: "Menos puntos hechos por un equipo en una sola jornada",
