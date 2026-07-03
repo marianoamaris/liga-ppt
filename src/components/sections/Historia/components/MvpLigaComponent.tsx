@@ -16,16 +16,20 @@ const MvpLigaComponent = () => {
         </thead>
         <tbody>
           {MVP_LIGA.map((g, idx) => {
+            const maxPremios = MVP_LIGA[0].premios;
+            const secondPremios = MVP_LIGA.find(x => x.premios < maxPremios)?.premios ?? 0;
+            const thirdPremios = MVP_LIGA.find(x => x.premios < secondPremios)?.premios ?? 0;
+
             let rowClass = "";
             let medal = "";
-            if (idx === 0) {
+            if (g.premios === maxPremios) {
               rowClass = "bg-yellow-100 font-bold text-yellow-800";
               medal = "🥇";
-            } else if (idx === 1) {
-              rowClass = "bg-yellow-100 font-bold text-yellow-800";
-              medal = "🥇";
-            } else if (idx === 2) {
-              rowClass = "bg-orange-200 font-semibold text-orange-800";
+            } else if (g.premios === secondPremios) {
+              rowClass = "bg-gray-100 font-semibold text-gray-700";
+              medal = "🥈";
+            } else if (g.premios === thirdPremios) {
+              rowClass = "bg-orange-100 font-semibold text-orange-800";
               medal = "🥉";
             } else if (idx % 2 === 0) {
               rowClass = "bg-white";
@@ -35,10 +39,7 @@ const MvpLigaComponent = () => {
             return (
               <tr
                 key={g.nombre}
-                className={
-                  rowClass +
-                  " border-t border-gray-100 transition-all hover:bg-yellow-50"
-                }
+                className={rowClass + " border-t border-gray-100 transition-all hover:bg-yellow-50"}
               >
                 <td className="px-4 py-2 text-lg">{medal || idx + 1}</td>
                 <td className="px-4 py-2">{g.nombre}</td>
