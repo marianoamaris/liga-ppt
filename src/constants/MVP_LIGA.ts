@@ -1,5 +1,5 @@
 export const MVP_LIGA = [
-  { nombre: "Jürgen Hassler", premios: 2 },
+  { nombre: "Jürgen Hassler", premios: 3 },
   { nombre: "Keni Contreras", premios: 2 },
   { nombre: "Jefferson Almanza", premios: 1 },
   { nombre: "Frederick Molina", premios: 1 },
