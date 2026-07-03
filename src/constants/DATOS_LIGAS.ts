@@ -2506,6 +2506,18 @@ export const ARQUEROS_LIGA_18: Record<string, string> = {
   "Palermo F.C.": "Pipe Castillejo",
 };
 
+const ARQUEROS_LIGA_19: Record<string, string> = {
+  "Brasil":        "Fernando Gómez",
+  "Corea del Sur": "Leonardo Cadena",
+  "Alemania":      "Luis Fonseca",
+  "Países Bajos":  "Santiago Sánchez",
+  "Francia":       "Jherson Orozco",
+  "Argentina":     "Brayan Ospino",
+  "Noruega":       "Hernán García",
+  "México":        "Keyner Vides",
+  "Portugal":      "Pipe Castillejo",
+};
+
 export const ARQUEROS_POR_LIGA: Record<number, Record<string, string>> = {
   5: ARQUEROS_LIGA_5,
   6: ARQUEROS_LIGA_6,
@@ -2518,6 +2530,7 @@ export const ARQUEROS_POR_LIGA: Record<number, Record<string, string>> = {
   13: ARQUEROS_LIGA_13,
   14: ARQUEROS_LIGA_14,
   18: ARQUEROS_LIGA_18,
+  19: ARQUEROS_LIGA_19,
 };
 
 // Datos para Liga PPT #14 (actualizados con resultados reales de Jornada 1, 2 y 3)

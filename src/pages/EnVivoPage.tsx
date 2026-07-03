@@ -3,8 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
 import { supabase } from "../lib/supabase";
 import { getColor, getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
-import { LIGA_19_EQUIPOS, type Liga19Equipo } from "../constants/liga19";
-import { PROXIMA_JORNADA_LIGA19, type FixtureGrupo } from "../constants/PROXIMA_JORNADA_LIGA19";
+import { LIGA_19_EQUIPOS } from "../constants/liga19";
 import type { EquipoEnCancha, Evento } from "../components/anotador/types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -865,133 +864,367 @@ function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplin
   );
 }
 
-// ── Próxima jornada ───────────────────────────────────────────────────────────
+// ── Torneo Regular ────────────────────────────────────────────────────────────
 
 type Standings = ReturnType<typeof mergeStandings>;
 
-function MatchupGroupCard({
-  grupo,
+function TorneoRegularSection({
   standings,
+  disciplina,
+  loading,
 }: {
-  grupo: FixtureGrupo;
   standings: Standings;
+  disciplina: JugadorDisciplina[];
+  loading: boolean;
 }) {
-  const equipos = grupo.equiposIds
-    .map((id) => LIGA_19_EQUIPOS.find((e) => e.id === id))
-    .filter((e): e is Liga19Equipo => !!e);
+  const [jornadaAbierta, setJornadaAbierta] = useState<string | null>(null);
 
-  const conStats = equipos.map((eq) => ({
-    eq,
-    st: standings.find((s) => s.equipoId === eq.id),
-  }));
-
-  const maxPuntos = Math.max(...conStats.map((c) => c.st?.puntos ?? -1));
-  const favoritos = conStats.filter((c) => (c.st?.puntos ?? -1) === maxPuntos);
-  const favoritoId = favoritos.length === 1 ? favoritos[0].eq.id : null;
-
-  const pares: { a: Liga19Equipo; b: Liga19Equipo; h2h?: NonNullable<Standing["vsRivales"]>[string] }[] = [];
-  for (let i = 0; i < conStats.length; i++) {
-    for (let j = i + 1; j < conStats.length; j++) {
-      const a = conStats[i];
-      const b = conStats[j];
-      const directo = a.st?.vsRivales?.[b.eq.nombre];
-      const inverso = b.st?.vsRivales?.[a.eq.nombre];
-      const h2h = directo ?? (inverso ? { victorias: inverso.derrotas, empates: inverso.empates, derrotas: inverso.victorias } : undefined);
-      pares.push({ a: a.eq, b: b.eq, h2h });
+  const jornadasDisponibles = useMemo(() => {
+    const keys = new Set<string>();
+    for (const s of standings) {
+      if (s.porJornada) Object.keys(s.porJornada).forEach((k) => keys.add(k));
     }
-  }
-  pares.sort((p1, p2) => {
-    const p1TieneLider = p1.a.id === favoritoId || p1.b.id === favoritoId;
-    const p2TieneLider = p2.a.id === favoritoId || p2.b.id === favoritoId;
-    return Number(p2TieneLider) - Number(p1TieneLider);
-  });
+    return [...keys].sort((a, b) => Number(a) - Number(b));
+  }, [standings]);
 
-  return (
-    <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
-      <div className="px-4 py-2.5 border-b border-gray-800 flex items-center gap-2">
-        <span className="bg-gray-700 text-white text-xs font-black px-2 py-0.5 rounded-lg">
-          Cancha {grupo.cancha}
-        </span>
-        {grupo.lugar && <span className="text-gray-500 text-xs">{grupo.lugar}</span>}
-      </div>
+  const teamDisciplina = useMemo(() => {
+    const map = new Map<string, { equipoId: string; equipo: string; amarillas: number; rojas: number }>();
+    for (const d of disciplina) {
+      const prev = map.get(d.equipoId) ?? { equipoId: d.equipoId, equipo: d.equipo, amarillas: 0, rojas: 0 };
+      map.set(d.equipoId, { ...prev, amarillas: prev.amarillas + d.amarillas, rojas: prev.rojas + d.rojas });
+    }
+    return [...map.values()].sort((a, b) => (b.amarillas + b.rojas * 2) - (a.amarillas + a.rojas * 2));
+  }, [disciplina]);
 
-      <div className="flex items-center justify-around py-4 px-3 flex-wrap gap-y-2">
-        {conStats.map(({ eq, st }, i) => (
-          <div key={eq.id} className="flex items-center">
-            {i > 0 && <span className="text-gray-600 text-sm font-light px-2 shrink-0">vs</span>}
-            <div className="text-center min-w-0">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(eq.id) }} />
-                <span className="text-white text-sm font-bold truncate">{eq.nombre}</span>
-              </div>
-              {st && (
-                <div className="text-gray-500 text-[11px] mt-1 tabular-nums">#{st.pos} · {st.puntos} pts</div>
-              )}
-              {favoritoId === eq.id && (
-                <span
-                  className="inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-                  style={{ backgroundColor: getColor(eq.id), color: getTextColor(eq.id) }}
-                >
-                  Líder de cancha
-                </span>
-              )}
-            </div>
-          </div>
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-900 rounded-2xl animate-pulse" />
         ))}
       </div>
+    );
+  }
 
-      {pares.length > 0 && (
-        <div className="px-4 py-2.5 border-t border-gray-800 space-y-1.5">
-          <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold">Cara a cara</p>
-          {pares.map(({ a, b, h2h }) => (
-            <div key={`${a.id}-${b.id}`} className="flex items-center justify-between gap-2 text-[11px]">
-              <span className="text-gray-400 truncate">{a.nombre} vs {b.nombre}</span>
-              <span className="shrink-0 tabular-nums">
-                <span className="text-green-400 font-bold">{h2h?.victorias ?? 0}V</span>{" "}
-                <span className="text-yellow-400 font-bold">{h2h?.empates ?? 0}E</span>{" "}
-                <span className="text-red-400 font-bold">{h2h?.derrotas ?? 0}D</span>
-              </span>
-            </div>
-          ))}
+  return (
+    <div className="space-y-5 max-w-2xl mx-auto">
+
+      {/* Banner */}
+      <div className="bg-gray-900 rounded-2xl px-4 py-3 border border-gray-800 flex items-center justify-between">
+        <div>
+          <h2 className="text-white font-bold text-sm">Torneo Regular · Liga #19</h2>
+          <p className="text-gray-500 text-xs mt-0.5">Copa del Mundo · 6 Jornadas · 9 Equipos</p>
+        </div>
+        <span className="bg-green-900/40 text-green-400 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border border-green-800/50">
+          Finalizado
+        </span>
+      </div>
+
+      {/* Jornada a Jornada */}
+      {jornadasDisponibles.length > 0 && (
+        <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
+          <div className="px-4 py-2.5 border-b border-gray-800">
+            <h3 className="text-white text-xs font-bold uppercase tracking-wider">Jornada a Jornada</h3>
+          </div>
+          <div className="divide-y divide-gray-800/60">
+            {jornadasDisponibles.map((j) => {
+              const abierta = jornadaAbierta === j;
+              const jornadaStandings = standings
+                .map((s) => ({
+                  nombre: s.nombre,
+                  equipoId: s.equipoId,
+                  ...(s.porJornada?.[j] ?? { victorias: 0, empates: 0, derrotas: 0, puntos: 0 }),
+                }))
+                .filter((s) => s.victorias + s.empates + s.derrotas > 0)
+                .sort((a, b) => b.puntos - a.puntos || b.victorias - a.victorias);
+              const lider = jornadaStandings[0];
+
+              return (
+                <div key={j}>
+                  <button
+                    onClick={() => setJornadaAbierta(abierta ? null : j)}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/40 transition-colors text-left"
+                  >
+                    <span className="text-white text-xs font-semibold">Jornada {j}</span>
+                    <div className="flex items-center gap-2.5">
+                      {lider && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getColor(lider.equipoId) }} />
+                          <span className="text-gray-500 text-[10px]">{lider.nombre} lideró</span>
+                        </div>
+                      )}
+                      <motion.span
+                        animate={{ rotate: abierta ? 180 : 0 }}
+                        transition={{ duration: 0.18 }}
+                        className="text-gray-600 text-[10px] inline-block"
+                      >
+                        ▼
+                      </motion.span>
+                    </div>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {abierta && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.18 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-3 space-y-1.5">
+                          {jornadaStandings.map((s, idx) => (
+                            <div key={s.equipoId} className="flex items-center gap-2 text-[11px]">
+                              <span className="text-gray-600 w-4 text-center shrink-0 tabular-nums">{idx + 1}</span>
+                              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: getColor(s.equipoId) }} />
+                              <span className="text-gray-300 flex-1 truncate">{s.nombre}</span>
+                              <div className="flex gap-2 tabular-nums shrink-0">
+                                <span className="text-green-400">{s.victorias}V</span>
+                                <span className="text-yellow-400">{s.empates}E</span>
+                                <span className="text-red-400">{s.derrotas}D</span>
+                                <span className="text-white font-bold w-6 text-right">{s.puntos}p</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
+
+      {/* Disciplina del Torneo */}
+      {(teamDisciplina.length > 0 || disciplina.length > 0) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
+            <div className="px-4 py-2.5 border-b border-gray-800">
+              <h3 className="text-white text-xs font-bold uppercase tracking-wider">Tarjetas por Equipo</h3>
+            </div>
+            <div className="divide-y divide-gray-800/60">
+              {teamDisciplina.slice(0, 6).map((t) => (
+                <div key={t.equipoId} className="flex items-center gap-2.5 px-4 py-2.5">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(t.equipoId) }} />
+                  <span className="text-gray-300 text-xs flex-1 truncate">{t.equipo}</span>
+                  <div className="flex gap-1.5 shrink-0">
+                    {t.amarillas > 0 && (
+                      <span className="text-[11px] bg-yellow-500/15 text-yellow-300 px-1.5 py-0.5 rounded font-bold tabular-nums">{t.amarillas}🟡</span>
+                    )}
+                    {t.rojas > 0 && (
+                      <span className="text-[11px] bg-red-500/15 text-red-300 px-1.5 py-0.5 rounded font-bold tabular-nums">{t.rojas}🔴</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
+            <div className="px-4 py-2.5 border-b border-gray-800">
+              <h3 className="text-white text-xs font-bold uppercase tracking-wider">Top Tarjeteados</h3>
+            </div>
+            <div className="divide-y divide-gray-800/60">
+              {[...disciplina]
+                .sort((a, b) => (b.amarillas + b.rojas * 2) - (a.amarillas + a.rojas * 2))
+                .slice(0, 6)
+                .map((d) => (
+                  <div key={d.jugador} className="flex items-center gap-2.5 px-4 py-2.5">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(d.equipoId) }} />
+                    <span className="text-gray-300 text-xs flex-1 truncate">{d.jugador}</span>
+                    <div className="flex gap-1 shrink-0">
+                      {d.amarillas > 0 && <span className="text-yellow-300 text-[11px] font-bold tabular-nums">{d.amarillas}🟡</span>}
+                      {d.rojas > 0 && <span className="text-red-300 text-[11px] font-bold tabular-nums">{d.rojas}🔴</span>}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
 
-function ProximaJornadaSection({ standings, loading }: { standings: Standings; loading: boolean }) {
-  const { jornada, fecha, grupos } = PROXIMA_JORNADA_LIGA19;
+// ── Playoff ───────────────────────────────────────────────────────────────────
+
+function PlayoffMatchup({
+  equipoA,
+  posA,
+  equipoB,
+  posB,
+  label,
+}: {
+  equipoA: Standings[number];
+  posA: number;
+  equipoB: Standings[number];
+  posB: number;
+  label: string;
+}) {
+  const colorA = getColor(equipoA.equipoId);
+  const colorB = getColor(equipoB.equipoId);
+
+  const h2hDirecto = equipoA.vsRivales?.[equipoB.nombre];
+  const h2hInverso = equipoB.vsRivales?.[equipoA.nombre];
+  const h2h = h2hDirecto
+    ?? (h2hInverso
+      ? { victorias: h2hInverso.derrotas, empates: h2hInverso.empates, derrotas: h2hInverso.victorias }
+      : null);
+
+  const favoritoEquipo = equipoA.puntos >= equipoB.puntos ? equipoA : equipoB;
+  const diferencia = Math.abs(equipoA.puntos - equipoB.puntos);
 
   return (
-    <div className="space-y-4">
-      <div className="bg-gray-900 rounded-2xl overflow-hidden">
-        <div className="px-4 py-3 flex items-center gap-2 flex-wrap">
-          {fecha && (
-            <span className="text-gray-900 bg-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg">
-              {fecha}
-            </span>
-          )}
-          <h2 className="text-white font-bold text-sm">
-            {jornada ? `Próxima jornada · J${jornada}` : "Próxima jornada"}
-          </h2>
+    <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
+      <div className="px-4 py-2 border-b border-gray-800">
+        <span className="text-gray-900 bg-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg">
+          {label}
+        </span>
+      </div>
+
+      <div className="px-4 py-5 flex items-center gap-2">
+        <div className="flex-1 text-center space-y-1 min-w-0">
+          <div className="flex items-center justify-center gap-1.5">
+            <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorA }} />
+            <span className="text-white font-bold text-sm leading-tight truncate">{equipoA.nombre}</span>
+          </div>
+          <p className="text-gray-500 text-[11px] tabular-nums">#{posA} · {equipoA.puntos} pts</p>
+          <p className="text-gray-600 text-[10px] tabular-nums">{equipoA.victorias}V {equipoA.empates}E {equipoA.derrotas}D</p>
+        </div>
+
+        <div className="shrink-0 px-2">
+          <span className="text-gray-700 font-bold text-lg">vs</span>
+        </div>
+
+        <div className="flex-1 text-center space-y-1 min-w-0">
+          <div className="flex items-center justify-center gap-1.5">
+            <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorB }} />
+            <span className="text-white font-bold text-sm leading-tight truncate">{equipoB.nombre}</span>
+          </div>
+          <p className="text-gray-500 text-[11px] tabular-nums">#{posB} · {equipoB.puntos} pts</p>
+          <p className="text-gray-600 text-[10px] tabular-nums">{equipoB.victorias}V {equipoB.empates}E {equipoB.derrotas}D</p>
         </div>
       </div>
 
-      {loading ? (
+      <div className="px-4 pb-4 border-t border-gray-800/60 pt-3 space-y-3">
+        <div>
+          <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-2">Cara a cara · historial</p>
+          {h2h ? (
+            <div className="flex items-center gap-2">
+              <span className="text-gray-300 text-[11px] flex-1 text-right truncate">{equipoA.nombre}</span>
+              <div className="flex gap-1.5 shrink-0 text-[11px] tabular-nums font-bold">
+                <span className="text-green-400">{h2h.victorias}V</span>
+                <span className="text-yellow-400">{h2h.empates}E</span>
+                <span className="text-red-400">{h2h.derrotas}D</span>
+              </div>
+              <span className="text-gray-300 text-[11px] flex-1 text-left truncate">{equipoB.nombre}</span>
+            </div>
+          ) : (
+            <p className="text-gray-600 text-xs">Sin historial directo</p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-gray-600 text-[10px]">Favorito por tabla:</span>
+          <span
+            className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full"
+            style={{ backgroundColor: getColor(favoritoEquipo.equipoId), color: getTextColor(favoritoEquipo.equipoId) }}
+          >
+            {favoritoEquipo.nombre}
+          </span>
+          {diferencia > 0 && (
+            <span className="text-gray-600 text-[10px]">+{diferencia} pts</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PlayoffSection({
+  standings,
+  loading,
+}: {
+  standings: Standings;
+  loading: boolean;
+}) {
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => <div key={i} className="h-44 bg-gray-900 rounded-2xl animate-pulse" />)}
+      </div>
+    );
+  }
+
+  if (standings.length < 6) {
+    return (
+      <div className="bg-gray-900 rounded-2xl py-10 text-center border border-gray-800">
+        <p className="text-gray-500 text-sm">Clasificación insuficiente para definir el playoff.</p>
+      </div>
+    );
+  }
+
+  const [p1, p2, p3, p4, p5, p6] = standings;
+
+  return (
+    <div className="space-y-5 max-w-2xl mx-auto">
+
+      {/* Banner */}
+      <div className="bg-gray-900 rounded-2xl px-4 py-3 border border-gray-800 flex items-center justify-between">
+        <div>
+          <h2 className="text-white font-bold text-sm">Playoff · Liga #19</h2>
+          <p className="text-gray-500 text-xs mt-0.5">#3–#6 juegan playoff · #1 y #2 van directo a semis</p>
+        </div>
+        <span className="bg-amber-900/30 text-amber-400 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border border-amber-800/30">
+          Próxima sesión
+        </span>
+      </div>
+
+      {/* Clasificados directos a Semifinales */}
+      <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
+        <div className="px-4 py-2.5 border-b border-gray-800">
+          <h3 className="text-white text-xs font-bold uppercase tracking-wider">Pasan Directo a Semifinales</h3>
+        </div>
+        <div className="flex gap-3 px-4 py-4">
+          {[p1, p2].map((s, i) => {
+            const color = getColor(s.equipoId);
+            return (
+              <div key={s.equipoId} className="flex-1 text-center">
+                <div
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border"
+                  style={{ borderColor: `${color}50`, backgroundColor: `${color}18` }}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                  <span className="text-white text-xs font-bold truncate">{s.nombre}</span>
+                </div>
+                <p className="text-gray-500 text-[10px] mt-1.5 tabular-nums">#{i + 1} · {s.puntos} pts</p>
+              </div>
+            );
+          })}
+        </div>
+        <div className="px-4 pb-3">
+          <p className="text-gray-600 text-[10px]">#1 y #2 esperan en semifinales a los ganadores del playoff.</p>
+        </div>
+      </div>
+
+      {/* Playoff */}
+      <div>
+        <p className="text-gray-500 text-[11px] uppercase tracking-wider font-semibold mb-3">Playoff · Fase previa</p>
         <div className="space-y-3">
-          {[1, 2].map((i) => <div key={i} className="h-28 bg-gray-900 rounded-2xl animate-pulse" />)}
+          <PlayoffMatchup equipoA={p3} posA={3} equipoB={p6} posB={6} label="Playoff 1 · #3 vs #6" />
+          <PlayoffMatchup equipoA={p4} posA={4} equipoB={p5} posB={5} label="Playoff 2 · #4 vs #5" />
         </div>
-      ) : grupos.length === 0 ? (
-        <div className="bg-gray-900 rounded-2xl py-10 text-center">
-          <p className="text-gray-500 text-sm">Aún no se ha definido el fixture de la próxima jornada.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {grupos.map((g) => (
-            <MatchupGroupCard key={g.cancha} grupo={g} standings={standings} />
-          ))}
-        </div>
-      )}
+      </div>
+
+      {/* Nota de formato */}
+      <div className="bg-gray-900 rounded-2xl px-4 py-3 border border-gray-800">
+        <p className="text-gray-500 text-xs leading-relaxed">
+          Los ganadores del playoff avanzan a semifinales donde se enfrentan a #1 y #2. El formato exacto se define al inicio de la sesión.
+        </p>
+      </div>
+
     </div>
   );
 }
@@ -1000,7 +1233,7 @@ function ProximaJornadaSection({ standings, loading }: { standings: Standings; l
 
 type FiltroCancha = "todas" | 1 | 2 | 3;
 
-type Tab = "en-vivo" | "proxima-jornada";
+type Tab = "en-vivo" | "torneo-regular" | "playoff";
 
 export function EnVivoPage() {
   const [tab, setTab]                   = useState<Tab>("en-vivo");
@@ -1146,12 +1379,20 @@ export function EnVivoPage() {
         En Vivo
       </button>
       <button
-        onClick={() => setTab("proxima-jornada")}
+        onClick={() => setTab("torneo-regular")}
         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-          tab === "proxima-jornada" ? "bg-gray-900 text-white shadow" : "text-gray-600 hover:text-gray-900"
+          tab === "torneo-regular" ? "bg-gray-900 text-white shadow" : "text-gray-600 hover:text-gray-900"
         }`}
       >
-        Próxima Jornada
+        Torneo Regular
+      </button>
+      <button
+        onClick={() => setTab("playoff")}
+        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          tab === "playoff" ? "bg-gray-900 text-white shadow" : "text-gray-600 hover:text-gray-900"
+        }`}
+      >
+        Playoff
       </button>
     </div>
   );
@@ -1219,8 +1460,16 @@ export function EnVivoPage() {
         </>
       )}
 
-      {tab === "proxima-jornada" && (
-        <ProximaJornadaSection standings={standings} loading={loadingStats} />
+      {tab === "torneo-regular" && (
+        <TorneoRegularSection
+          standings={standings}
+          disciplina={disciplina}
+          loading={loadingStats || loadingRankings}
+        />
+      )}
+
+      {tab === "playoff" && (
+        <PlayoffSection standings={standings} loading={loadingStats} />
       )}
     </div>
   );

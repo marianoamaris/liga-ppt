@@ -39,6 +39,8 @@ const TABS = [
   { id: "mas_goles_jornada",     label: "Goles en jornada", icon: "🔥" },
   { id: "menos_goles_recibidos", label: "Menos goles arco", icon: "🧤" },
   { id: "mas_puntos_equipo",     label: "Más puntos",       icon: "🏅" },
+  { id: "mas_puntos_jornada",    label: "Puntos en jornada", icon: "⚡" },
+  { id: "menos_puntos_jornada",  label: "Menos pts jornada", icon: "💀" },
   { id: "menos_puntos_equipo",   label: "Menos puntos",     icon: "📉" },
 ] as const;
 
@@ -58,7 +60,7 @@ const RECORDS: Record<RecordId, UserRecord | EquipoRecord> = {
     podium: [
       find("enavarro") ?? def("Emanuel Navarro", "enavarro"),
       find("jhernandez") ?? def("José Hernández", "jhernandez"),
-      find("jdlc") ?? def("Juan de la Cruz", "jdlc"),
+      find("jhassler") ?? def("Jürgen Hassler", "jhassler"),
     ],
     stats: [33, 31, 29],
   },
@@ -67,11 +69,11 @@ const RECORDS: Record<RecordId, UserRecord | EquipoRecord> = {
     statLabel: "goles",
     type: "user",
     podium: [
+      find("jhassler") ?? def("Jürgen Hassler", "jhassler"),
       find("scorzo") ?? def("Santiago Corzo", "scorzo"),
       find("jhernandez") ?? def("José Hernández", "jhernandez"),
-      find("vcastilla") ?? def("Víctor Castilla", "vcastilla"),
     ],
-    stats: [12, 11, 10],
+    stats: [12, 12, 11],
   },
   menos_goles_recibidos: {
     label: "Menos goles recibidos en una liga (arquero)",
@@ -94,6 +96,28 @@ const RECORDS: Record<RecordId, UserRecord | EquipoRecord> = {
       { equipo: "Sport Boys",   color: "#FF69B4", puntos: 150, temporada: 13, victorias: 67, empates: 16, derrotas: 39 },
     ],
     stats: [186, 160, 150],
+  },
+  mas_puntos_jornada: {
+    label: "Más puntos hechos por un equipo en una sola jornada",
+    statLabel: "puntos",
+    type: "equipo",
+    podium: [
+      { equipo: "Países Bajos", color: "#F97316", puntos: 41, temporada: 19, victorias: 20, empates: 1, derrotas: 13 },
+      { equipo: "México",       color: "#22C55E", puntos: 34, temporada: 19, victorias: 17, empates: 0, derrotas: 15 },
+      { equipo: "Brasil",       color: "#FDB913", puntos: 34, temporada: 19, victorias: 15, empates: 4, derrotas:  5 },
+    ],
+    stats: [41, 34, 34],
+  },
+  menos_puntos_jornada: {
+    label: "Menos puntos hechos por un equipo en una sola jornada",
+    statLabel: "puntos",
+    type: "equipo",
+    podium: [
+      { equipo: "Argentina", color: "#2563EB", puntos:  1, temporada: 19, victorias: 0, empates: 1, derrotas: 10 },
+      { equipo: "Portugal",  color: "#D00027", puntos:  2, temporada: 19, victorias: 1, empates: 0, derrotas:  8 },
+      { equipo: "Noruega",   color: "#FF69B4", puntos:  4, temporada: 19, victorias: 2, empates: 0, derrotas: 12 },
+    ],
+    stats: [1, 2, 4],
   },
   menos_puntos_equipo: {
     label: "Menos puntos hechos por un equipo en una liga",
