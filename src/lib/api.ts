@@ -166,6 +166,28 @@ export interface Arquero {
   golesDe?: Record<string, number>;
 }
 
+// ── Liga config ───────────────────────────────────────────────────────────────
+
+export interface TeamConfig {
+  nombre: string;
+  color: string;
+  jugadores: string[];
+  arquero?: string;
+  capitan?: string;
+}
+
+export const ligaConfigApi = {
+  get: (temporada: number) =>
+    req<{ temporada: number; equipos: TeamConfig[] }>(
+      `/ligas/equipos?temporada=${temporada}`
+    ),
+  save: (temporada: number, equipos: TeamConfig[]) =>
+    req<{ ok: boolean }>("/ligas/equipos", {
+      method: "POST",
+      body: JSON.stringify({ temporada, equipos }),
+    }),
+};
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export const authApi = {

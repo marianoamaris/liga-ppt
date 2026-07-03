@@ -12,6 +12,7 @@ import { CalendarioPage } from "./pages/CalendarioPage";
 import { PatrocinadoresPage } from "./pages/PatrocinadoresPage";
 import { ActualizacionDatosJugadorPage } from "./pages/ActualizacionDatosJugadorPage";
 import { AnotadorPage } from "./pages/AnotadorPage";
+import { CrearLigaPage } from "./pages/CrearLigaPage";
 import { EnVivoPage } from "./pages/EnVivoPage";
 
 export const AppRouter = () => (
@@ -37,6 +38,7 @@ export const AppRouter = () => (
       {/* Sin layout */}
       <Route path="/login" element={<SignIn />} />
       <Route path="/anotador" element={<AnotadorPage />} />
+      <Route path="/crear-liga" element={<CrearLigaPage />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
