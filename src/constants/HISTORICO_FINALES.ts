@@ -223,6 +223,16 @@ export const FINALES_HISTORICAS: FinalHistorica[] = [
     notaMarcador:
       "Campeón Sporting de Lisboa: 2-0 en penales tras empate 3-3 en tiempo reglamentario",
   },
+  {
+    temporada: 19,
+    equipo1: "Brasil",
+    equipo2: "México",
+    goles1: 11,
+    goles2: 5,
+    color1: "amarillo",
+    color2: "verde",
+    resultado: "1",
+  },
 ];
 
 /** Cuenta finales ganadas y disputadas por color de camiseta. */
