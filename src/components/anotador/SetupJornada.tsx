@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { LIGA_19_EQUIPOS } from "../../constants/liga19";
-import { JORNADAS_LIGA19_TOTAL } from "../../constants/ANOTADOR_CONFIG";
-import { PLANTILLAS_LIGA19 } from "../../constants/PLANTILLAS_LIGA19";
+import { LIGA_20_EQUIPOS } from "../../constants/liga20";
+import { JORNADAS_LIGA20_TOTAL } from "../../constants/ANOTADOR_CONFIG";
+import { PLANTILLAS_LIGA20 } from "../../constants/PLANTILLAS_LIGA20";
 import { getColor } from "./utils";
 import type { EquipoEnCancha, ModoPartido, PartidoConfig } from "./types";
 
 function buildEquipo(equipoId: string): EquipoEnCancha {
-  const equipo = LIGA_19_EQUIPOS.find((e) => e.id === equipoId)!;
-  const plantilla = PLANTILLAS_LIGA19.find((p) => p.equipoId === equipoId)!;
+  const equipo = LIGA_20_EQUIPOS.find((e) => e.id === equipoId)!;
+  const plantilla = PLANTILLAS_LIGA20.find((p) => p.equipoId === equipoId)!;
   return {
     equipo,
     jugadores: plantilla.jugadores.map((nombre) => ({ nombre })),
@@ -30,9 +30,9 @@ interface SlotProps {
 }
 
 function TeamSlot({ slot, equipoId, ocupados, onChange }: SlotProps) {
-  const equipo = equipoId ? LIGA_19_EQUIPOS.find((e) => e.id === equipoId) : null;
+  const equipo = equipoId ? LIGA_20_EQUIPOS.find((e) => e.id === equipoId) : null;
   const plantilla = equipoId
-    ? PLANTILLAS_LIGA19.find((p) => p.equipoId === equipoId)
+    ? PLANTILLAS_LIGA20.find((p) => p.equipoId === equipoId)
     : null;
   const color = equipo ? getColor(equipo.id) : "#4B5563";
 
@@ -57,7 +57,7 @@ function TeamSlot({ slot, equipoId, ocupados, onChange }: SlotProps) {
         style={equipo ? { borderLeft: `3px solid ${color}` } : undefined}
       >
         <option value="">— Seleccionar equipo —</option>
-        {LIGA_19_EQUIPOS.map((eq) => (
+        {LIGA_20_EQUIPOS.map((eq) => (
           <option
             key={eq.id}
             value={eq.id}
@@ -144,7 +144,7 @@ export function SetupJornada({ onIniciar }: Props) {
     <div className="min-h-screen bg-gray-950 overflow-y-auto">
       <div className="max-w-lg mx-auto px-4 pt-8 pb-10 space-y-4">
         <div className="text-center pb-2">
-          <p className="text-gray-500 text-sm">Liga PPT · Edición #19</p>
+          <p className="text-gray-500 text-sm">Liga PPT · Edición #20</p>
           <h1 className="text-white text-2xl font-bold mt-1">Configurar Partido</h1>
         </div>
 
@@ -177,7 +177,7 @@ export function SetupJornada({ onIniciar }: Props) {
               onChange={(e) => setJornada(Number(e.target.value))}
               className="w-full bg-gray-700 text-white rounded-xl px-4 py-3.5 font-medium focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[52px]"
             >
-              {Array.from({ length: JORNADAS_LIGA19_TOTAL }, (_, i) => i + 1).map((n) => (
+              {Array.from({ length: JORNADAS_LIGA20_TOTAL }, (_, i) => i + 1).map((n) => (
                 <option key={n} value={n}>Jornada {n}</option>
               ))}
             </select>

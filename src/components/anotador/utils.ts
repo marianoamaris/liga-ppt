@@ -1,25 +1,25 @@
 import type { EquipoEnCancha, Evento, TeamScore } from "./types";
 
-export const LIGA19_COLORES: Record<string, string> = {
-  brasil:          "#FFD700",
-  argentina:       "#1565C0",
-  mexico:          "#2E7D32",
-  alemania:        "#212121",
-  noruega:         "#E91E8C",
-  francia:         "#F5F5F5",
-  "corea-del-sur": "#7B1FA2",
-  "paises-bajos":  "#E65100",
-  portugal:        "#C62828",
+export const LIGA20_COLORES: Record<string, string> = {
+  brighton:          "#FFD700",
+  "manchester-city": "#1565C0",
+  liverpool:         "#2E7D32",
+  newcastle:         "#212121",
+  "crystal-palace":  "#E91E8C",
+  tottenham:         "#F5F5F5",
+  "aston-villa":     "#7B1FA2",
+  "hull-city":       "#E65100",
+  arsenal:           "#C62828",
 };
 
 export const DURACION_PARTIDO = 8 * 60; // 480 segundos
 
 export function getColor(id: string): string {
-  return LIGA19_COLORES[id] ?? "#4B5563";
+  return LIGA20_COLORES[id] ?? "#4B5563";
 }
 
 export function getTextColor(id: string): string {
-  return ["francia", "brasil"].includes(id) ? "#111827" : "#ffffff";
+  return ["tottenham", "brighton"].includes(id) ? "#111827" : "#ffffff";
 }
 
 export function makeId(): string {

@@ -12,8 +12,8 @@ import { FaHistory } from "react-icons/fa";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Liga20DestacadoCarousel from "./Liga20DestacadoCarousel";
 import Liga19DestacadoCarousel from "./Liga19DestacadoCarousel";
-import Liga18DestacadoCarousel from "./Liga18DestacadoCarousel";
 import EnVivoDestacado from "./EnVivoDestacado";
 
 const HomeDesktop: React.FC = () => {
@@ -43,8 +43,8 @@ const HomeDesktop: React.FC = () => {
       </Card>
 
       <EnVivoDestacado />
+      <Liga20DestacadoCarousel />
       <Liga19DestacadoCarousel />
-      <Liga18DestacadoCarousel />
 
       {/* Módulos principales */}
       <Card className="w-full max-w-5xl p-2 mb-8 bg-white">

@@ -1,34 +1,29 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
 import { Card } from "../common/Card";
-import {
-  LIGA_19_DESTACADO,
-  LIGA_19_EQUIPOS,
-} from "../../constants/liga19";
+import { UserCard } from "../common/UserCard";
+import { USUARIOS_LIGA } from "../../constants/USUARIOS_LIGA";
+import imgCampeon from "../../assets/LIGA_19/liga-19-campeon.jpg";
 
-const SLIDE_COUNT = LIGA_19_EQUIPOS.length;
+const SLIDE_COUNT = 2;
 
-/** Altura fija del visor para que no colapse al cambiar de slide */
-const VIEWPORT_CLASS =
-  "relative h-[min(320px,55vw)] w-full md:h-[400px]";
+const userByUsername = (username: string) =>
+  USUARIOS_LIGA.find((u) => u.username === username);
 
-function preloadLiga19Images(): void {
-  LIGA_19_EQUIPOS.forEach((eq) => {
-    const img = new Image();
-    img.src = eq.imagen;
-  });
-}
+const UserCardGrid: React.FC<{ usernames: readonly string[] }> = ({
+  usernames,
+}) => (
+  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {usernames.map((un) => {
+      const u = userByUsername(un);
+      return u ? <UserCard key={un} user={u} /> : null;
+    })}
+  </div>
+);
 
 const Liga19DestacadoCarousel: React.FC = () => {
-  const navigate = useNavigate();
   const [slide, setSlide] = useState(0);
   const touchStartX = useRef<number | null>(null);
-  const equipo = LIGA_19_EQUIPOS[slide];
-
-  useEffect(() => {
-    preloadLiga19Images();
-  }, []);
 
   const go = useCallback((dir: -1 | 1) => {
     setSlide((s) => (s + dir + SLIDE_COUNT) % SLIDE_COUNT);
@@ -52,90 +47,150 @@ const Liga19DestacadoCarousel: React.FC = () => {
     <Card className="relative mb-8 w-full max-w-5xl overflow-hidden border border-green-800/30 bg-gradient-to-b from-green-950 via-emerald-950 to-black p-0 text-white shadow-xl">
       <div className="border-b border-white/10 px-4 py-3 md:px-6">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-lime-400/90">
-          {LIGA_19_DESTACADO.subtitulo}
+          Destacado Liga PPT
         </p>
         <h2 className="text-center text-lg font-bold text-white md:text-xl">
-          🌍🏆 {LIGA_19_DESTACADO.titulo}
+          🌍🏆 Edición #19 · Mundial — ¡Brasil campeón! 🇧🇷
         </h2>
       </div>
 
       <div
-        className="touch-pan-y px-3 pb-3 pt-3 md:px-6 md:pb-4 md:pt-4"
+        className="touch-pan-y px-3 pb-4 pt-3 md:px-6 md:pb-6 md:pt-4"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <p className="mb-4 text-center text-sm leading-relaxed text-gray-200 md:text-base">
-          {LIGA_19_DESTACADO.descripcion}
-        </p>
+        {slide === 0 ? (
+          <div className="space-y-4">
+            <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-inner">
+              <img
+                src={imgCampeon}
+                alt="Brasil, campeón Liga PPT 19 – Edición Mundial"
+                className="mx-auto max-h-[420px] w-full object-contain md:max-h-[480px]"
+                loading="lazy"
+              />
+            </div>
+            <div className="space-y-3 text-sm leading-relaxed text-gray-200 md:text-base">
+              <p className="text-center text-base font-semibold text-lime-300 md:text-lg">
+                ¡Brasil es el campeón de la Liga PPT #19 – Edición Mundial! 🇧🇷🌍
+              </p>
+              <p>
+                En una final llena de emociones,{" "}
+                <strong className="text-white">Brasil</strong> derrotó{" "}
+                <strong>11-5</strong> a{" "}
+                <strong className="text-white">México</strong> y levantó el
+                trofeo de campeón.
+              </p>
+              <div className="grid gap-3 rounded-lg border border-white/10 bg-white/5 p-3 text-sm sm:grid-cols-2">
+                <div>
+                  <p className="mb-1 font-semibold text-yellow-300">
+                    🟡 Goleadores de Brasil
+                  </p>
+                  <p>
+                    José Hernández (4), Luis Rico (4), Luis Suárez (2) y
+                    Frederick (1)
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-1 font-semibold text-green-300">
+                    🟢 Goleadores de México
+                  </p>
+                  <p>Toto (2), Jürgen Hassler (2) y Héctor Jr (1)</p>
+                </div>
+              </div>
+              <p className="text-center text-sm font-medium text-gray-300">
+                ¡Así termina una histórica Liga PPT #19! 🔥⚽
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <div className="space-y-3 text-sm leading-relaxed text-gray-200 md:text-base">
+              <p className="text-center text-base font-semibold text-amber-200 md:text-lg">
+                ¡Felicitaciones a los campeones de la Liga PPT #19! 🏆
+              </p>
+              <p>
+                <strong className="text-white">Eudes Pavajeau</strong> conquista
+                su quinta Liga PPT, quedando solo por detrás de Emanuel Navarro
+                (7) e igualando a Cristian Benjumea, Keni Contreras y Frank
+                Ramírez en el segundo lugar del palmarés histórico. 👏
+              </p>
+            </div>
 
-        <div
-          className={`${VIEWPORT_CLASS} overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-inner`}
-        >
-          {LIGA_19_EQUIPOS.map((eq, i) => (
-            <img
-              key={eq.id}
-              src={eq.imagen}
-              alt={`Equipo ${eq.nombre} – Liga PPT 19`}
-              width={800}
-              height={600}
-              decoding="sync"
-              loading="eager"
-              fetchPriority={i === 0 ? "high" : "auto"}
-              aria-hidden={slide !== i}
-              className={`absolute inset-0 mx-auto h-full w-full object-contain transition-opacity duration-150 ${
-                slide === i
-                  ? "z-10 opacity-100"
-                  : "pointer-events-none z-0 opacity-0"
-              }`}
-            />
-          ))}
-        </div>
-        <p className="mt-3 text-center text-base font-bold text-lime-300 md:text-lg">
-          {equipo.nombre}
-        </p>
-        <p className="mt-1 text-center text-xs text-gray-400">
-          {slide + 1} de {SLIDE_COUNT} equipos
-        </p>
+            <div className="space-y-6 rounded-xl border border-white/10 bg-black/30 p-3 md:p-4">
+              <div>
+                <p className="mb-3 text-sm font-bold text-amber-300">
+                  Quinta liga ⭐
+                </p>
+                <UserCardGrid usernames={["epavajeau"]} />
+              </div>
+              <div>
+                <p className="mb-3 text-sm font-bold text-yellow-200">
+                  Cuarta liga
+                </p>
+                <UserCardGrid usernames={["fmolina"]} />
+              </div>
+              <div>
+                <p className="mb-3 text-sm font-bold text-slate-200">
+                  Tercera liga
+                </p>
+                <UserCardGrid usernames={["jhernandez"]} />
+              </div>
+              <div>
+                <p className="mb-3 text-sm font-bold text-emerald-200">
+                  Segunda liga
+                </p>
+                <UserCardGrid usernames={["fgomez"]} />
+              </div>
+              <div>
+                <p className="mb-3 text-sm font-bold text-orange-200">
+                  Primer título en la Liga PPT 🎉
+                </p>
+                <UserCardGrid
+                  usernames={["lpaez", "lsuarez", "lrico", "ddaza"]}
+                />
+              </div>
+              <p className="text-center text-sm font-medium text-gray-300">
+                ¡Felicitaciones a todos por este logro y por escribir un nuevo
+                capítulo en la historia de la Liga PPT! 🏆⚽
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-2 border-t border-white/10 bg-black/50 px-3 py-3 md:px-6">
         <button
           type="button"
           className="rounded-full p-2 text-white transition hover:bg-white/10"
-          aria-label="Equipo anterior"
+          aria-label="Anterior"
           onClick={() => go(-1)}
         >
           <FaChevronLeft className="text-xl" />
         </button>
-        <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
-          <div className="flex max-w-full flex-wrap justify-center gap-1.5 px-1">
-            {LIGA_19_EQUIPOS.map((eq, i) => (
+        <div className="flex flex-1 flex-col items-center gap-1">
+          <div className="flex gap-2">
+            {Array.from({ length: SLIDE_COUNT }).map((_, i) => (
               <button
-                key={eq.id}
+                key={i}
                 type="button"
-                aria-label={`Ver equipo ${eq.nombre}`}
-                title={eq.nombre}
+                aria-label={`Ir al destacado ${i + 1}`}
                 className={`h-2.5 rounded-full transition-all ${
                   slide === i
-                    ? "w-6 bg-lime-400"
+                    ? "w-8 bg-lime-400"
                     : "w-2.5 bg-white/30 hover:bg-white/50"
                 }`}
                 onClick={() => setSlide(i)}
               />
             ))}
           </div>
-          <button
-            type="button"
-            className="text-xs font-semibold text-lime-300 underline-offset-2 hover:underline md:text-sm"
-            onClick={() => navigate("/anuncios#l19-mundial")}
-          >
-            Ver anuncio completo de la edición →
-          </button>
+          <span className="text-[10px] text-gray-500 md:text-xs">
+            {slide === 0 ? "Final y campeón" : "Palmarés de los campeones"}
+          </span>
         </div>
         <button
           type="button"
           className="rounded-full p-2 text-white transition hover:bg-white/10"
-          aria-label="Equipo siguiente"
+          aria-label="Siguiente"
           onClick={() => go(1)}
         >
           <FaChevronRight className="text-xl" />

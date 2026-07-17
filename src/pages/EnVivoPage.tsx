@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
 import { supabase } from "../lib/supabase";
 import { getColor, getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
-import { LIGA_19_EQUIPOS } from "../constants/liga19";
+import { LIGA_20_EQUIPOS } from "../constants/liga20";
 import type { EquipoEnCancha, Evento } from "../components/anotador/types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -19,7 +19,7 @@ const MODO_ICON: Record<string, string> = {
 };
 
 function toLocalEquipo(eq: Partido["equipos"][number]): EquipoEnCancha {
-  const local = LIGA_19_EQUIPOS.find((e) => e.id === eq.equipo.id);
+  const local = LIGA_20_EQUIPOS.find((e) => e.id === eq.equipo.id);
   return {
     equipo: local ?? { id: eq.equipo.id, nombre: eq.equipo.nombre, imagen: "" },
     jugadores: eq.jugadores,
@@ -30,7 +30,7 @@ function toLocalEquipo(eq: Partido["equipos"][number]): EquipoEnCancha {
 /** Merge finalized standings + all live active match events */
 function mergeStandings(base: Standing[], partidos: Partido[]) {
   const map = new Map<string, Standing & { pos: number }>();
-  for (const eq of LIGA_19_EQUIPOS) {
+  for (const eq of LIGA_20_EQUIPOS) {
     map.set(eq.id, { equipoId: eq.id, nombre: eq.nombre, victorias: 0, empates: 0, derrotas: 0, puntos: 0, pos: 0 });
   }
   for (const s of base) {
@@ -296,7 +296,7 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
                           <div className="px-4 pb-2.5 pt-0.5 space-y-1 border-t border-gray-800/40">
                             <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-1.5">Goles por rival</p>
                             {vsEntries.map(([rival, golesContra]) => {
-                              const rivalEq = LIGA_19_EQUIPOS.find((e) => e.nombre === rival);
+                              const rivalEq = LIGA_20_EQUIPOS.find((e) => e.nombre === rival);
                               const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
                               return (
                                 <div key={rival} className="flex items-center gap-2">
@@ -402,7 +402,7 @@ function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: bo
                           <div className="px-4 pb-2.5 pt-0.5 space-y-1 border-t border-gray-800/40">
                             <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-1.5">Goles recibidos de</p>
                             {vsEntries.map(([rival, golesContra]) => {
-                              const rivalEq = LIGA_19_EQUIPOS.find((e) => e.nombre === rival);
+                              const rivalEq = LIGA_20_EQUIPOS.find((e) => e.nombre === rival);
                               const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
                               return (
                                 <div key={rival} className="flex items-center gap-2">
@@ -577,7 +577,7 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
       <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
         <h2 className="text-white font-bold text-sm">Clasificación en vivo</h2>
-        <span className="text-gray-600 text-xs ml-auto">Temporada 19</span>
+        <span className="text-gray-600 text-xs ml-auto">Temporada 20</span>
       </div>
 
       {/* Header fijo */}
@@ -697,7 +697,7 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
                                   <span className="w-5 text-center text-red-600 text-[10px] font-bold">D</span>
                                 </div>
                                 {vsEntries.map(([rival, rec]) => {
-                                  const rivalEq = LIGA_19_EQUIPOS.find((e) => e.nombre === rival);
+                                  const rivalEq = LIGA_20_EQUIPOS.find((e) => e.nombre === rival);
                                   const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
                                   return (
                                     <div key={rival} className="flex items-center gap-2 py-0.5 px-1">
@@ -742,7 +742,7 @@ function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplin
   const [expandedEquipo, setExpandedEquipo] = useState<string | null>(null);
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
 
-  const equipoStats = LIGA_19_EQUIPOS
+  const equipoStats = LIGA_20_EQUIPOS
     .map((eq) => {
       const jugadores = disciplina.filter((j) => j.equipoId === eq.id);
       return {
@@ -912,11 +912,11 @@ function TorneoRegularSection({
       {/* Banner */}
       <div className="bg-gray-900 rounded-2xl px-4 py-3 border border-gray-800 flex items-center justify-between">
         <div>
-          <h2 className="text-white font-bold text-sm">Torneo Regular · Liga #19</h2>
-          <p className="text-gray-500 text-xs mt-0.5">Copa del Mundo · 6 Jornadas · 9 Equipos</p>
+          <h2 className="text-white font-bold text-sm">Torneo Regular · Liga #20</h2>
+          <p className="text-gray-500 text-xs mt-0.5">Premier League · 6 Jornadas · 9 Equipos</p>
         </div>
         <span className="bg-green-900/40 text-green-400 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border border-green-800/50">
-          Finalizado
+          En curso
         </span>
       </div>
 
@@ -1174,7 +1174,7 @@ function PlayoffSection({
       {/* Banner */}
       <div className="bg-gray-900 rounded-2xl px-4 py-3 border border-gray-800 flex items-center justify-between">
         <div>
-          <h2 className="text-white font-bold text-sm">Playoff · Liga #19</h2>
+          <h2 className="text-white font-bold text-sm">Playoff · Liga #20</h2>
           <p className="text-gray-500 text-xs mt-0.5">#3–#6 juegan playoff · #1 y #2 van directo a semis</p>
         </div>
         <span className="bg-amber-900/30 text-amber-400 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border border-amber-800/30">
@@ -1267,7 +1267,7 @@ export function EnVivoPage() {
 
   async function fetchStandings() {
     try {
-      const { standings } = await statsApi.clasificacion(19);
+      const { standings } = await statsApi.clasificacion(20);
       setBase(standings);
     } catch {
       // silent
@@ -1279,9 +1279,9 @@ export function EnVivoPage() {
   async function fetchRankings() {
     try {
       const [{ goleadores: g }, { arqueros: a }, { disciplina: d }] = await Promise.all([
-        statsApi.goleadores(19),
-        statsApi.arqueros(19),
-        statsApi.disciplina(19),
+        statsApi.goleadores(20),
+        statsApi.arqueros(20),
+        statsApi.disciplina(20),
       ]);
       setGoleadores(g);
       setArqueros(a);

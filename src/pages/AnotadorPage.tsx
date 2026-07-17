@@ -4,7 +4,7 @@ import { PartidoEnVivo } from "../components/anotador/PartidoEnVivo";
 import { ResumenPartido } from "../components/anotador/ResumenPartido";
 import { useAuth } from "../context/AuthContext";
 import { partidosApi, type ApiEquipo, type Partido } from "../lib/api";
-import { LIGA_19_EQUIPOS } from "../constants/liga19";
+import { LIGA_20_EQUIPOS } from "../constants/liga20";
 import type {
   Evento,
   EquipoEnCancha,
@@ -43,7 +43,7 @@ function toApiEquipos(equipos: EquipoEnCancha[]): ApiEquipo[] {
 
 function fromBackend(bp: Partido): PartidoVivo {
   const equipos: EquipoEnCancha[] = bp.equipos.map((eq) => {
-    const local = LIGA_19_EQUIPOS.find((e) => e.id === eq.equipo.id);
+    const local = LIGA_20_EQUIPOS.find((e) => e.id === eq.equipo.id);
     return {
       equipo: local ?? { id: eq.equipo.id, nombre: eq.equipo.nombre, imagen: "" },
       jugadores: eq.jugadores,
@@ -101,7 +101,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         <div className="text-center">
           <img src="/ligaPPT-escudo.png" alt="Liga PPT" className="w-14 h-14 mx-auto mb-3 object-contain" />
           <h1 className="text-white text-xl font-black">Zona Anotadores</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Liga PPT · Edición #19</p>
+          <p className="text-gray-500 text-sm mt-0.5">Liga PPT · Edición #20</p>
         </div>
         <form onSubmit={handleSubmit} className="bg-gray-900 rounded-2xl p-6 space-y-4 border border-gray-800 shadow-2xl">
           <div className="space-y-1.5">
@@ -195,7 +195,7 @@ export function AnotadorPage() {
 
       try {
         const created = await partidosApi.create({
-          temporada: 19,
+          temporada: 20,
           modo: config.modo,
           ...(config.modo === "jornada" ? { jornada: config.jornada } : {}),
           equipos: toApiEquipos(config.equipos),

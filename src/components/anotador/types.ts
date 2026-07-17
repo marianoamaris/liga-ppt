@@ -1,4 +1,4 @@
-import type { Liga19Equipo } from "../../constants/liga19";
+import type { Liga20Equipo } from "../../constants/liga20";
 
 export type ModoPartido = "jornada" | "cuartos" | "semifinal" | "final";
 
@@ -7,7 +7,7 @@ export interface JugadorEnCancha {
 }
 
 export interface EquipoEnCancha {
-  equipo: Liga19Equipo;
+  equipo: Liga20Equipo;
   jugadores: JugadorEnCancha[];
   arqueroDesignado?: string;
 }

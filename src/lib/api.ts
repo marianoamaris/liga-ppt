@@ -256,19 +256,19 @@ export interface JugadorDisciplina {
 }
 
 export const statsApi = {
-  clasificacion: (temporada = 19) =>
+  clasificacion: (temporada = 20) =>
     req<{ temporada: number; standings: Standing[] }>(
       `/clasificacion?temporada=${temporada}`
     ),
-  goleadores: (temporada = 19) =>
+  goleadores: (temporada = 20) =>
     req<{ temporada: number; goleadores: Goleador[] }>(
       `/goleadores?temporada=${temporada}`
     ),
-  arqueros: (temporada = 19) =>
+  arqueros: (temporada = 20) =>
     req<{ temporada: number; arqueros: Arquero[] }>(
       `/arqueros?temporada=${temporada}`
     ),
-  disciplina: (temporada = 19) =>
+  disciplina: (temporada = 20) =>
     req<{ disciplina: JugadorDisciplina[] }>(
       `/disciplina?temporada=${temporada}`
     ),
