@@ -2,6 +2,7 @@ import type { Evento } from "../components/anotador/types";
 import type {
   Edicion,
   EdicionEquipo,
+  EdicionFinal,
   EquipoConPlantilla,
   Jugador,
   Posicion,
@@ -217,8 +218,12 @@ export const jugadoresApi = {
 
 export const edicionesApi = {
   list: () => req<{ total: number; ediciones: Edicion[] }>("/ediciones"),
+  finales: () =>
+    req<{ total: number; finales: EdicionFinal[] }>("/ediciones/finales"),
   get: (numero: number) =>
-    req<{ edicion: Edicion; equipos: EdicionEquipo[] }>(`/ediciones/${numero}`),
+    req<{ edicion: Edicion; equipos: EdicionEquipo[]; final: EdicionFinal | null }>(
+      `/ediciones/${numero}`
+    ),
   equipos: (numero: number) =>
     req<{ edicion: number; equipos: EdicionEquipo[] }>(`/ediciones/${numero}/equipos`),
   plantillas: (numero: number) =>

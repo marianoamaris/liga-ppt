@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { edicionesApi, jugadoresApi } from "../lib/api";
 import {
+  finalAHistorica,
   jugadorAUsuarioLiga,
   type Edicion,
   type EdicionEquipo,
+  type EdicionFinal,
   type EquipoConPlantilla,
+  type EquipoLocal,
+  type FinalHistorica,
   type Jugador,
   type UsuarioLiga,
 } from "../types/jugador";
+import { camisetaEquipo } from "../utils/imagenesEquipos";
 
 interface Estado<T> {
   datos: T;
@@ -65,7 +70,22 @@ export function useJugadores(opciones: { incluirInciertos?: boolean } = {}) {
     [datos]
   );
 
-  return { jugadores: datos, usuarios, loading, error };
+  /**
+   * Búsqueda por username, que es como las vistas de récords y los carruseles
+   * referencian a un jugador. Devuelve undefined mientras el padrón carga.
+   */
+  const porUsername = useMemo(() => {
+    const mapa = new Map<string, UsuarioLiga>();
+    for (const u of usuarios) mapa.set(u.username, u);
+    return mapa;
+  }, [usuarios]);
+
+  const buscarPorUsername = useMemo(
+    () => (username: string) => porUsername.get(username),
+    [porUsername]
+  );
+
+  return { jugadores: datos, usuarios, buscarPorUsername, loading, error };
 }
 
 /** Catálogo de ediciones, de la más reciente a la más antigua. */
@@ -78,7 +98,42 @@ export function useEdiciones() {
   return { ediciones: datos, loading, error };
 }
 
-/** Equipos de una edición, con sus colores. */
+/** Una edición concreta con sus equipos y su final. */
+export function useEdicion(numero: number | null) {
+  const { datos, loading, error } = useAsync<{
+    edicion: Edicion | null;
+    equipos: EdicionEquipo[];
+    final: EdicionFinal | null;
+  }>(
+    () =>
+      numero == null
+        ? Promise.resolve({ edicion: null, equipos: [], final: null })
+        : edicionesApi.get(numero),
+    { edicion: null, equipos: [], final: null },
+    [numero]
+  );
+
+  return { ...datos, loading, error };
+}
+
+/** Finales de todas las ediciones, de la más reciente a la más antigua. */
+export function useFinales() {
+  const { datos, loading, error } = useAsync<EdicionFinal[]>(
+    () => edicionesApi.finales().then((r) => r.finales),
+    [],
+    []
+  );
+
+  /** Misma forma que el antiguo `FINALES_HISTORICAS`, en orden ascendente. */
+  const finales: FinalHistorica[] = useMemo(
+    () => [...datos].sort((a, b) => a.edicion - b.edicion).map(finalAHistorica),
+    [datos]
+  );
+
+  return { finales, loading, error };
+}
+
+/** Equipos de una edición, con sus colores y camisetas. */
 export function useEquiposEdicion(numero: number | null) {
   const { datos, loading, error } = useAsync<EdicionEquipo[]>(
     () => (numero == null ? Promise.resolve([]) : edicionesApi.equipos(numero).then((r) => r.equipos)),
@@ -96,7 +151,33 @@ export function useEquiposEdicion(numero: number | null) {
     return mapa;
   }, [datos]);
 
-  return { equipos: datos, colores, loading, error };
+  /** Forma que consumen las vistas de partido, con la camiseta ya resuelta. */
+  const locales: EquipoLocal[] = useMemo(
+    () =>
+      datos.map((e) => ({
+        id: e.slug,
+        nombre: e.nombre,
+        imagen: (numero != null && camisetaEquipo(numero, e.color_slug)) || "",
+      })),
+    [datos, numero]
+  );
+
+  const porId = useMemo(() => {
+    const mapa = new Map<string, EquipoLocal>();
+    for (const e of locales) mapa.set(e.id, e);
+    return mapa;
+  }, [locales]);
+
+  /** Color de un equipo; gris neutro si no está cargado todavía. */
+  const colorDe = useMemo(
+    () => (id: string) => {
+      const c = colores.get(id);
+      return (Array.isArray(c) ? c[0] : c) ?? "#4B5563";
+    },
+    [colores]
+  );
+
+  return { equipos: datos, locales, porId, colores, colorDe, loading, error };
 }
 
 /** Equipos de una edición junto con sus plantillas. */

@@ -1,10 +1,7 @@
-import {
-  ETIQUETA_COLOR,
-  FINALES_HISTORICAS,
-  resumenVictoriasPorColor,
-  type ColorCamiseta,
-  type FinalHistorica,
-} from "../../../../constants/HISTORICO_FINALES";
+import { useMemo } from "react";
+import type { ColorCamiseta, FinalHistorica } from "../../../../types/jugador";
+import { ETIQUETA_COLOR, resumenVictoriasPorColor } from "../../../../utils/finales";
+import { useFinales } from "../../../../hooks/useCatalogo";
 import championsLogo from "../../../../assets/UEFA_Champions_League_logo.png";
 
 const chipColor: Record<ColorCamiseta, string> = {
@@ -184,7 +181,8 @@ function FilaFinal({ f }: { f: FinalHistorica }) {
 }
 
 const HistoricoFinalesComponent = () => {
-  const resumen = resumenVictoriasPorColor();
+  const { finales, loading, error } = useFinales();
+  const resumen = useMemo(() => resumenVictoriasPorColor(finales), [finales]);
 
   return (
     <div className="min-w-0 w-full max-w-full">
@@ -213,9 +211,20 @@ const HistoricoFinalesComponent = () => {
             </tr>
           </thead>
           <tbody>
-            {FINALES_HISTORICAS.map((f) => (
+            {finales.map((f) => (
               <FilaFinal key={f.temporada} f={f} />
             ))}
+            {!finales.length && (
+              <tr>
+                <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-500">
+                  {loading
+                    ? "Cargando finales…"
+                    : error
+                      ? `No se pudieron cargar las finales: ${error}`
+                      : "Todavía no hay finales registradas"}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

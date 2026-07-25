@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { USUARIOS_LIGA, type UsuarioLiga } from "../constants/USUARIOS_LIGA";
+import type { UsuarioLiga } from "../types/jugador";
+import { useJugadores } from "../hooks/useCatalogo";
 import { fotoJugadorPorNombre } from "../utils/fotosJugadores";
 import noPhoto from "../assets/no-photo.jpg";
 
@@ -50,9 +51,13 @@ const def = (name: string, username: string, posicion: UsuarioLiga["posicion"] =
   name, username, ligasJugadas: 0, ligasGanadas: 0, golesTotales: 0, esAdmin: false, posicion,
 });
 
-const find = (username: string) => USUARIOS_LIGA.find((u) => u.username === username);
-
-const RECORDS: Record<RecordId, UserRecord | EquipoRecord> = {
+/**
+ * Los récords referencian jugadores por username. El padrón llega de la API, así
+ * que se construyen dentro del componente; `def` cubre a quien ya no esté en él.
+ */
+const construirRecords = (
+  find: (username: string) => UsuarioLiga | undefined
+): Record<RecordId, UserRecord | EquipoRecord> => ({
   mas_goles_liga: {
     label: "Más goles anotados en una sola liga",
     statLabel: "goles",
@@ -130,7 +135,7 @@ const RECORDS: Record<RecordId, UserRecord | EquipoRecord> = {
     ],
     stats: [62, 63, 64],
   },
-};
+});
 
 // ── Podium slot config (display order: 2nd left, 1st center, 3rd right) ──
 
@@ -207,7 +212,12 @@ function TeamDot({ color, size }: { color: string; size: number }) {
 
 export const LogrosPage: React.FC = () => {
   const [selected, setSelected] = useState<RecordId>("mas_goles_liga");
-  const data = RECORDS[selected];
+  const { buscarPorUsername } = useJugadores();
+  const records = useMemo(
+    () => construirRecords(buscarPorUsername),
+    [buscarPorUsername]
+  );
+  const data = records[selected];
 
   return (
     <div

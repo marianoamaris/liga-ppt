@@ -1,10 +1,20 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
 import { supabase } from "../lib/supabase";
 import { getColor, getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
-import { LIGA_20_EQUIPOS } from "../constants/liga20";
+import { EDICION_ACTUAL } from "../config";
+import { useEquiposEdicion } from "../hooks/useCatalogo";
+import type { EquipoLocal } from "../types/jugador";
 import type { EquipoEnCancha, Evento } from "../components/anotador/types";
+
+/**
+ * Catálogo de equipos de la edición en curso. Antes venía de `constants/liga20`
+ * y era accesible desde cualquier punto del archivo; ahora llega de la API, así
+ * que se comparte por contexto en lugar de pasarlo por ocho niveles de props.
+ */
+const EquiposCtx = createContext<EquipoLocal[]>([]);
+const useEquipos = () => useContext(EquiposCtx);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -18,8 +28,11 @@ const MODO_ICON: Record<string, string> = {
   jornada: "⚽", cuartos: "🎯", semifinal: "⚡", final: "🏆",
 };
 
-function toLocalEquipo(eq: Partido["equipos"][number]): EquipoEnCancha {
-  const local = LIGA_20_EQUIPOS.find((e) => e.id === eq.equipo.id);
+function toLocalEquipo(
+  eq: Partido["equipos"][number],
+  equipos: EquipoLocal[]
+): EquipoEnCancha {
+  const local = equipos.find((e) => e.id === eq.equipo.id);
   return {
     equipo: local ?? { id: eq.equipo.id, nombre: eq.equipo.nombre, imagen: "" },
     jugadores: eq.jugadores,
@@ -28,9 +41,9 @@ function toLocalEquipo(eq: Partido["equipos"][number]): EquipoEnCancha {
 }
 
 /** Merge finalized standings + all live active match events */
-function mergeStandings(base: Standing[], partidos: Partido[]) {
+function mergeStandings(base: Standing[], partidos: Partido[], equipos: EquipoLocal[]) {
   const map = new Map<string, Standing & { pos: number }>();
-  for (const eq of LIGA_20_EQUIPOS) {
+  for (const eq of equipos) {
     map.set(eq.id, { equipoId: eq.id, nombre: eq.nombre, victorias: 0, empates: 0, derrotas: 0, puntos: 0, pos: 0 });
   }
   for (const s of base) {
@@ -38,8 +51,8 @@ function mergeStandings(base: Standing[], partidos: Partido[]) {
   }
   for (const partido of partidos) {
     if (partido.modo !== "jornada") continue;
-    const equipos = partido.equipos.map(toLocalEquipo);
-    const live = computeScores(equipos, partido.eventos);
+    const enCancha = partido.equipos.map((e) => toLocalEquipo(e, equipos));
+    const live = computeScores(enCancha, partido.eventos);
     for (const [id, score] of live.entries()) {
       const e = map.get(id);
       if (e) map.set(id, { ...e, victorias: e.victorias + score.victorias, empates: e.empates + score.empates, derrotas: e.derrotas + score.derrotas, puntos: e.puntos + score.puntos });
@@ -59,7 +72,8 @@ const RAZON: Record<string, string> = {
 // ── Marcador ──────────────────────────────────────────────────────────────────
 
 function Marcador({ partido }: { partido: Partido }) {
-  const equipos = partido.equipos.map(toLocalEquipo);
+  const catalogo = useEquipos();
+  const equipos = partido.equipos.map((e) => toLocalEquipo(e, catalogo));
   const scores  = computeScores(equipos, partido.eventos);
 
   if (partido.modo !== "jornada") {
@@ -179,7 +193,8 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
 // ── Cancha card ───────────────────────────────────────────────────────────────
 
 function CanchaCard({ partido, numero }: { partido: Partido; numero: number }) {
-  const equipos = partido.equipos.map(toLocalEquipo);
+  const catalogo = useEquipos();
+  const equipos = partido.equipos.map((e) => toLocalEquipo(e, catalogo));
   return (
     <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800">
       {/* Header */}
@@ -220,6 +235,7 @@ function CanchaCard({ partido, numero }: { partido: Partido; numero: number }) {
 const LAYOUT_TRANSITION = { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } as const;
 
 function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; loading: boolean }) {
+  const catalogo = useEquipos();
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   return (
@@ -296,7 +312,7 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
                           <div className="px-4 pb-2.5 pt-0.5 space-y-1 border-t border-gray-800/40">
                             <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-1.5">Goles por rival</p>
                             {vsEntries.map(([rival, golesContra]) => {
-                              const rivalEq = LIGA_20_EQUIPOS.find((e) => e.nombre === rival);
+                              const rivalEq = catalogo.find((e) => e.nombre === rival);
                               const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
                               return (
                                 <div key={rival} className="flex items-center gap-2">
@@ -321,6 +337,7 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
 }
 
 function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: boolean }) {
+  const catalogo = useEquipos();
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   return (
@@ -402,7 +419,7 @@ function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: bo
                           <div className="px-4 pb-2.5 pt-0.5 space-y-1 border-t border-gray-800/40">
                             <p className="text-gray-600 text-[10px] uppercase tracking-wider font-semibold mb-1.5">Goles recibidos de</p>
                             {vsEntries.map(([rival, golesContra]) => {
-                              const rivalEq = LIGA_20_EQUIPOS.find((e) => e.nombre === rival);
+                              const rivalEq = catalogo.find((e) => e.nombre === rival);
                               const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
                               return (
                                 <div key={rival} className="flex items-center gap-2">
@@ -570,6 +587,7 @@ const COL = {
 };
 
 function TablaClasificacion({ standings, loading }: { standings: ReturnType<typeof mergeStandings>; loading: boolean }) {
+  const catalogo = useEquipos();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -697,7 +715,7 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
                                   <span className="w-5 text-center text-red-600 text-[10px] font-bold">D</span>
                                 </div>
                                 {vsEntries.map(([rival, rec]) => {
-                                  const rivalEq = LIGA_20_EQUIPOS.find((e) => e.nombre === rival);
+                                  const rivalEq = catalogo.find((e) => e.nombre === rival);
                                   const rivalColor = rivalEq ? getColor(rivalEq.id) : "#6b7280";
                                   return (
                                     <div key={rival} className="flex items-center gap-2 py-0.5 px-1">
@@ -739,10 +757,11 @@ const RAZON_LABEL: Record<string, string> = {
 };
 
 function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplina[]; loading: boolean }) {
+  const catalogo = useEquipos();
   const [expandedEquipo, setExpandedEquipo] = useState<string | null>(null);
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
 
-  const equipoStats = LIGA_20_EQUIPOS
+  const equipoStats = catalogo
     .map((eq) => {
       const jugadores = disciplina.filter((j) => j.equipoId === eq.id);
       return {
@@ -1247,6 +1266,7 @@ export function EnVivoPage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingRankings, setLoadingRankings] = useState(true);
   const [lastUpdate, setLastUpdate]     = useState<Date | null>(null);
+  const { locales: catalogo }           = useEquiposEdicion(EDICION_ACTUAL);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const channelRef = useRef<any>(null);
 
@@ -1321,7 +1341,7 @@ export function EnVivoPage() {
 
   // Canchas numeradas por orden de inicio
   const canchas = partidos.slice(0, 3);
-  const standings = mergeStandings(baseStandings, canchas);
+  const standings = mergeStandings(baseStandings, canchas, catalogo);
 
   // Which cancha cards to show
   const visibles: { partido: Partido; numero: number }[] =
@@ -1398,6 +1418,7 @@ export function EnVivoPage() {
   );
 
   return (
+    <EquiposCtx.Provider value={catalogo}>
     <div className="min-h-full bg-gray-100 p-4 md:p-6 space-y-4">
 
       {/* Header */}
@@ -1472,5 +1493,6 @@ export function EnVivoPage() {
         <PlayoffSection standings={standings} loading={loadingStats} />
       )}
     </div>
+    </EquiposCtx.Provider>
   );
 }

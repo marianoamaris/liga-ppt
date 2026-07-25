@@ -2,24 +2,24 @@ import React, { useCallback, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { Card } from "../common/Card";
 import { UserCard } from "../common/UserCard";
-import { USUARIOS_LIGA } from "../../constants/USUARIOS_LIGA";
+import { useJugadores } from "../../hooks/useCatalogo";
 import imgCampeon from "../../assets/LIGA_19/liga-19-campeon.jpg";
 
 const SLIDE_COUNT = 2;
 
-const userByUsername = (username: string) =>
-  USUARIOS_LIGA.find((u) => u.username === username);
-
 const UserCardGrid: React.FC<{ usernames: readonly string[] }> = ({
   usernames,
-}) => (
-  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    {usernames.map((un) => {
-      const u = userByUsername(un);
-      return u ? <UserCard key={un} user={u} /> : null;
-    })}
-  </div>
-);
+}) => {
+  const { buscarPorUsername } = useJugadores();
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {usernames.map((un) => {
+        const u = buscarPorUsername(un);
+        return u ? <UserCard key={un} user={u} /> : null;
+      })}
+    </div>
+  );
+};
 
 const Liga19DestacadoCarousel: React.FC = () => {
   const [slide, setSlide] = useState(0);

@@ -4,7 +4,9 @@ import { PartidoEnVivo } from "../components/anotador/PartidoEnVivo";
 import { ResumenPartido } from "../components/anotador/ResumenPartido";
 import { useAuth } from "../context/AuthContext";
 import { partidosApi, type ApiEquipo, type Partido } from "../lib/api";
-import { LIGA_20_EQUIPOS } from "../constants/liga20";
+import { EDICION_ACTUAL } from "../config";
+import { useEquiposEdicion } from "../hooks/useCatalogo";
+import type { EquipoLocal } from "../types/jugador";
 import type {
   Evento,
   EquipoEnCancha,
@@ -41,9 +43,9 @@ function toApiEquipos(equipos: EquipoEnCancha[]): ApiEquipo[] {
   }));
 }
 
-function fromBackend(bp: Partido): PartidoVivo {
+function fromBackend(bp: Partido, catalogo: EquipoLocal[]): PartidoVivo {
   const equipos: EquipoEnCancha[] = bp.equipos.map((eq) => {
-    const local = LIGA_20_EQUIPOS.find((e) => e.id === eq.equipo.id);
+    const local = catalogo.find((e) => e.id === eq.equipo.id);
     return {
       equipo: local ?? { id: eq.equipo.id, nombre: eq.equipo.nombre, imagen: "" },
       jugadores: eq.jugadores,
@@ -144,6 +146,7 @@ export function AnotadorPage() {
   const [phase, setPhase] = useState<Phase>("login");
   const [partido, setPartido] = useState<PartidoVivo | null>(null);
   const backendIdRef = useRef<string | null>(null);
+  const { locales: catalogo } = useEquiposEdicion(EDICION_ACTUAL);
 
   // ── Restore session on mount ─────────────────────────────────────────────────
   useEffect(() => {
@@ -165,7 +168,7 @@ export function AnotadorPage() {
         backendIdRef.current = bp.id;
         if (bp.finalizado_en) {
           // Rule 1: partido finalizado is immutable — go straight to resumen
-          setPartido(fromBackend(bp));
+          setPartido(fromBackend(bp, catalogo));
           setPhase("resumen");
           clearActive();
         } else if (bp.anotador_id !== profile.id) {
@@ -173,7 +176,7 @@ export function AnotadorPage() {
           clearActive();
           setPhase("setup");
         } else {
-          setPartido(fromBackend(bp));
+          setPartido(fromBackend(bp, catalogo));
           setPhase("live");
         }
       })
@@ -181,7 +184,7 @@ export function AnotadorPage() {
         clearActive();
         setPhase("setup");
       });
-  }, [authLoading, profile]);
+  }, [authLoading, profile, catalogo]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 

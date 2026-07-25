@@ -1,17 +1,22 @@
 import { useState } from "react";
-import { LIGA_20_EQUIPOS } from "../../constants/liga20";
 import { JORNADAS_LIGA20_TOTAL } from "../../constants/ANOTADOR_CONFIG";
-import { PLANTILLAS_LIGA20 } from "../../constants/PLANTILLAS_LIGA20";
-import { getColor } from "./utils";
+import { EDICION_ACTUAL } from "../../config";
+import { usePlantillasEdicion } from "../../hooks/useCatalogo";
+import { camisetaEquipo } from "../../utils/imagenesEquipos";
+import type { EquipoConPlantilla } from "../../types/jugador";
 import type { EquipoEnCancha, ModoPartido, PartidoConfig } from "./types";
 
-function buildEquipo(equipoId: string): EquipoEnCancha {
-  const equipo = LIGA_20_EQUIPOS.find((e) => e.id === equipoId)!;
-  const plantilla = PLANTILLAS_LIGA20.find((p) => p.equipoId === equipoId)!;
+function buildEquipo(equipo: EquipoConPlantilla): EquipoEnCancha {
   return {
-    equipo,
-    jugadores: plantilla.jugadores.map((nombre) => ({ nombre })),
-    arqueroDesignado: plantilla.arqueroDesignado,
+    equipo: {
+      id: equipo.slug,
+      nombre: equipo.nombre,
+      imagen: camisetaEquipo(equipo.edicion, equipo.color_slug) ?? "",
+    },
+    jugadores: equipo.jugadores.map(({ nombre }) => ({ nombre })),
+    ...(equipo.arqueroDesignado
+      ? { arqueroDesignado: equipo.arqueroDesignado }
+      : {}),
   };
 }
 
@@ -27,14 +32,12 @@ interface SlotProps {
   equipoId: string | null;
   ocupados: string[];
   onChange: (id: string | null) => void;
+  equipos: EquipoConPlantilla[];
 }
 
-function TeamSlot({ slot, equipoId, ocupados, onChange }: SlotProps) {
-  const equipo = equipoId ? LIGA_20_EQUIPOS.find((e) => e.id === equipoId) : null;
-  const plantilla = equipoId
-    ? PLANTILLAS_LIGA20.find((p) => p.equipoId === equipoId)
-    : null;
-  const color = equipo ? getColor(equipo.id) : "#4B5563";
+function TeamSlot({ slot, equipoId, ocupados, onChange, equipos }: SlotProps) {
+  const equipo = equipoId ? equipos.find((e) => e.slug === equipoId) : null;
+  const color = equipo?.color_hex ?? "#4B5563";
 
   return (
     <div
@@ -57,25 +60,24 @@ function TeamSlot({ slot, equipoId, ocupados, onChange }: SlotProps) {
         style={equipo ? { borderLeft: `3px solid ${color}` } : undefined}
       >
         <option value="">— Seleccionar equipo —</option>
-        {LIGA_20_EQUIPOS.map((eq) => (
+        {equipos.map((eq) => (
           <option
-            key={eq.id}
-            value={eq.id}
-            disabled={ocupados.includes(eq.id) && equipoId !== eq.id}
+            key={eq.slug}
+            value={eq.slug}
+            disabled={ocupados.includes(eq.slug) && equipoId !== eq.slug}
           >
             {eq.nombre}
           </option>
         ))}
       </select>
 
-      {plantilla && (
+      {equipo && (
         <div className="space-y-1.5">
           <p className="text-gray-500 text-[11px] uppercase tracking-wider font-semibold">
             Plantilla
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {plantilla.jugadores.map((j) => {
-              const esArquero = j === plantilla.arqueroDesignado;
+            {equipo.jugadores.map(({ nombre: j, esArquero }) => {
               return (
                 <span
                   key={j}
@@ -105,6 +107,7 @@ export function SetupJornada({ onIniciar }: Props) {
   const [modo, setModo] = useState<ModoPartido>("jornada");
   const [jornada, setJornada] = useState(1);
   const [slots, setSlots] = useState<(string | null)[]>([null, null, null]);
+  const { equipos, loading, error } = usePlantillasEdicion(EDICION_ACTUAL);
 
   const esPlayoff = modo !== "jornada";
   const slotCount = esPlayoff ? 2 : 3;
@@ -125,17 +128,22 @@ export function SetupJornada({ onIniciar }: Props) {
 
   function handleIniciar() {
     if (!listos) return;
-    const ids = activeSlots as string[];
+    const elegidos = (activeSlots as string[]).map((id) =>
+      equipos.find((e) => e.slug === id)
+    );
+    if (elegidos.some((e) => !e)) return;
+    const [a, b, c] = elegidos as EquipoConPlantilla[];
+
     if (modo === "jornada") {
       onIniciar({
         modo: "jornada",
         jornada,
-        equipos: [buildEquipo(ids[0]), buildEquipo(ids[1]), buildEquipo(ids[2])],
+        equipos: [buildEquipo(a), buildEquipo(b), buildEquipo(c)],
       });
     } else {
       onIniciar({
         modo,
-        equipos: [buildEquipo(ids[0]), buildEquipo(ids[1])],
+        equipos: [buildEquipo(a), buildEquipo(b)],
       });
     }
   }
@@ -185,6 +193,19 @@ export function SetupJornada({ onIniciar }: Props) {
         )}
 
         {/* Team slots */}
+        {(loading || error) && (
+          <p
+            className={`rounded-2xl px-4 py-3 text-sm ${
+              error
+                ? "bg-red-900/30 text-red-300"
+                : "bg-gray-800/80 text-gray-400"
+            }`}
+          >
+            {error
+              ? `No se pudieron cargar los equipos: ${error}`
+              : "Cargando equipos y plantillas…"}
+          </p>
+        )}
         {Array.from({ length: slotCount }, (_, i) => (
           <TeamSlot
             key={i}
@@ -192,6 +213,7 @@ export function SetupJornada({ onIniciar }: Props) {
             equipoId={slots[i] ?? null}
             ocupados={ocupados.filter((id) => id !== slots[i])}
             onChange={(id) => updateSlot(i, id)}
+            equipos={equipos}
           />
         ))}
 

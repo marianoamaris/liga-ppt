@@ -24,6 +24,7 @@ export interface Jugador {
 export interface Edicion {
   numero: number;
   nombre: string | null;
+  subtitulo: string | null;
   tematica: string | null;
   descripcion: string | null;
   estado: "historica" | "activa" | "proxima";
@@ -32,6 +33,16 @@ export interface Edicion {
   subcampeon_slug: string | null;
   /** `partidos` = derivable de eventos; `agregados` = totales heredados. */
   fuente_datos: "partidos" | "agregados";
+}
+
+/**
+ * Equipo tal como lo consumen las vistas de partido: identificador, nombre y
+ * camiseta ya resuelta. Es la forma que antes exportaba `constants/liga20.ts`.
+ */
+export interface EquipoLocal {
+  id: string;
+  nombre: string;
+  imagen: string;
 }
 
 export interface EdicionEquipo {
@@ -43,6 +54,64 @@ export interface EdicionEquipo {
   color_slug: string | null;
   imagen: string | null;
   orden: number | null;
+}
+
+/** Color de camiseta del equipo en una final. */
+export type ColorCamiseta =
+  | "azul"
+  | "rojo"
+  | "verde"
+  | "morado"
+  | "negro"
+  | "rosado"
+  | "blanco"
+  | "naranja"
+  | "amarillo";
+
+export type ResultadoFinal = "1" | "2" | "empate" | "pendiente";
+
+/** Fila de `edicion_finales`, tal cual la devuelve la API. */
+export interface EdicionFinal {
+  edicion: number;
+  equipo1_slug: string;
+  equipo2_slug: string;
+  equipo1_nombre: string;
+  equipo2_nombre: string;
+  goles1: number | null;
+  goles2: number | null;
+  color1: ColorCamiseta | null;
+  color2: ColorCamiseta | null;
+  resultado: ResultadoFinal;
+  nota_marcador: string | null;
+}
+
+/** Forma que consumía la vista cuando los datos vivían en `HISTORICO_FINALES.ts`. */
+export interface FinalHistorica {
+  temporada: number;
+  equipo1: string;
+  equipo2: string;
+  goles1: number | null;
+  goles2: number | null;
+  color1: ColorCamiseta;
+  color2: ColorCamiseta;
+  resultado: ResultadoFinal;
+  notaMarcador?: string;
+}
+
+export function finalAHistorica(f: EdicionFinal): FinalHistorica {
+  return {
+    temporada: f.edicion,
+    equipo1: f.equipo1_nombre,
+    equipo2: f.equipo2_nombre,
+    goles1: f.goles1,
+    goles2: f.goles2,
+    // La base guarda el color como texto libre; si faltara, "blanco" es el
+    // chip neutro y la fila sigue siendo legible.
+    color1: f.color1 ?? "blanco",
+    color2: f.color2 ?? "blanco",
+    resultado: f.resultado,
+    ...(f.nota_marcador ? { notaMarcador: f.nota_marcador } : {}),
+  };
 }
 
 export interface PlantillaJugador {

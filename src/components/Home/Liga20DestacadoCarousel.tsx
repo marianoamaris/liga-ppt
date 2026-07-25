@@ -2,37 +2,41 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../common/Card";
-import {
-  LIGA_20_DESTACADO,
-  LIGA_20_EQUIPOS,
-} from "../../constants/liga20";
-
-const SLIDE_COUNT = LIGA_20_EQUIPOS.length;
+import { EDICION_ACTUAL } from "../../config";
+import { useEdicion, useEquiposEdicion } from "../../hooks/useCatalogo";
 
 /** Altura fija del visor para que no colapse al cambiar de slide */
 const VIEWPORT_CLASS =
   "relative h-[min(320px,55vw)] w-full md:h-[400px]";
 
-function preloadLiga20Images(): void {
-  LIGA_20_EQUIPOS.forEach((eq) => {
+function preloadImagenes(urls: string[]): void {
+  for (const url of urls) {
+    if (!url) continue;
     const img = new Image();
-    img.src = eq.imagen;
-  });
+    img.src = url;
+  }
 }
 
 const Liga20DestacadoCarousel: React.FC = () => {
   const navigate = useNavigate();
   const [slide, setSlide] = useState(0);
   const touchStartX = useRef<number | null>(null);
-  const equipo = LIGA_20_EQUIPOS[slide];
+  const { edicion } = useEdicion(EDICION_ACTUAL);
+  const { locales } = useEquiposEdicion(EDICION_ACTUAL);
+  const slideCount = locales.length;
+  const equipo = locales[slide];
 
   useEffect(() => {
-    preloadLiga20Images();
-  }, []);
+    preloadImagenes(locales.map((e) => e.imagen));
+  }, [locales]);
 
-  const go = useCallback((dir: -1 | 1) => {
-    setSlide((s) => (s + dir + SLIDE_COUNT) % SLIDE_COUNT);
-  }, []);
+  const go = useCallback(
+    (dir: -1 | 1) => {
+      if (slideCount === 0) return;
+      setSlide((s) => (s + dir + slideCount) % slideCount);
+    },
+    [slideCount]
+  );
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0]?.clientX ?? null;
@@ -52,10 +56,10 @@ const Liga20DestacadoCarousel: React.FC = () => {
     <Card className="relative mb-8 w-full max-w-5xl overflow-hidden border border-indigo-800/30 bg-gradient-to-b from-indigo-950 via-slate-950 to-black p-0 text-white shadow-xl">
       <div className="border-b border-white/10 px-4 py-3 md:px-6">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-sky-400/90">
-          {LIGA_20_DESTACADO.subtitulo}
+          {edicion?.subtitulo}
         </p>
         <h2 className="text-center text-lg font-bold text-white md:text-xl">
-          🏴󠁧󠁢󠁥󠁮󠁧󠁿⚽ {LIGA_20_DESTACADO.titulo}
+          🏴󠁧󠁢󠁥󠁮󠁧󠁿⚽ {edicion?.nombre}
         </h2>
       </div>
 
@@ -65,17 +69,17 @@ const Liga20DestacadoCarousel: React.FC = () => {
         onTouchEnd={onTouchEnd}
       >
         <p className="mb-4 text-center text-sm leading-relaxed text-gray-200 md:text-base">
-          {LIGA_20_DESTACADO.descripcion}
+          {edicion?.descripcion}
         </p>
 
         <div
           className={`${VIEWPORT_CLASS} overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-inner`}
         >
-          {LIGA_20_EQUIPOS.map((eq, i) => (
+          {locales.map((eq, i) => (
             <img
               key={eq.id}
               src={eq.imagen}
-              alt={`Equipo ${eq.nombre} – Liga PPT 20`}
+              alt={`Equipo ${eq.nombre} – Liga PPT ${EDICION_ACTUAL}`}
               width={800}
               height={600}
               decoding="sync"
@@ -91,10 +95,12 @@ const Liga20DestacadoCarousel: React.FC = () => {
           ))}
         </div>
         <p className="mt-3 text-center text-base font-bold text-sky-300 md:text-lg">
-          {equipo.nombre}
+          {equipo?.nombre ?? " "}
         </p>
         <p className="mt-1 text-center text-xs text-gray-400">
-          {slide + 1} de {SLIDE_COUNT} equipos
+          {slideCount === 0
+            ? "Cargando equipos…"
+            : `${slide + 1} de ${slideCount} equipos`}
         </p>
       </div>
 
@@ -109,7 +115,7 @@ const Liga20DestacadoCarousel: React.FC = () => {
         </button>
         <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
           <div className="flex max-w-full flex-wrap justify-center gap-1.5 px-1">
-            {LIGA_20_EQUIPOS.map((eq, i) => (
+            {locales.map((eq, i) => (
               <button
                 key={eq.id}
                 type="button"

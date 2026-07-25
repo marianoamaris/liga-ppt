@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "./Card";
 import noPhoto from "../../assets/no-photo.jpg";
-import type { UsuarioLiga } from "../../constants/USUARIOS_LIGA";
+import type { UsuarioLiga } from "../../types/jugador";
 import { fotoJugadorPorNombre } from "../../utils/fotosJugadores";
 import { FaStar, FaTrophy, FaFutbol, FaMedal } from "react-icons/fa6";
 

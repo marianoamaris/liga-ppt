@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, type FormEvent } from "react";
-import { USUARIOS_LIGA } from "../constants/USUARIOS_LIGA";
+import React, { useState, useRef, useEffect, useMemo, type FormEvent } from "react";
+import { useJugadores } from "../hooks/useCatalogo";
 import { ligaConfigApi, type TeamConfig } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -21,9 +21,6 @@ export const SLUG_TO_HEX: Record<string, string> = Object.fromEntries(
   SLOT_COLORS.map((s) => [s.slug, s.hex])
 );
 
-const ALL_PLAYERS = USUARIOS_LIGA.map((u) => u.name).sort((a, b) =>
-  a.localeCompare(b)
-);
 
 function isLight(hex: string): boolean {
   const c = hex.replace("#", "");
@@ -56,8 +53,14 @@ function PlayerSearch({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { usuarios } = useJugadores();
 
-  const filtered = ALL_PLAYERS.filter(
+  const todos = useMemo(
+    () => usuarios.map((u) => u.name).sort((a, b) => a.localeCompare(b)),
+    [usuarios]
+  );
+
+  const filtered = todos.filter(
     (p) =>
       !assigned.includes(p) &&
       p.toLowerCase().includes(query.toLowerCase())
