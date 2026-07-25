@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import type { Posicion } from "../../../constants/USUARIOS_LIGA";
-import { USUARIOS_LIGA } from "../../../constants/USUARIOS_LIGA";
+import type { Posicion } from "../../../types/jugador";
+import { useJugadores } from "../../../hooks/useCatalogo";
 import { SidebarTabs } from "../../common/SidebarTabs";
 import { UserCard } from "../../common/UserCard";
 import MvpFinalComponent from "./components/MvpFinalComponent";
@@ -38,8 +38,10 @@ export const Historia: React.FC = () => {
   const [tab, setTab] = useState("jugadores");
   const [posicion, setPosicion] = useState<"todas" | Posicion>("todas");
   const [search, setSearch] = useState<string>("");
+  const { usuarios, loading, error } = useJugadores();
+
   // Conteo total de jugadores por posición
-  const conteoPorPosicion = USUARIOS_LIGA.reduce(
+  const conteoPorPosicion = usuarios.reduce(
     (acc, u) => {
       acc[u.posicion] = (acc[u.posicion] || 0) + 1;
       return acc;
@@ -52,7 +54,14 @@ export const Historia: React.FC = () => {
     }
   );
 
-  const usuariosFiltrados = USUARIOS_LIGA.filter((u) => {
+  /** Mensaje a mostrar en lugar de la grilla mientras no haya padrón que listar. */
+  const estadoPadron = loading
+    ? "Cargando jugadores…"
+    : error
+      ? `No se pudo cargar el padrón: ${error}`
+      : null;
+
+  const usuariosFiltrados = usuarios.filter((u) => {
     // First apply search filter if there's a search term
     if (search && !u.name.toLowerCase().includes(search.toLowerCase())) {
       return false;
@@ -169,11 +178,11 @@ export const Historia: React.FC = () => {
             >
               {!usuariosFiltrados.length ? (
                 <span className="text-sm text-center text-gray-500 md:text-base">
-                  No hay jugadores para mostrar
+                  {estadoPadron ?? "No hay jugadores para mostrar"}
                 </span>
               ) : (
-                usuariosFiltrados.map((user, index) => (
-                  <UserCard key={index} user={user} />
+                usuariosFiltrados.map((user) => (
+                  <UserCard key={user.username} user={user} />
                 ))
               )}
             </div>
@@ -181,9 +190,13 @@ export const Historia: React.FC = () => {
         )}
         {tab === "admins" && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {usuariosFiltrados.map((user) => (
-              <UserCard key={user.username} user={user} />
-            ))}
+            {estadoPadron ? (
+              <span className="text-sm text-gray-500 md:text-base">{estadoPadron}</span>
+            ) : (
+              usuariosFiltrados.map((user) => (
+                <UserCard key={user.username} user={user} />
+              ))
+            )}
           </div>
         )}
         {tab === "goleadores" && <HistoricoGoleadoresComponent />}

@@ -1,4 +1,11 @@
 import type { Evento } from "../components/anotador/types";
+import type {
+  Edicion,
+  EdicionEquipo,
+  EquipoConPlantilla,
+  Jugador,
+  Posicion,
+} from "../types/jugador";
 import { supabase } from "./supabase";
 
 const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
@@ -186,6 +193,38 @@ export const ligaConfigApi = {
       method: "POST",
       body: JSON.stringify({ temporada, equipos }),
     }),
+};
+
+// ── Catálogo: jugadores y ediciones ───────────────────────────────────────────
+// Reemplazan a USUARIOS_LIGA.ts, TEAM_COLORS, LIGA_*_EQUIPOS y PLANTILLAS_LIGA*.
+
+export const jugadoresApi = {
+  list: (params: { q?: string; posicion?: Posicion; activo?: "true" | "false" | "todos"; inciertos?: boolean } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.q) qs.set("q", params.q);
+    if (params.posicion) qs.set("posicion", params.posicion);
+    if (params.activo) qs.set("activo", params.activo);
+    if (params.inciertos) qs.set("inciertos", "true");
+    const query = qs.toString();
+    return req<{ total: number; jugadores: Jugador[] }>(
+      `/jugadores${query ? `?${query}` : ""}`
+    );
+  },
+  /** Acepta el slug canónico o cualquier grafía alternativa registrada. */
+  get: (slug: string) =>
+    req<{ jugador: Jugador; resueltoPorAlias?: string }>(`/jugadores/${slug}`),
+};
+
+export const edicionesApi = {
+  list: () => req<{ total: number; ediciones: Edicion[] }>("/ediciones"),
+  get: (numero: number) =>
+    req<{ edicion: Edicion; equipos: EdicionEquipo[] }>(`/ediciones/${numero}`),
+  equipos: (numero: number) =>
+    req<{ edicion: number; equipos: EdicionEquipo[] }>(`/ediciones/${numero}/equipos`),
+  plantillas: (numero: number) =>
+    req<{ edicion: number; equipos: EquipoConPlantilla[] }>(
+      `/ediciones/${numero}/plantillas`
+    ),
 };
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
