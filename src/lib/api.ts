@@ -4,8 +4,11 @@ import type {
   EdicionEquipo,
   EdicionFinal,
   EquipoConPlantilla,
+  FilaPalmares,
   HistoricoEdicion,
   Jugador,
+  JugadorTitulos,
+  TipoPalmares,
   Posicion,
 } from "../types/jugador";
 import { supabase } from "./supabase";
@@ -215,6 +218,14 @@ export const jugadoresApi = {
   /** Acepta el slug canónico o cualquier grafía alternativa registrada. */
   get: (slug: string) =>
     req<{ jugador: Jugador; resueltoPorAlias?: string }>(`/jugadores/${slug}`),
+};
+
+export const palmaresApi = {
+  /** Sin tipo devuelve todo agrupado, que es lo que pinta Historia. */
+  todo: () => req<{ palmares: Record<TipoPalmares, FilaPalmares[]> }>("/palmares"),
+  porTipo: (tipo: TipoPalmares) =>
+    req<{ tipo: TipoPalmares; palmares: FilaPalmares[] }>(`/palmares?tipo=${tipo}`),
+  titulos: () => req<{ total: number; titulos: JugadorTitulos[] }>("/palmares/titulos"),
 };
 
 export const edicionesApi = {

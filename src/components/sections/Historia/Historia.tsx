@@ -3,14 +3,9 @@ import type { Posicion } from "../../../types/jugador";
 import { useJugadores } from "../../../hooks/useCatalogo";
 import { SidebarTabs } from "../../common/SidebarTabs";
 import { UserCard } from "../../common/UserCard";
-import MvpFinalComponent from "./components/MvpFinalComponent";
-import MvpLigaComponent from "./components/MvpLigaComponent";
-import GuanteDeOroComponent from "./components/GuanteDeOroComponent";
-import BotaDeOroComponent from "./components/BotaDeOroComponent";
 import MasGanadoresComponent from "./components/MasGanadoresComponent";
+import { TablaPalmares } from "./components/TablaPalmares";
 import HistoricoFinalesComponent from "./components/HistoricoFinalesComponent";
-import HistoricoGoleadoresComponent from "./components/HistoricoGoleadoresComponent";
-import CapitanesHistoricosComponent from "./components/CapitanesHistoricosComponent";
 import SearchInput from "../../common/SearchInput";
 
 const TABS = [
@@ -155,14 +150,57 @@ export const Historia: React.FC = () => {
             )}
           </div>
         )}
-        {tab === "goleadores" && <HistoricoGoleadoresComponent />}
+        {tab === "goleadores" && (
+          <TablaPalmares
+            tipo="goles_historicos"
+            titulo="Top goleadores histórico"
+            unidad="goles"
+            descripcion="Goles acumulados en toda la historia de la liga."
+          />
+        )}
         {tab === "ganadores" && <MasGanadoresComponent />}
-        {tab === "capitanes" && <CapitanesHistoricosComponent />}
+        {tab === "capitanes" && (
+          <TablaPalmares
+            tipo="capitan_campeon"
+            titulo="Capitanes históricos"
+            unidad="títulos"
+            descripcion="Jugadores que levantaron el trofeo llevando el brazalete."
+            columnaDetalle="Ediciones:"
+          />
+        )}
         {tab === "historico_finales" && <HistoricoFinalesComponent />}
-        {tab === "bota" && <BotaDeOroComponent />}
-        {tab === "guante" && <GuanteDeOroComponent />}
-        {tab === "mvp" && <MvpLigaComponent />}
-        {tab === "mvp_final" && <MvpFinalComponent />}
+        {tab === "bota" && (
+          <TablaPalmares
+            tipo="bota_oro"
+            titulo="Bota de oro"
+            unidad="botas"
+            descripcion="Máximo goleador de cada edición."
+          />
+        )}
+        {tab === "guante" && (
+          <TablaPalmares
+            tipo="guante_oro"
+            titulo="Guante de oro"
+            unidad="guantes"
+            descripcion="Arquero menos batido de cada edición."
+          />
+        )}
+        {tab === "mvp" && (
+          <TablaPalmares
+            tipo="mvp_liga"
+            titulo="MVP de la liga"
+            unidad="premios"
+            descripcion="Jugador más valioso de cada edición."
+          />
+        )}
+        {tab === "mvp_final" && (
+          <TablaPalmares
+            tipo="mvp_final"
+            titulo="MVP de la final"
+            unidad="premios"
+            descripcion="Figura del partido decisivo."
+          />
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { edicionesApi, jugadoresApi } from "../lib/api";
+import { edicionesApi, jugadoresApi, palmaresApi } from "../lib/api";
 import {
   finalAHistorica,
   jugadorAUsuarioLiga,
@@ -9,8 +9,11 @@ import {
   type EquipoConPlantilla,
   type EquipoLocal,
   type FinalHistorica,
+  type FilaPalmares,
   type HistoricoEdicion,
   type Jugador,
+  type JugadorTitulos,
+  type TipoPalmares,
   type UsuarioLiga,
 } from "../types/jugador";
 import { camisetaEquipo } from "../utils/imagenesEquipos";
@@ -145,6 +148,32 @@ export function useHistoricoEdicion(numero: number | null) {
     [numero]
   );
   return { historico: datos, loading, error };
+}
+
+/** Todo el palmarés histórico, agrupado por tipo de récord. */
+export function usePalmares() {
+  const { datos, loading, error } = useAsync<Record<TipoPalmares, FilaPalmares[]>>(
+    () => palmaresApi.todo().then((r) => r.palmares),
+    {} as Record<TipoPalmares, FilaPalmares[]>,
+    []
+  );
+
+  const de = useMemo(
+    () => (tipo: TipoPalmares): FilaPalmares[] => datos[tipo] ?? [],
+    [datos]
+  );
+
+  return { palmares: datos, de, loading, error };
+}
+
+/** Jugadores con títulos, con el detalle de las ediciones que ganaron. */
+export function useTitulos() {
+  const { datos, loading, error } = useAsync<JugadorTitulos[]>(
+    () => palmaresApi.titulos().then((r) => r.titulos),
+    [],
+    []
+  );
+  return { titulos: datos, loading, error };
 }
 
 /** Equipos de una edición, con sus colores y camisetas. */

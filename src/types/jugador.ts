@@ -163,6 +163,38 @@ export interface HistoricoEdicion {
   origen: "agregados" | "partidos";
 }
 
+export type TipoPalmares =
+  | "bota_oro"
+  | "guante_oro"
+  | "mvp_liga"
+  | "mvp_final"
+  | "capitan_campeon"
+  | "goles_historicos";
+
+/** Referencia mínima al jugador que devuelve la API junto a cada récord. */
+export type JugadorRef = Pick<
+  Jugador,
+  "slug" | "nombre" | "apodo" | "foto_archivo"
+> & { posicion?: Posicion };
+
+export interface FilaPalmares {
+  jugador_nombre: string;
+  tipo: TipoPalmares;
+  cantidad: number;
+  /** En capitanes, las temporadas en que ganó con el brazalete. */
+  detalle: string | null;
+  jugadores: JugadorRef | null;
+}
+
+export interface JugadorTitulos {
+  jugador_nombre: string;
+  jugador: JugadorRef | null;
+  ligas: number[];
+  champions: number;
+  mundial: number;
+  total: number;
+}
+
 export interface PlantillaJugador {
   nombre: string;
   esArquero: boolean;
