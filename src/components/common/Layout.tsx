@@ -1,76 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
+import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
-import { SIDEBAR_ITEMS } from "../../constants/theme";
-import { useLocation, useNavigate, Outlet } from "react-router-dom";
-import { RxHamburgerMenu } from "react-icons/rx";
+import { BarraInferior } from "./BarraInferior";
 
-export const Layout: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const selectedPath =
-    SIDEBAR_ITEMS.find((item) => item.path === location.pathname)?.path || "";
+/**
+ * Estructura común de las páginas públicas.
+ *
+ * El fondo y el espaciado los pone cada página: unas ya están migradas al tema
+ * oscuro y otras todavía traen sus tarjetas claras.
+ */
+export const Layout: React.FC = () => (
+  <div className="flex h-dvh overflow-hidden bg-ink">
+    <Sidebar className="hidden md:flex" />
 
-  const handleCloseSidebar = () => setSidebarOpen(false);
+    <main className="min-w-0 flex-1 overflow-y-auto pb-[3.75rem] md:pb-0">
+      <Outlet />
+    </main>
 
-  return (
-    <div className="box-border flex h-screen min-h-screen overflow-hidden">
-      {/* Desktop Sidebar */}
-      <Sidebar
-        onItemClick={(path) => navigate(path)}
-        selectedPath={selectedPath}
-        onSignInClick={() => navigate("/login")}
-        className="flex-col justify-between hidden min-h-screen p-6 transition-all duration-200 md:flex"
-      />
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 flex md:hidden">
-          <div
-            style={{
-              background: "linear-gradient(to bottom, #000 60%, #222 100%)",
-            }}
-            className="relative z-50 flex flex-col justify-between w-full h-full animate-slide-in-left"
-          >
-            <button
-              className="absolute text-2xl text-white top-4 right-4"
-              onClick={handleCloseSidebar}
-              aria-label="Cerrar menú"
-            >
-              ×
-            </button>
-            <div className="w-full h-full px-5 pt-14 pb-6 sm:px-6">
-              <Sidebar
-                onItemClick={(path) => {
-                  handleCloseSidebar();
-                  navigate(path);
-                }}
-                selectedPath={selectedPath}
-                onSignInClick={() => navigate("/login")}
-                className="flex flex-col justify-between w-full md:hidden"
-                mobile={true}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* El fondo y el espaciado los pone cada página: unas ya están migradas
-            al tema oscuro y otras todavía traen sus tarjetas claras. */}
-        <main className="flex h-0 max-h-full min-h-0 flex-1 items-center justify-center overflow-y-auto bg-ink">
-          <div className="h-full min-h-0 w-full min-w-0">
-            <div className="flex flex-row-reverse w-full md:hidden">
-              <button
-                className="p-2 text-2xl"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Abrir menú"
-              >
-                <RxHamburgerMenu />
-              </button>
-            </div>
-            <Outlet />
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-};
+    <BarraInferior />
+  </div>
+);

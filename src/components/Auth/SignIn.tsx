@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { THEME } from "../../constants/theme";
+import { ESCUDO } from "../../constants/navegacion";
 import { Card } from "../common/Card";
 import { Input } from "../common/Input";
 import { Button } from "../common/Button";
@@ -27,7 +27,7 @@ export const SignIn: React.FC = () => {
       {/* Fondo difuminado */}
       <div
         className="absolute inset-0 bg-center bg-cover filter blur-lg"
-        style={{ backgroundImage: `url(${THEME.logo.escudo})` }}
+        style={{ backgroundImage: `url(${ESCUDO})` }}
       />
       {/* Overlay oscuro */}
       <div className="absolute inset-0 bg-black opacity-50" />

@@ -1,132 +1,51 @@
-import React, { useEffect, useState } from "react";
-import { GiSoccerKick, GiWhistle } from "react-icons/gi";
-import { FaHome, FaRegCalendarAlt } from "react-icons/fa";
-import {
-  FaRankingStar,
-  FaMedal,
-  FaChevronLeft,
-  FaChevronRight,
-  FaGavel,
-  FaBullhorn,
-  FaHandshake,
-  FaUserPen,
-  FaUserPlus,
-  FaSignal,
-  FaChartBar,
-} from "react-icons/fa6";
-import { SIDEBAR_ITEMS, THEME } from "../../constants/theme";
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { NAVEGACION } from "../../constants/navegacion";
 
-const ICONS: Record<
-  string,
-  React.ComponentType<{ className?: string; size?: number }>
-> = {
-  FaHome,
-  GiSoccerKick,
-  FaRankingStar,
-  GiWhistle,
-  FaMedal,
-  FaGavel,
-  FaBullhorn,
-  FaHandshake,
-  FaUserPen,
-  FaUserPlus,
-  FaRegCalendarAlt,
-  FaSignal,
-  FaChartBar,
-};
+/**
+ * Navegación de escritorio. Los destinos van agrupados por frecuencia de uso
+ * y son enlaces reales: antes eran `<li onClick>`, que no reciben foco ni se
+ * pueden abrir en otra pestaña.
+ */
+export const Sidebar: React.FC<{ className?: string }> = ({ className = "" }) => (
+  <nav
+    aria-label="Secciones"
+    className={`flex w-56 shrink-0 flex-col gap-1 overflow-y-auto border-r border-line bg-surface py-4 ${className}`}
+  >
+    <div className="flex items-center gap-2.5 px-4 pb-4">
+      <img
+        src="/PPT.png"
+        alt=""
+        className="size-8 shrink-0 rounded-full bg-chalk object-contain p-0.5"
+      />
+      <span className="font-cond text-base text-chalk">Liga PPT</span>
+    </div>
 
-interface SidebarProps {
-  onItemClick: (path: string) => void;
-  selectedPath: string;
-  onSignInClick?: () => void;
-  className?: string;
-  mobile?: boolean;
-}
-
-export const Sidebar: React.FC<SidebarProps> = ({
-  onItemClick,
-  selectedPath,
-  mobile,
-  className,
-}) => {
-  const [expanded, setExpanded] = useState<boolean>(true);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("sidebar-expanded");
-    if (saved !== null) setExpanded(saved === "true");
-  }, []);
-  useEffect(() => {
-    localStorage.setItem("sidebar-expanded", expanded ? "true" : "false");
-  }, [expanded]);
-
-  return (
-    <nav
-      className={`${THEME.colors.primary} ${THEME.colors.text.primary} ${
-        expanded ? "w-60" : "w-20"
-      } ${className}`}
-      style={{ background: "linear-gradient(to bottom, #000 60%, #222 100%)" }}
-    >
-      <div className="flex-col items-center hidden md:flex">
-        {/* <button
-          onClick={onSignInClick}
-          className={`w-full mb-6 px-2 py-2 rounded-lg font-semibold bg-gray-400 text-white hover:bg-gray-500 cursor-pointer shadow transition text-center ${
-            expanded ? "" : "text-xs px-0"
-          }`}
-        >
-          {expanded ? (
-            "Iniciar sesión / Registrarme"
-          ) : (
-            <span className="text-lg">🔑</span>
-          )}
-        </button> */}
-        <button
-          onClick={() => setExpanded((e) => !e)}
-          className="self-end p-2 mb-2 text-white transition bg-gray-800 rounded-full shadow hover:bg-gray-700"
-          title={expanded ? "Colapsar menú" : "Expandir menú"}
-        >
-          {expanded ? <FaChevronLeft /> : <FaChevronRight />}
-        </button>
-      </div>
-      <ul
-        className={`flex flex-col flex-1 justify-start space-y-2 ${
-          mobile ? "pt-2" : "pt-1"
-        }`}
-      >
-        {SIDEBAR_ITEMS.map((item) => (
-          <li
-            key={item.id}
-            onClick={() => onItemClick(item.path)}
-            className={`flex items-center transition-colors p-2 rounded-lg cursor-pointer
-              ${
-                selectedPath === item.path
-                  ? THEME.colors.selected
-                  : `${THEME.colors.text.secondary} hover:${THEME.colors.hover}`
-              }
-              ${expanded ? "" : "justify-center"}
-            `}
-            title={!expanded ? item.label : undefined}
+    {NAVEGACION.map((grupo) => (
+      <div key={grupo.id} className="flex flex-col gap-0.5">
+        {grupo.titulo && (
+          <h2 className="font-cond mx-4 mt-4 mb-1 border-t border-line pt-3 text-[0.625rem] text-chalk-3">
+            {grupo.titulo}
+          </h2>
+        )}
+        {grupo.destinos.map(({ id, label, path, Icono }) => (
+          <NavLink
+            key={id}
+            to={path}
+            end={path === "/"}
+            className={({ isActive }) =>
+              `font-cond mx-2 flex items-center gap-2.5 rounded-sm px-2 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
+                isActive
+                  ? "bg-raised text-chalk"
+                  : "text-chalk-3 hover:bg-raised/60 hover:text-chalk-2"
+              }`
+            }
           >
-            {ICONS[item.icon] &&
-              React.createElement(ICONS[item.icon], {
-                size: 22,
-                className: expanded ? "mr-2" : "mx-auto",
-              })}
-            {expanded && <span>{item.label}</span>}
-          </li>
+            <Icono aria-hidden className="size-4 shrink-0" />
+            {label}
+          </NavLink>
         ))}
-      </ul>
-      {!mobile && (
-        // <div className="flex items-center justify-center p-6 bg-black">
-        <div className="flex justify-center">
-          <img
-            src="/PPT.png"
-            alt="Logo Liga PPT"
-            className="object-contain w-24 h-24"
-          />
-        </div>
-
-        // </div>
-      )}
-    </nav>
-  );
-};
+      </div>
+    ))}
+  </nav>
+);
