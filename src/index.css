@@ -1,1 +1,73 @@
 @import "tailwindcss";
+
+/**
+ * Sistema de diseño de Liga PPT.
+ *
+ * La paleta sale del escudo: negro cálido del damasco de fondo y el blanco tiza
+ * del trazo. Deliberadamente NO se usa la escala `gray` de Tailwind, que tira a
+ * azul; la de aquí tira a cálido, que es lo que hace que se lea como esta liga
+ * y no como una app oscura cualquiera.
+ *
+ * El acento no es un color de marca: es el color de camiseta de cada equipo, y
+ * viene de la base de datos (`edicion_equipos.color_hex`). Por eso aquí solo hay
+ * neutros y estados.
+ */
+@theme {
+  /* ── Superficies ─────────────────────────────────────────────── */
+  --color-ink: #141110;
+  --color-surface: #1d1917;
+  --color-raised: #282221;
+  --color-line: #3a322e;
+
+  /* ── Texto. Ratios medidos sobre --color-ink ─────────────────── */
+  --color-chalk: #f6f2ee; /* 16.9:1 — principal */
+  --color-chalk-2: #b9afa8; /*  8.7:1 — secundario */
+  --color-chalk-3: #9a908a; /*  4.9:1 — terciario, mínimo AA */
+
+  /* ── Estados. Nunca decoración ───────────────────────────────── */
+  --color-vivo: #e8442e;
+  --color-amarilla: #e5b33b;
+  --color-roja: #d93a2b;
+
+  /* ── Tipografía ──────────────────────────────────────────────── */
+  /* Condensada en mayúsculas: el registro de las tarjetas de plantilla.
+     Caras del sistema con carácter propio primero. La familia definitiva
+     (una grotesca condensada licenciada) entra por aquí cuando se decida. */
+  --font-cond: "Avenir Next Condensed", "Franklin Gothic Medium",
+    "Helvetica Neue Condensed", "Liberation Sans Narrow", "Arial Narrow",
+    system-ui, sans-serif;
+  --font-data: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  /* ── Escala de radios: tres pasos, no cuatro ─────────────────── */
+  --radius-sm: 0.1875rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+
+  /* ── Elevación: tres pasos ───────────────────────────────────── */
+  --shadow-e1: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-e2: 0 4px 12px rgb(0 0 0 / 0.35);
+  --shadow-e3: 0 12px 32px rgb(0 0 0 / 0.45);
+}
+
+/* Nombres y titulares. Las mayúsculas necesitan algo de tracking para respirar. */
+.font-cond {
+  font-stretch: condensed;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Cifras que se alinean en columna y no bailan al actualizarse en vivo. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

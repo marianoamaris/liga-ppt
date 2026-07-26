@@ -54,7 +54,9 @@ export const Layout: React.FC = () => {
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
-        <main className="flex h-0 min-h-0 max-h-full flex-1 items-center justify-center overflow-y-auto bg-gray-100 md:p-6">
+        {/* El fondo y el espaciado los pone cada página: unas ya están migradas
+            al tema oscuro y otras todavía traen sus tarjetas claras. */}
+        <main className="flex h-0 max-h-full min-h-0 flex-1 items-center justify-center overflow-y-auto bg-ink">
           <div className="h-full min-h-0 w-full min-w-0">
             <div className="flex flex-row-reverse w-full md:hidden">
               <button
