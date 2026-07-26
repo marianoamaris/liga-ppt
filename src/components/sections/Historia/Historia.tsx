@@ -172,6 +172,7 @@ export const Historia: React.FC = () => {
         {tab === "bota" && (
           <TablaPalmares
             tipo="bota_oro"
+            columnaDetalle="Ediciones:"
             titulo="Bota de oro"
             unidad="botas"
             descripcion="Máximo goleador de cada edición."
@@ -180,6 +181,7 @@ export const Historia: React.FC = () => {
         {tab === "guante" && (
           <TablaPalmares
             tipo="guante_oro"
+            columnaDetalle="Ediciones:"
             titulo="Guante de oro"
             unidad="guantes"
             descripcion="Arquero menos batido de cada edición."
@@ -188,6 +190,7 @@ export const Historia: React.FC = () => {
         {tab === "mvp" && (
           <TablaPalmares
             tipo="mvp_liga"
+            columnaDetalle="Ediciones:"
             titulo="MVP de la liga"
             unidad="premios"
             descripcion="Jugador más valioso de cada edición."
@@ -196,6 +199,7 @@ export const Historia: React.FC = () => {
         {tab === "mvp_final" && (
           <TablaPalmares
             tipo="mvp_final"
+            columnaDetalle="Ediciones:"
             titulo="MVP de la final"
             unidad="premios"
             descripcion="Figura del partido decisivo."
