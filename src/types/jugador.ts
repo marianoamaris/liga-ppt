@@ -31,6 +31,9 @@ export interface Edicion {
   total_jornadas: number;
   campeon_slug: string | null;
   subcampeon_slug: string | null;
+  /** Resueltos por la API a partir del slug; solo en el listado de ediciones. */
+  campeon_nombre?: string | null;
+  campeon_color?: string | null;
   /** `partidos` = derivable de eventos; `agregados` = totales heredados. */
   fuente_datos: "partidos" | "agregados";
 }
@@ -112,6 +115,52 @@ export function finalAHistorica(f: EdicionFinal): FinalHistorica {
     resultado: f.resultado,
     ...(f.nota_marcador ? { notaMarcador: f.nota_marcador } : {}),
   };
+}
+
+/** Fila de clasificación. Las ediciones antiguas solo registraban puntos. */
+export interface FilaClasificacion {
+  edicion: number;
+  equipo_slug: string;
+  posicion: number;
+  pj: number | null;
+  victorias: number | null;
+  empates: number | null;
+  derrotas: number | null;
+  puntos: number;
+}
+
+export interface JornadaEdicion {
+  jornada: number;
+  resultados: FilaClasificacion[];
+}
+
+export interface GoleadorEdicion {
+  jugador_nombre: string;
+  jugador_id: string | null;
+  /** Solo viene en las ediciones derivadas de partidos. */
+  equipo_slug?: string | null;
+  goles: number;
+  posicion: number;
+}
+
+export interface ArqueroEdicion {
+  jugador_nombre: string;
+  jugador_id: string | null;
+  equipo_slug: string | null;
+  goles_recibidos: number;
+  pj: number | null;
+}
+
+/** Respuesta de `/historico/:numero`, ya sea de agregados o de partidos. */
+export interface HistoricoEdicion {
+  edicion: Edicion;
+  equipos: EdicionEquipo[];
+  clasificacion: FilaClasificacion[];
+  jornadas: JornadaEdicion[];
+  goleadores: GoleadorEdicion[];
+  arqueros: ArqueroEdicion[];
+  final: EdicionFinal | null;
+  origen: "agregados" | "partidos";
 }
 
 export interface PlantillaJugador {

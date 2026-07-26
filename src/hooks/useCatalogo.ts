@@ -9,6 +9,7 @@ import {
   type EquipoConPlantilla,
   type EquipoLocal,
   type FinalHistorica,
+  type HistoricoEdicion,
   type Jugador,
   type UsuarioLiga,
 } from "../types/jugador";
@@ -131,6 +132,19 @@ export function useFinales() {
   );
 
   return { finales, loading, error };
+}
+
+/**
+ * Edición completa. El backend decide si la sirve desde los agregados
+ * históricos o derivándola de los partidos, y lo indica en `origen`.
+ */
+export function useHistoricoEdicion(numero: number | null) {
+  const { datos, loading, error } = useAsync<HistoricoEdicion | null>(
+    () => (numero == null ? Promise.resolve(null) : edicionesApi.historico(numero)),
+    null,
+    [numero]
+  );
+  return { historico: datos, loading, error };
 }
 
 /** Equipos de una edición, con sus colores y camisetas. */

@@ -4,6 +4,7 @@ import type {
   EdicionEquipo,
   EdicionFinal,
   EquipoConPlantilla,
+  HistoricoEdicion,
   Jugador,
   Posicion,
 } from "../types/jugador";
@@ -226,6 +227,8 @@ export const edicionesApi = {
     ),
   equipos: (numero: number) =>
     req<{ edicion: number; equipos: EdicionEquipo[] }>(`/ediciones/${numero}/equipos`),
+  /** Edición completa: tabla, jornadas, goleadores, arqueros y final. */
+  historico: (numero: number) => req<HistoricoEdicion>(`/historico/${numero}`),
   plantillas: (numero: number) =>
     req<{ edicion: number; equipos: EquipoConPlantilla[] }>(
       `/ediciones/${numero}/plantillas`
