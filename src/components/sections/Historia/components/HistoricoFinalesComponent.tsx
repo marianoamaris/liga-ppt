@@ -1,274 +1,166 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import type { ColorCamiseta, FinalHistorica } from "../../../../types/jugador";
 import { ETIQUETA_COLOR, resumenVictoriasPorColor } from "../../../../utils/finales";
 import { useFinales } from "../../../../hooks/useCatalogo";
-import championsLogo from "../../../../assets/UEFA_Champions_League_logo.png";
 
-const chipColor: Record<ColorCamiseta, string> = {
-  azul: "bg-blue-600 text-white",
-  rojo: "bg-red-600 text-white",
-  verde: "bg-green-600 text-white",
-  morado: "bg-purple-600 text-white",
-  negro: "bg-gray-900 text-white",
-  rosado: "bg-pink-400 text-gray-900",
-  blanco: "bg-gray-100 text-gray-900 border border-gray-300",
-  naranja: "bg-orange-500 text-white",
-  amarillo: "bg-yellow-400 text-gray-900",
+/**
+ * Color real de cada camiseta. Se usa como relleno del punto que acompaña al
+ * equipo, no como fondo de texto: sobre un color pleno el marcador dejaría de
+ * cumplir contraste en la mitad de los casos.
+ */
+const COLOR_CAMISETA: Record<ColorCamiseta, string> = {
+  azul: "#1565C0",
+  rojo: "#C62828",
+  verde: "#2E7D32",
+  morado: "#7B1FA2",
+  negro: "#212121",
+  rosado: "#E91E8C",
+  blanco: "#F5F5F5",
+  naranja: "#E65100",
+  amarillo: "#FFD600",
 };
 
-function MarcadorCelda({
-  goles,
-  color,
-  destacado,
-}: {
-  goles: number | null;
-  color: ColorCamiseta;
-  destacado: boolean;
-}) {
-  if (goles === null) {
-    return (
-      <span
-        className={`inline-flex min-w-[2.25rem] items-center justify-center rounded px-2 py-1 text-sm font-bold ${chipColor[color]} opacity-60`}
-      >
-        —
-      </span>
-    );
-  }
+function PuntoCamiseta({ color }: { color: ColorCamiseta }) {
   return (
     <span
-      className={`inline-flex min-w-[2.25rem] items-center justify-center rounded px-2 py-1 text-sm font-bold transition ${
-        chipColor[color]
-      } ${destacado ? "ring-2 ring-yellow-400 ring-offset-0 md:ring-offset-2" : "opacity-90"}`}
+      className="size-2.5 shrink-0 rounded-full ring-[1.5px] ring-chalk-3"
+      style={{ backgroundColor: COLOR_CAMISETA[color] }}
+      title={ETIQUETA_COLOR[color]}
+    />
+  );
+}
+
+function Finalista({
+  nombre,
+  color,
+  campeon,
+  alineadoDerecha = false,
+}: {
+  nombre: string;
+  color: ColorCamiseta;
+  campeon: boolean;
+  alineadoDerecha?: boolean;
+}) {
+  return (
+    <div
+      className={`flex min-w-0 items-center gap-2 ${
+        alineadoDerecha ? "flex-row-reverse text-right" : ""
+      }`}
     >
-      {goles}
-    </span>
+      <PuntoCamiseta color={color} />
+      <span
+        className={`font-cond truncate text-sm ${campeon ? "text-chalk" : "text-chalk-3"}`}
+      >
+        {nombre}
+      </span>
+    </div>
   );
 }
 
 function FilaFinal({ f }: { f: FinalHistorica }) {
   const gana1 = f.resultado === "1";
   const gana2 = f.resultado === "2";
-  const empate = f.resultado === "empate";
-  const pendiente = f.resultado === "pendiente";
-  const esFinalChampions = f.temporada === 18;
-
-  const rowClass = esFinalChampions
-    ? "relative border-y border-[#c9a227]/45 bg-gradient-to-r from-[#050a14] via-[#0c1f45] to-[#050a14] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-    : f.temporada % 2 === 0
-      ? "bg-gray-50 border-t border-gray-100"
-      : "bg-white border-t border-gray-100";
-
-  const chipUcl =
-    "inline-block rounded px-2 py-1 text-sm font-semibold bg-blue-950/75 text-white border border-white/10 shadow-sm ring-1 ring-[#c9a227]/30";
+  const decidida = gana1 || gana2;
 
   return (
-    <tr className={rowClass}>
-      <td
-        className={`px-3 py-3 ${
-          esFinalChampions
-            ? "min-w-0 max-w-[11rem] align-middle text-[#c9a227] sm:max-w-none"
-            : "whitespace-nowrap font-semibold text-gray-800"
-        }`}
-      >
-        {esFinalChampions ? (
-          <div className="flex min-w-0 flex-col items-start gap-1.5 sm:flex-row sm:items-start sm:gap-2">
-            <img
-              src={championsLogo}
-              alt="Champions"
-              width={40}
-              height={40}
-              className="h-8 w-8 shrink-0 object-contain sm:h-9 sm:w-9 md:h-10 md:w-10"
-              loading="lazy"
-              decoding="async"
-            />
-            <div className="min-w-0 flex flex-col gap-0.5 leading-tight">
-              <span className="text-lg font-black tracking-tight">18</span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-100/90">
-                Champions
-              </span>
-            </div>
-          </div>
-        ) : (
-          f.temporada
-        )}
-      </td>
-      <td className="px-3 py-3">
-        <span
-          className={
-            esFinalChampions
-              ? chipUcl
-              : `inline-block rounded px-2 py-1 text-sm font-medium ${chipColor[f.color1]}`
-          }
-        >
-          {f.equipo1}
+    <li className="border-t border-line py-3 first:border-t-0">
+      <div className="grid grid-cols-[2.5rem_1fr_auto_1fr] items-center gap-3">
+        <span className="tnum font-data text-xs text-chalk-3">#{f.temporada}</span>
+
+        <Finalista nombre={f.equipo1} color={f.color1} campeon={gana1} />
+
+        <span className="tnum font-data shrink-0 text-base font-bold text-chalk">
+          {f.goles1 ?? "—"}
+          <span className="mx-1 font-normal text-chalk-3">–</span>
+          {f.goles2 ?? "—"}
         </span>
-      </td>
-      <td className="px-3 py-3 text-center">
-        {pendiente ? (
-          esFinalChampions ? (
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-xs font-semibold tracking-widest uppercase text-blue-100/70">
-                Final Champions
-              </span>
-              <span className="text-sm font-bold tracking-wide text-[#c9a227]">
-                Por definir
-              </span>
-            </div>
-          ) : (
-            <span className="text-sm font-semibold text-amber-700">
-              Por definir
-            </span>
-          )
-        ) : empate ? (
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <MarcadorCelda
-              goles={f.goles1}
-              color={f.color1}
-              destacado={false}
-            />
-            <span className="text-gray-500">—</span>
-            <MarcadorCelda
-              goles={f.goles2}
-              color={f.color2}
-              destacado={false}
-            />
-            <span className="w-full text-xs font-semibold text-gray-600 sm:w-auto">
-              Empate
-            </span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center justify-center gap-2">
-              <MarcadorCelda
-                goles={f.goles1}
-                color={f.color1}
-                destacado={gana1}
-              />
-              <span className="font-bold text-gray-400">—</span>
-              <MarcadorCelda
-                goles={f.goles2}
-                color={f.color2}
-                destacado={gana2}
-              />
-            </div>
-            {f.notaMarcador ? (
-              <span
-                className={`max-w-[16rem] text-xs font-medium leading-snug md:max-w-none ${
-                  esFinalChampions
-                    ? "text-blue-100/95"
-                    : "text-gray-600"
-                }`}
-              >
-                {f.notaMarcador}
-              </span>
-            ) : null}
-          </div>
-        )}
-      </td>
-      <td className="px-3 py-3">
-        <span
-          className={
-            esFinalChampions
-              ? chipUcl
-              : `inline-block rounded px-2 py-1 text-sm font-medium ${chipColor[f.color2]}`
-          }
-        >
-          {f.equipo2}
-        </span>
-      </td>
-    </tr>
+
+        <Finalista nombre={f.equipo2} color={f.color2} campeon={gana2} alineadoDerecha />
+      </div>
+
+      {(f.notaMarcador || !decidida) && (
+        <p className="mt-1.5 pl-[3.25rem] text-[0.6875rem] text-chalk-3">
+          {f.notaMarcador ??
+            (f.resultado === "empate" ? "Terminó en empate" : "Final pendiente")}
+        </p>
+      )}
+    </li>
   );
 }
 
-const HistoricoFinalesComponent = () => {
+const HistoricoFinalesComponent: React.FC = () => {
   const { finales, loading, error } = useFinales();
   const resumen = useMemo(() => resumenVictoriasPorColor(finales), [finales]);
 
-  return (
-    <div className="min-w-0 w-full max-w-full">
-      <h2 className="mb-2 text-2xl font-extrabold text-center text-gray-800">
-        Histórico de finales
-      </h2>
-      <p className="mx-auto mb-6 max-w-3xl text-center text-sm text-gray-600 md:text-base">
-        Resultado de las finales por temporada. El marcador resalta al campeón
-        según el color de camiseta del equipo ganador.
-      </p>
+  // De la más reciente a la más antigua: es el orden en que se buscan
+  const ordenadas = useMemo(
+    () => [...finales].sort((a, b) => b.temporada - a.temporada),
+    [finales]
+  );
 
-      <div className="min-w-0 overflow-x-auto rounded-xl border border-gray-200 shadow-lg [-webkit-overflow-scrolling:touch]">
-        <table className="w-max min-w-[36rem] border-collapse text-left text-sm md:min-w-full md:w-full md:text-base">
-          <thead className="text-white bg-gradient-to-r from-slate-800 to-slate-600">
-            <tr>
-              <th className="rounded-tl-xl px-3 py-3 md:px-4">Temp.</th>
-              <th className="min-w-[8.5rem] px-3 py-3 md:min-w-0 md:px-4">
-                Equipo 1
-              </th>
-              <th className="min-w-[8rem] px-3 py-3 text-center md:px-4">
-                Marcador
-              </th>
-              <th className="min-w-[8.5rem] rounded-tr-xl px-3 py-3 md:min-w-0 md:px-4">
-                Equipo 2
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {finales.map((f) => (
-              <FilaFinal key={f.temporada} f={f} />
-            ))}
-            {!finales.length && (
-              <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-500">
-                  {loading
-                    ? "Cargando finales…"
-                    : error
-                      ? `No se pudieron cargar las finales: ${error}`
-                      : "Todavía no hay finales registradas"}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+  const maxGanadas = resumen[0]?.ganadas ?? 0;
+
+  return (
+    <section className="flex flex-col gap-6">
+      <div>
+        <h2 className="font-cond text-lg text-chalk">Histórico de finales</h2>
+        <p className="mt-1 max-w-prose text-sm text-chalk-3">
+          Resultado de cada final. El campeón va resaltado; el subcampeón, atenuado.
+        </p>
       </div>
 
-      <section className="mt-8 rounded-xl border border-gray-200 bg-gradient-to-br from-amber-50 to-white p-5 shadow-md">
-        <h3 className="mb-3 text-lg font-bold text-gray-900 md:text-xl">
-          Resumen: finales ganadas por color de camiseta
-        </h3>
-        <p className="mb-4 text-sm text-gray-600">
-          Solo se cuentan victorias en la final con resultado definido. No
-          incluye empates.
+      {loading ? (
+        <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+          Cargando finales…
         </p>
-        <ul className="space-y-2">
-          {resumen.map(({ color, ganadas, disputadas }) => (
-            <li
-              key={color}
-              className="flex flex-wrap items-center gap-2 text-base text-gray-800"
-            >
-              <span
-                className={`inline-block min-w-[5.5rem] rounded px-2 py-0.5 text-sm font-semibold text-center ${chipColor[color]}`}
-              >
-                {ETIQUETA_COLOR[color]}
-              </span>
-              {ganadas > 0 ? (
-                <span>
-                  ganó{" "}
-                  <strong className="font-bold text-gray-900">{ganadas}</strong>{" "}
-                  de{" "}
-                  <strong className="font-bold text-gray-900">{disputadas}</strong>{" "}
-                  {disputadas === 1 ? "final disputada" : "finales disputadas"}
-                </span>
-              ) : (
-                <span className="text-gray-500">
-                  no ha ganado{" "}
-                  <span className="text-gray-400 text-sm">
-                    ({disputadas} {disputadas === 1 ? "final disputada" : "finales disputadas"})
+      ) : error ? (
+        <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+          No se pudieron cargar las finales: {error}
+        </p>
+      ) : (
+        <>
+          <ul className="rounded-md border border-line bg-surface px-4">
+            {ordenadas.map((f) => (
+              <FilaFinal key={f.temporada} f={f} />
+            ))}
+          </ul>
+
+          <div>
+            <h3 className="font-cond text-sm text-chalk-2">
+              Finales ganadas por color de camiseta
+            </h3>
+            <p className="mt-1 mb-3 text-[0.6875rem] text-chalk-3">
+              Solo cuentan las finales con resultado definido.
+            </p>
+            <ul className="rounded-md border border-line bg-surface px-4">
+              {resumen.map(({ color, ganadas, disputadas }) => (
+                <li
+                  key={color}
+                  className="flex items-center gap-3 border-t border-line py-2 first:border-t-0"
+                >
+                  <PuntoCamiseta color={color} />
+                  <span className="font-cond min-w-0 flex-1 truncate text-sm text-chalk">
+                    {ETIQUETA_COLOR[color]}
                   </span>
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+                  <span className="hidden h-[3px] w-16 shrink-0 overflow-hidden rounded-full bg-line sm:block">
+                    <span
+                      className="block h-full bg-chalk-2"
+                      style={{
+                        width: maxGanadas ? `${(ganadas / maxGanadas) * 100}%` : "0%",
+                      }}
+                    />
+                  </span>
+                  <span className="tnum font-data w-20 shrink-0 text-right text-sm text-chalk">
+                    <span className="font-bold">{ganadas}</span>
+                    <span className="text-chalk-3"> de {disputadas}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
+    </section>
   );
 };
 
