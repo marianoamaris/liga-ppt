@@ -14,9 +14,9 @@ export const Sidebar: React.FC<{ className?: string }> = ({ className = "" }) =>
   >
     <div className="flex items-center gap-2.5 px-4 pb-4">
       <img
-        src="/PPT.png"
+        src="/ligaPPT-escudo.png"
         alt=""
-        className="size-8 shrink-0 rounded-full bg-chalk object-contain p-0.5"
+        className="size-8 shrink-0 rounded-full object-contain"
       />
       <span className="font-cond text-base text-chalk">Liga PPT</span>
     </div>

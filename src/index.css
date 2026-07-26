@@ -50,6 +50,18 @@
   --shadow-e3: 0 12px 32px rgb(0 0 0 / 0.45);
 }
 
+/* Sin esto, los controles nativos (spinners del input numérico, selección de
+   texto, autocompletado, scrollbars) se dibujan con el esquema claro y quedan
+   ilegibles sobre las superficies oscuras. */
+:root {
+  color-scheme: dark;
+}
+
+::selection {
+  background: var(--color-chalk);
+  color: var(--color-ink);
+}
+
 /* Nombres y titulares. Las mayúsculas necesitan algo de tracking para respirar. */
 .font-cond {
   font-stretch: condensed;

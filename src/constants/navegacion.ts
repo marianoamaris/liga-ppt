@@ -1,10 +1,9 @@
 import type { IconType } from "react-icons";
 import { GiSoccerKick, GiWhistle } from "react-icons/gi";
-import { FaHome, FaRegCalendarAlt } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 import {
   FaBullhorn,
   FaEllipsis,
-  FaGavel,
   FaHandshake,
   FaMedal,
   FaRankingStar,
@@ -53,13 +52,6 @@ export const NAVEGACION: GrupoNav[] = [
     destinos: [
       { id: "historia", label: "Historia", path: "/historia", Icono: GiWhistle },
       { id: "logros", label: "Logros", path: "/logros", Icono: FaMedal },
-      {
-        id: "calendario",
-        label: "Calendario",
-        path: "/calendario",
-        Icono: FaRegCalendarAlt,
-      },
-      { id: "reglamento", label: "Reglamento", path: "/reglamento", Icono: FaGavel },
     ],
   },
   {

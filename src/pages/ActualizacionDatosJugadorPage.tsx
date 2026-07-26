@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { Card } from "../components/common/Card";
-import { Button } from "../components/common/Button";
 import {
   CONTACTO_LIGA_EMAIL,
   NETLIFY_FORM_GRUPO_RESERVAS,
 } from "../constants/ACTUALIZACION_DATOS_JUGADOR";
-import ContadorJugadores from "../components/common/ContadorJugadores";
 
 const POSICIONES = ["Arquero", "Defensa", "Mediocampista", "Delantero"] as const;
 type Posicion = (typeof POSICIONES)[number];
@@ -71,32 +68,29 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center justify-center p-4 pb-12">
-      <div className="w-full max-w-2xl space-y-6">
+    <div className="min-h-full bg-ink p-4 pb-12 text-chalk">
+      <div className="mx-auto w-full max-w-2xl space-y-4">
         {/* Header */}
-        <Card className="border border-gray-200 bg-white p-6 text-gray-900 shadow-md md:p-8">
+        <div className="rounded-md border border-line bg-surface p-5 md:p-6">
           <div className="mb-4 flex flex-col items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase tracking-widest text-green-700">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
+            <span className="font-cond inline-flex items-center gap-2 text-[0.6875rem] text-vivo">
+              <span className="size-1.5 rounded-full bg-vivo" />
               Inscripciones abiertas
             </span>
-            <h1 className="text-center text-2xl font-bold text-gray-900">
+            <h1 className="font-cond text-center text-2xl text-chalk">
               Participar en la Liga PPT
             </h1>
 
-            {/* Contador de cupos (dinámico desde API) */}
-            <ContadorJugadores />
-
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-chalk-2">
               Únete al <strong>Grupo de Reservas</strong> y entra a la lista de espera. Si un cupo queda
               libre, te contactamos para que puedas participar en la liga rápidamente.
             </p>
           </div>
 
           {/* Info box: cómo funciona */}
-          <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-gray-800 space-y-2">
-            <p className="font-semibold text-blue-900">¿Cómo funciona el Grupo de Reservas?</p>
-            <ul className="list-inside list-disc space-y-1 text-gray-700">
+          <div className="mb-4 space-y-2 rounded-sm border border-line p-4 text-sm">
+            <p className="font-cond text-chalk">¿Cómo funciona el grupo de reservas?</p>
+            <ul className="list-inside list-disc space-y-1 text-chalk-2">
               <li>
                 Es una <strong>lista de espera</strong>: cuando alguien activo en la liga libere su cupo,
                 avisamos al grupo de reservas para que alguien pueda entrar de inmediato.
@@ -112,9 +106,9 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
           </div>
 
           {/* Ventajas */}
-          <div className="mb-6 rounded-xl border border-green-100 bg-green-50 p-4 text-sm space-y-2">
-            <p className="font-semibold text-green-900">Ventajas de estar en el grupo</p>
-            <ul className="list-inside list-disc space-y-1 text-gray-700">
+          <div className="mb-5 space-y-2 rounded-sm border border-line p-4 text-sm">
+            <p className="font-cond text-chalk">Ventajas de estar en el grupo</p>
+            <ul className="list-inside list-disc space-y-1 text-chalk-2">
               <li>
                 Ocasionalmente se organizan <strong>partidos dentro del mismo grupo de reservas</strong>,
                 así mantienes el ritmo y la comunidad.
@@ -132,24 +126,24 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
 
           {exito ? (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 p-5 text-center text-green-900"
+              className="rounded-sm border border-line bg-raised p-5 text-center"
               role="status"
             >
-              <p className="text-lg font-bold">¡Listo, recibimos tu solicitud!</p>
-              <p className="mt-2 text-sm">
+              <p className="font-cond text-lg text-chalk">Listo, recibimos tu solicitud</p>
+              <p className="mt-2 text-sm text-chalk-2">
                 Te contactaremos por WhatsApp cuando haya un cupo disponible. Si tienes dudas, escribe a{" "}
-                <a className="font-semibold text-green-700 underline" href={`mailto:${CONTACTO_LIGA_EMAIL}`}>
+                <a className="text-chalk underline underline-offset-2" href={`mailto:${CONTACTO_LIGA_EMAIL}`}>
                   {CONTACTO_LIGA_EMAIL}
                 </a>
                 .
               </p>
-              <Button
+              <button
                 type="button"
-                className="mt-4 bg-gray-800 text-white hover:bg-gray-700"
+                className="font-cond mt-4 cursor-pointer rounded-sm border border-line px-4 py-2 text-sm text-chalk-2 transition-colors hover:text-chalk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
                 onClick={() => setExito(false)}
               >
                 Enviar otra solicitud
-              </Button>
+              </button>
             </div>
           ) : (
             <form
@@ -168,8 +162,8 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
 
               {/* Nombre */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="nombre" className="text-sm font-semibold">
-                  Nombre completo <span className="text-red-600">*</span>
+                <label htmlFor="nombre" className="font-cond text-sm text-chalk-2">
+                  Nombre completo <span className="text-vivo">*</span>
                 </label>
                 <input
                   id="nombre"
@@ -177,15 +171,15 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   required
                   maxLength={120}
                   autoComplete="name"
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  className="rounded-sm border border-line bg-ink px-3 py-2.5 text-chalk placeholder:text-chalk-3 focus:border-chalk-3 focus:outline-none"
                   placeholder="Ej. Juan Pérez"
                 />
               </div>
 
               {/* Edad */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="edad" className="text-sm font-semibold">
-                  Edad <span className="text-red-600">*</span>
+                <label htmlFor="edad" className="font-cond text-sm text-chalk-2">
+                  Edad <span className="text-vivo">*</span>
                 </label>
                 <input
                   id="edad"
@@ -194,15 +188,15 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   required
                   min={14}
                   max={70}
-                  className="w-28 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  className="w-28 rounded-sm border border-line bg-ink px-3 py-2.5 text-chalk placeholder:text-chalk-3 focus:border-chalk-3 focus:outline-none"
                   placeholder="25"
                 />
               </div>
 
               {/* WhatsApp */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="whatsapp" className="text-sm font-semibold">
-                  Número de WhatsApp <span className="text-red-600">*</span>
+                <label htmlFor="whatsapp" className="font-cond text-sm text-chalk-2">
+                  Número de WhatsApp <span className="text-vivo">*</span>
                 </label>
                 <input
                   id="whatsapp"
@@ -211,15 +205,15 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   required
                   maxLength={20}
                   autoComplete="tel"
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+                  className="rounded-sm border border-line bg-ink px-3 py-2.5 text-chalk placeholder:text-chalk-3 focus:border-chalk-3 focus:outline-none"
                   placeholder="Ej. 3001234567"
                 />
               </div>
 
               {/* Posición */}
               <div className="flex flex-col gap-2">
-                <span className="text-sm font-semibold">
-                  Posición(es) en la que juegas <span className="text-red-600">*</span>
+                <span className="font-cond text-sm text-chalk-2">
+                  Posición(es) en la que juegas <span className="text-vivo">*</span>
                 </span>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {POSICIONES.map((p) => {
@@ -229,10 +223,11 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                         key={p}
                         type="button"
                         onClick={() => togglePosicion(p)}
-                        className={`rounded-lg border-2 px-3 py-2 text-sm font-semibold transition-all ${
+                        aria-pressed={selected}
+                        className={`font-cond rounded-sm border px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
                           selected
-                            ? "border-green-500 bg-green-50 text-green-800"
-                            : "border-gray-200 bg-white text-gray-700 hover:border-green-300"
+                            ? "border-chalk-3 bg-raised text-chalk"
+                            : "border-line text-chalk-3 hover:text-chalk-2"
                         }`}
                       >
                         {p}
@@ -241,7 +236,7 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                   })}
                 </div>
                 {posicionError && (
-                  <p className="text-xs text-red-600">Selecciona al menos una posición.</p>
+                  <p className="text-xs text-vivo">Selecciona al menos una posición.</p>
                 )}
                 {/* hidden input para netlify */}
                 <input type="hidden" name="posiciones" value={[...posiciones].join(", ")} />
@@ -254,9 +249,9 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                     type="checkbox"
                     name="disponibilidad_jueves"
                     required
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-green-600"
+                    className="mt-0.5 size-4 shrink-0 accent-chalk"
                   />
-                  <span className="text-sm text-gray-800">
+                  <span className="text-sm text-chalk-2">
                     Confirmo que puedo estar <strong>disponible todos los jueves a las 6:00 PM</strong> para
                     participar en las jornadas de la Liga PPT. Entiendo que esta es una condición
                     indispensable para pertenecer al grupo de reservas.
@@ -266,23 +261,23 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
 
               {error ? (
                 <p
-                  className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900"
+                  className="rounded-sm bg-vivo/15 px-3 py-2.5 text-sm text-chalk-2"
                   role="alert"
                 >
                   {error}
                 </p>
               ) : null}
 
-              <Button
+              <button
                 type="submit"
                 disabled={enviando}
-                className="w-full bg-green-600 text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="font-cond w-full cursor-pointer rounded-sm bg-chalk px-4 py-3 text-sm text-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
               >
                 {enviando ? "Enviando…" : "Enviar solicitud"}
-              </Button>
+              </button>
             </form>
           )}
-        </Card>
+        </div>
       </div>
     </div>
   );

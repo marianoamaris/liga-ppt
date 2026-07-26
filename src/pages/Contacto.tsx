@@ -1,81 +1,74 @@
 import React from "react";
-import { Card } from "../components/common/Card";
-import { FaRegEnvelope, FaYoutube, FaInstagram } from "react-icons/fa";
+import type { IconType } from "react-icons";
+import { FaRegEnvelope } from "react-icons/fa6";
+import { FaYoutube, FaInstagram } from "react-icons/fa6";
+import { CONTACTO_LIGA_EMAIL } from "../constants/ACTUALIZACION_DATOS_JUGADOR";
+
+interface Canal {
+  id: string;
+  Icono: IconType;
+  titulo: string;
+  descripcion: string;
+  etiqueta: string;
+  href: string;
+  externo?: boolean;
+}
+
+const CANALES: Canal[] = [
+  {
+    id: "correo",
+    Icono: FaRegEnvelope,
+    titulo: "Correo",
+    descripcion: "Dudas, sugerencias o cualquier cosa sobre la liga.",
+    etiqueta: CONTACTO_LIGA_EMAIL,
+    href: `mailto:${CONTACTO_LIGA_EMAIL}`,
+  },
+  {
+    id: "youtube",
+    Icono: FaYoutube,
+    titulo: "YouTube",
+    descripcion: "Partidos completos, resúmenes y lo mejor de cada jornada.",
+    etiqueta: "@ligappt",
+    href: "https://www.youtube.com/@ligappt",
+    externo: true,
+  },
+  {
+    id: "instagram",
+    Icono: FaInstagram,
+    titulo: "Instagram",
+    descripcion: "Resultados del día, goleadores, arqueros y MVPs.",
+    etiqueta: "@ligappt",
+    href: "https://www.instagram.com/ligappt",
+    externo: true,
+  },
+];
 
 export const Contacto: React.FC = () => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] w-full p-4">
-    <div className="w-full max-w-4xl space-y-6">
-      {/* Card principal de bienvenida */}
-      <Card className="flex flex-col items-center justify-center w-full p-8 text-white bg-black border border-black">
-        <img
-          src="/PPT.png"
-          alt="Logo Liga PPT"
-          className="object-contain w-24 h-24 mb-4 shadow-xl"
-        />
-        <div className="mb-2 text-2xl font-bold text-white">
-          ¿Necesitas información?
-        </div>
-        <div className="mb-4 text-base text-center text-white/90">
-          Conecta con la Liga PPT a través de nuestros canales oficiales
-        </div>
-      </Card>
-
-      {/* Cards de contacto */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {/* Email */}
-        <Card className="flex flex-col items-center justify-center p-6 text-center bg-white hover:shadow-lg transition-shadow">
-          <FaRegEnvelope className="mb-3 text-pink-600" size={32} />
-          <h3 className="mb-2 text-lg font-bold text-gray-800">
-            Correo Oficial
-          </h3>
-          <p className="mb-4 text-sm text-gray-600">
-            Para dudas, sugerencias o información adicional sobre la Liga PPT
-          </p>
-          <a
-            href="mailto:contacto@ligappt.com"
-            className="px-4 py-2 text-sm font-semibold text-white bg-pink-600 rounded hover:bg-pink-700 transition"
-          >
-            contacto@ligappt.com
-          </a>
-        </Card>
-
-        {/* YouTube */}
-        <Card className="flex flex-col items-center justify-center p-6 text-center bg-white hover:shadow-lg transition-shadow">
-          <FaYoutube className="mb-3 text-red-600" size={32} />
-          <h3 className="mb-2 text-lg font-bold text-gray-800">
-            Canal de YouTube
-          </h3>
-          <p className="mb-4 text-sm text-gray-600">
-            Mira los partidos completos, highlights y contenido exclusivo de la
-            Liga PPT
-          </p>
-          <a
-            href="https://www.youtube.com/@ligappt"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded hover:bg-red-700 transition"
-          >
-            @ligappt
-          </a>
-        </Card>
-
-        {/* Instagram */}
-        <Card className="flex flex-col items-center justify-center p-6 text-center bg-white hover:shadow-lg transition-shadow">
-          <FaInstagram className="mb-3 text-purple-600" size={32} />
-          <h3 className="mb-2 text-lg font-bold text-gray-800">Instagram</h3>
-          <p className="mb-4 text-sm text-gray-600">
-            Resúmenes rápidos, premios de goleador, mejor arquero, MVPs y más
-          </p>
-          <a
-            href="https://www.instagram.com/ligappt?igsh=MXRyeTBsNTZlMHNhNQ%3D%3D&utm_source=qr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded hover:bg-purple-700 transition"
-          >
-            @ligappt
-          </a>
-        </Card>
+  <div className="min-h-full bg-ink text-chalk">
+    <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
+      <div>
+        <h1 className="font-cond text-2xl text-chalk">Contacto</h1>
+        <p className="mt-1 max-w-prose text-sm text-chalk-3">
+          Los canales oficiales de la Liga PPT.
+        </p>
       </div>
+
+      <ul className="grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-3">
+        {CANALES.map(({ id, Icono, titulo, descripcion, etiqueta, href, externo }) => (
+          <li key={id}>
+            <a
+              href={href}
+              {...(externo ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              className="flex h-full flex-col gap-2 rounded-md border border-line bg-surface p-4 transition-colors hover:border-chalk-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+            >
+              <Icono aria-hidden className="size-5 text-chalk-2" />
+              <h2 className="font-cond text-base text-chalk">{titulo}</h2>
+              <p className="flex-1 text-sm text-chalk-3">{descripcion}</p>
+              <span className="font-cond text-sm text-chalk-2">{etiqueta}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 );

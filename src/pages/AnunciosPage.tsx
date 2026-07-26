@@ -1,167 +1,111 @@
-import React, { useState } from "react";
-import {
-  CHANGELOG_DATA,
-  type ChangelogEntry,
-  type ChangeType,
-} from "../constants/CHANGELOG";
-import { IoIosArrowDown } from "react-icons/io";
-import { FaShareAlt, FaWhatsapp, FaFacebookF } from "react-icons/fa";
-import { AnnouncementCard } from "../components/common/AnnouncementCard";
-import { Liga19MundialAnnouncement } from "../components/anuncios/Liga19MundialAnnouncement";
-import { EnVivoAnuncio } from "../components/anuncios/EnVivoAnuncio";
-import { GrupoReservasAnuncio } from "../components/anuncios/GrupoReservasAnuncio";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { FaShareNodes, FaWhatsapp } from "react-icons/fa6";
+import { CONTACTO_LIGA_EMAIL } from "../constants/ACTUALIZACION_DATOS_JUGADOR";
 
-const getBadgeClass = (type: ChangeType) => {
-  switch (type) {
-    case "NUEVO":
-      return "bg-green-100 text-green-800";
-    case "MEJORA":
-      return "bg-blue-100 text-blue-800";
-    case "FIX":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+const TITULO = "¿Quieres jugar en la Liga PPT?";
+const TEXTO =
+  "Abrimos el grupo de reservas: una lista de espera oficial para quienes quieran unirse. " +
+  "Inscríbete, completa tu perfil y serás de los primeros en entrar cuando haya un cupo.";
 
-const ChangelogItem: React.FC<{ entry: ChangelogEntry }> = ({ entry }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+/**
+ * Anuncios.
+ *
+ * Antes acumulaba el historial completo de versiones de la app junto a tres
+ * anuncios de ediciones ya cerradas. El historial de versiones interesa a quien
+ * desarrolla, no a quien juega, así que queda solo lo accionable: cómo entrar.
+ */
+export const AnunciosPage: React.FC = () => {
+  const navigate = useNavigate();
 
-  const url = `${window.location.origin}/anuncios#${entry.version}`;
+  const url =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/participa-en-la-liga-ppt`
+      : "/participa-en-la-liga-ppt";
 
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const copiarEnlace = () => {
+    if (typeof navigator === "undefined") return;
     if (navigator.share) {
-      navigator.share({
-        title: entry.title,
-        text: entry.description,
-        url,
-      });
-    } else {
-      navigator.clipboard.writeText(url);
-      alert("Enlace copiado al portapapeles");
+      void navigator.share({ title: TITULO, text: TEXTO, url });
+    } else if (navigator.clipboard) {
+      void navigator.clipboard.writeText(url);
     }
   };
 
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-    entry.title + "\n" + entry.description + "\n" + url
-  )}`;
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-    url
-  )}`;
-
   return (
-    <AnnouncementCard onClick={() => setIsExpanded(!isExpanded)}>
-      {/* Top black section with logo */}
-      <div className="flex items-center justify-center p-6 bg-black">
-        <img
-          src="/PPT.png"
-          alt="Logo Liga PPT"
-          className="object-contain w-24 h-24"
-        />
-      </div>
+    <div className="min-h-full bg-ink text-chalk">
+      <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
+        <div>
+          <h1 className="font-cond text-2xl text-chalk">Anuncios</h1>
+          <p className="mt-1 text-sm text-chalk-3">Lo último de la Liga PPT.</p>
+        </div>
 
-      {/* Bottom white section */}
-      <div className="p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">{entry.title}</h2>
-          <div className="flex items-center gap-2">
-            <span className="hidden mr-2 text-sm text-gray-500 sm:block">
-              {entry.date}
+        <article className="flex flex-col gap-4 rounded-md border border-line bg-surface p-5">
+          <div>
+            <span className="font-cond inline-flex items-center gap-2 text-[0.6875rem] text-vivo">
+              <span className="size-1.5 rounded-full bg-vivo" />
+              Inscripciones abiertas
             </span>
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="p-2 text-green-600 transition rounded-full bg-green-50 hover:bg-green-100 hover:text-green-800"
-              title="Compartir en WhatsApp"
-            >
-              <FaWhatsapp size={18} />
-            </a>
-            <a
-              href={facebookUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="p-2 text-blue-600 transition rounded-full bg-blue-50 hover:bg-blue-100 hover:text-blue-800"
-              title="Compartir en Facebook"
-            >
-              <FaFacebookF size={16} />
-            </a>
+            <h2 className="font-cond mt-2 text-xl text-chalk">{TITULO}</h2>
+          </div>
+
+          <p className="max-w-prose text-sm text-chalk-2">{TEXTO}</p>
+
+          <ul className="flex flex-col gap-2 border-t border-line pt-4 text-sm text-chalk-2">
+            <li className="flex gap-3">
+              <span className="font-cond w-16 shrink-0 text-chalk-3">Cuándo</span>
+              Los jueves, a las 6:00 PM
+            </li>
+            <li className="flex gap-3">
+              <span className="font-cond w-16 shrink-0 text-chalk-3">Dónde</span>
+              Valledupar
+            </li>
+            <li className="flex gap-3">
+              <span className="font-cond w-16 shrink-0 text-chalk-3">Cómo</span>
+              Déjanos tus datos y te escribimos cuando se abra un cupo
+            </li>
+          </ul>
+
+          <div className="flex flex-wrap gap-2">
             <button
-              onClick={handleShare}
-              className="p-2 text-gray-500 transition bg-gray-100 rounded-full hover:bg-gray-200 hover:text-gray-700"
-              title="Compartir anuncio"
+              type="button"
+              onClick={() => navigate("/participa-en-la-liga-ppt")}
+              className="font-cond cursor-pointer rounded-sm bg-chalk px-4 py-2.5 text-sm text-ink transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
             >
-              <FaShareAlt size={18} />
+              Quiero inscribirme
             </button>
-            <IoIosArrowDown
-              className={`text-gray-500 transition-transform duration-300 ${
-                isExpanded ? "rotate-180" : ""
-              }`}
-              size={20}
-            />
-          </div>
-        </div>
-        <p className="mt-2 text-sm text-gray-600">{entry.description}</p>
-        <span className="mt-2 text-xs text-gray-500 sm:hidden">
-          {entry.date}
-        </span>
 
-        {/* Expanded content */}
-        {isExpanded && (
-          <div className="pt-4 mt-4 border-t border-gray-200">
-            <h3 className="mb-3 text-sm font-semibold text-gray-800">
-              Detalles de los cambios:
-            </h3>
-            <ul className="space-y-3">
-              {entry.changes.map((change, index) => (
-                <li key={index} className="flex items-start text-sm">
-                  <span
-                    className={`text-xs font-semibold mr-3 px-2.5 py-0.5 rounded-full ${getBadgeClass(
-                      change.type
-                    )}`}
-                  >
-                    {change.type}
-                  </span>
-                  <span className="flex-1 text-gray-700">
-                    {change.description}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <div className="mt-4 text-right">
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-gray-500 bg-gray-100 rounded-lg">
-            Versión {entry.version}
-          </span>
-        </div>
-      </div>
-    </AnnouncementCard>
-  );
-};
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(`${TITULO} ${url}`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="font-cond inline-flex cursor-pointer items-center gap-2 rounded-sm border border-line px-4 py-2.5 text-sm text-chalk-2 transition-colors hover:text-chalk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+            >
+              <FaWhatsapp aria-hidden className="size-4" />
+              Compartir
+            </a>
 
-export const AnunciosPage: React.FC = () => {
-  return (
-    <div className="flex flex-col items-center w-full min-h-screen p-2 md:p-4">
-      <div className="w-full max-w-4xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Historial de Cambios y Anuncios
-          </h1>
-          <p className="max-w-2xl mx-auto mt-2 text-base text-gray-600">
-            Últimas novedades de la Liga PPT, modalidades y premios. Más abajo,
-            el historial de cambios y anuncios anteriores.
-          </p>
-        </div>
-        <GrupoReservasAnuncio />
-        <EnVivoAnuncio />
-        <Liga19MundialAnnouncement />
-        {CHANGELOG_DATA.map((entry) => (
-          <ChangelogItem key={entry.version} entry={entry} />
-        ))}
+            <button
+              type="button"
+              onClick={copiarEnlace}
+              className="font-cond inline-flex cursor-pointer items-center gap-2 rounded-sm border border-line px-4 py-2.5 text-sm text-chalk-2 transition-colors hover:text-chalk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+            >
+              <FaShareNodes aria-hidden className="size-4" />
+              Copiar enlace
+            </button>
+          </div>
+        </article>
+
+        <p className="text-sm text-chalk-3">
+          ¿Dudas? Escríbenos a{" "}
+          <a
+            href={`mailto:${CONTACTO_LIGA_EMAIL}`}
+            className="text-chalk-2 underline underline-offset-2 transition-colors hover:text-chalk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+          >
+            {CONTACTO_LIGA_EMAIL}
+          </a>
+          .
+        </p>
       </div>
     </div>
   );

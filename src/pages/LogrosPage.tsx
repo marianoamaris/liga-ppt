@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { UsuarioLiga } from "../types/jugador";
 import { useJugadores } from "../hooks/useCatalogo";
+import { Puesto } from "../components/common/iconos";
 import { fotoJugadorPorNombre } from "../utils/fotosJugadores";
-import noPhoto from "../assets/no-photo.jpg";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -36,13 +36,13 @@ type EquipoRecord = {
 // ── Records ────────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: "mas_goles_liga",        label: "Goles en liga",    icon: "⚽" },
-  { id: "mas_goles_jornada",     label: "Goles en jornada", icon: "🔥" },
-  { id: "menos_goles_recibidos", label: "Menos goles arco", icon: "🧤" },
-  { id: "mas_puntos_equipo",     label: "Más puntos",       icon: "🏅" },
-  { id: "mas_puntos_jornada",    label: "Puntos en jornada", icon: "⚡" },
-  { id: "menos_puntos_jornada",  label: "Menos pts jornada", icon: "💀" },
-  { id: "menos_puntos_equipo",   label: "Menos puntos",     icon: "📉" },
+  { id: "mas_goles_liga",        label: "Goles en una liga" },
+  { id: "mas_goles_jornada",     label: "Goles en una jornada" },
+  { id: "menos_goles_recibidos", label: "Menos goles recibidos" },
+  { id: "mas_puntos_equipo",     label: "Más puntos de un equipo" },
+  { id: "mas_puntos_jornada",    label: "Más puntos en una jornada" },
+  { id: "menos_puntos_jornada",  label: "Menos puntos en una jornada" },
+  { id: "menos_puntos_equipo",   label: "Menos puntos de un equipo" },
 ] as const;
 
 type RecordId = (typeof TABS)[number]["id"];
@@ -144,65 +144,50 @@ const SLOTS = [
     dataIdx: 1,
     rank: 2,
     barH: 104,
-    gradFrom: "#475569",
-    gradTo:   "#94a3b8",
-    glowColor: "rgba(148,163,184,0.25)",
-    textShade: "#cbd5e1",
-    medal: "🥈",
-    label: "PLATA",
+    tono: "var(--color-chalk-2)",
+    label: "Segundo",
   },
   {
     dataIdx: 0,
     rank: 1,
     barH: 160,
-    gradFrom: "#b45309",
-    gradTo:   "#fbbf24",
-    glowColor: "rgba(251,191,36,0.35)",
-    textShade: "#fef3c7",
-    medal: "🥇",
-    label: "ORO",
+    tono: "var(--color-chalk)",
+    label: "Primero",
   },
   {
     dataIdx: 2,
     rank: 3,
     barH: 72,
-    gradFrom: "#92400e",
-    gradTo:   "#d97706",
-    glowColor: "rgba(217,119,6,0.25)",
-    textShade: "#fde68a",
-    medal: "🥉",
-    label: "BRONCE",
+    tono: "var(--color-chalk-3)",
+    label: "Tercero",
   },
 ];
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function PlayerAvatar({ user, size }: { user: UsuarioLiga; size: number }) {
-  const src = user.username === "sirama" ? noPhoto : fotoJugadorPorNombre(user.name);
+  const src = fotoJugadorPorNombre(user.name);
   return (
     <div
-      className="rounded-full overflow-hidden shrink-0 border-2 border-white/20"
+      className="shrink-0 overflow-hidden rounded-full bg-raised ring-2 ring-line"
       style={{ width: size, height: size }}
     >
       {src ? (
-        <img
-          src={src}
-          alt={user.name}
-          className="w-full h-full object-cover object-top"
-        />
+        <img src={src} alt="" className="size-full object-cover object-top" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-800 text-xl">
-          ⚽
-        </div>
+        <span className="font-cond grid size-full place-items-center text-chalk-3">
+          {user.name.charAt(0)}
+        </span>
       )}
     </div>
   );
 }
 
+/** Los récords de equipo se identifican por su color de camiseta. */
 function TeamDot({ color, size }: { color: string; size: number }) {
   return (
     <div
-      className="rounded-full border-2 border-white/25 shadow-lg shrink-0"
+      className="shrink-0 rounded-full ring-2 ring-chalk-3"
       style={{ width: size, height: size, background: color }}
     />
   );
@@ -220,21 +205,7 @@ export const LogrosPage: React.FC = () => {
   const data = records[selected];
 
   return (
-    <div
-      className="min-h-screen rounded-2xl overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #060c06 0%, #0a160a 50%, #0d1f0d 100%)",
-      }}
-    >
-      {/* Subtle pitch glow at bottom */}
-      <div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 40% at 50% 105%, rgba(34,197,94,0.07) 0%, transparent 70%)",
-        }}
-      />
-
+    <div className="min-h-full bg-ink">
       {/* Header */}
       <div className="relative pt-10 pb-2 text-center">
         <motion.div
@@ -242,16 +213,10 @@ export const LogrosPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-green-500/50 text-[10px] tracking-[0.35em] uppercase font-semibold mb-2">
+          <p className="font-cond mb-2 text-[0.625rem] text-chalk-3">
             Liga PPT · Todos los tiempos
           </p>
-          <h1
-            className="text-5xl font-black text-white uppercase tracking-[0.18em] mb-1"
-            style={{ textShadow: "0 0 40px rgba(251,191,36,0.2)" }}
-          >
-            RÉCORDS
-          </h1>
-          <div className="w-16 h-0.5 mx-auto mt-3 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent" />
+          <h1 className="font-cond text-4xl text-chalk">Récords</h1>
         </motion.div>
       </div>
 
@@ -268,21 +233,13 @@ export const LogrosPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06, duration: 0.3 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative px-4 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200"
-                style={{
-                  border: active
-                    ? "1px solid rgba(251,191,36,0.6)"
-                    : "1px solid rgba(255,255,255,0.1)",
-                  color: active ? "#fbbf24" : "rgba(255,255,255,0.4)",
-                  background: active
-                    ? "rgba(251,191,36,0.08)"
-                    : "rgba(255,255,255,0.03)",
-                  boxShadow: active
-                    ? "0 0 16px rgba(251,191,36,0.18), inset 0 0 8px rgba(251,191,36,0.06)"
-                    : "none",
-                }}
+                aria-pressed={active}
+                className={`font-cond rounded-sm border px-3 py-1.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
+                  active
+                    ? "border-chalk-3 bg-raised text-chalk"
+                    : "border-line text-chalk-3 hover:text-chalk-2"
+                }`}
               >
-                <span className="mr-1.5">{tab.icon}</span>
                 {tab.label}
               </motion.button>
             );
@@ -300,7 +257,7 @@ export const LogrosPage: React.FC = () => {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="relative px-4 pt-6 pb-10"
         >
-          <p className="text-center text-white/25 text-[10px] uppercase tracking-widest mb-10">
+          <p className="font-cond mb-10 text-center text-[0.6875rem] text-chalk-3">
             {data.label}
           </p>
 
@@ -325,22 +282,11 @@ export const LogrosPage: React.FC = () => {
                 >
                   {/* Card */}
                   <div
-                    className="w-full rounded-2xl p-3 flex flex-col items-center gap-2 mb-2"
-                    style={{
-                      background: "rgba(255,255,255,0.04)",
-                      border: isGold
-                        ? `1px solid rgba(251,191,36,0.3)`
-                        : `1px solid rgba(255,255,255,0.07)`,
-                      backdropFilter: "blur(8px)",
-                      boxShadow: isGold
-                        ? `0 0 40px ${slot.glowColor}, 0 8px 32px rgba(0,0,0,0.4)`
-                        : `0 4px 20px rgba(0,0,0,0.3)`,
-                    }}
+                    className={`mb-2 flex w-full flex-col items-center gap-2 rounded-md border bg-surface p-3 ${
+                      isGold ? "border-chalk-3" : "border-line"
+                    }`}
                   >
-                    {/* Medal */}
-                    <span className={isGold ? "text-3xl" : "text-2xl"}>
-                      {slot.medal}
-                    </span>
+                    <Puesto n={slot.rank} className={isGold ? "size-6 text-xs" : ""} />
 
                     {/* Avatar / team dot */}
                     {data.type === "user" ? (
@@ -358,64 +304,44 @@ export const LogrosPage: React.FC = () => {
                     {/* Name */}
                     <div className="text-center px-1">
                       <div
-                        className="font-bold leading-tight text-white"
-                        style={{ fontSize: isGold ? "0.85rem" : "0.72rem" }}
+                        className="font-cond leading-tight text-chalk"
+                        style={{ fontSize: isGold ? "0.9rem" : "0.78rem" }}
                       >
                         {data.type === "user"
                           ? (item as UsuarioLiga).name
                           : (item as TeamData).equipo}
                       </div>
                       {data.type === "user" ? (
-                        <div className="text-gray-500 text-[10px]">
+                        <div className="text-[0.625rem] text-chalk-3">
                           @{(item as UsuarioLiga).username}
                         </div>
                       ) : (
-                        <div className="text-gray-500 text-[10px]">
-                          Liga {(item as TeamData).temporada}
+                        <div className="font-cond text-[0.625rem] text-chalk-3">
+                          Edición {(item as TeamData).temporada}
                         </div>
                       )}
                     </div>
 
                     {/* Stat */}
                     <div
-                      className="font-black leading-none"
-                      style={{
-                        fontSize: isGold ? "2rem" : "1.5rem",
-                        color: slot.gradTo,
-                        textShadow: `0 0 20px ${slot.glowColor}`,
-                      }}
+                      className="tnum font-data leading-none font-bold tracking-tight"
+                      style={{ fontSize: isGold ? "2rem" : "1.5rem", color: slot.tono }}
                     >
                       {stat}
                     </div>
-                    <div className="text-gray-600 text-[10px] -mt-1 uppercase tracking-wider">
+                    <div className="font-cond -mt-1 text-[0.625rem] text-chalk-3">
                       {data.statLabel}
                     </div>
                   </div>
 
                   {/* Podium block */}
                   <div
-                    className="w-full rounded-t-xl flex items-center justify-center relative overflow-hidden"
-                    style={{
-                      height: slot.barH,
-                      background: `linear-gradient(180deg, ${slot.gradFrom} 0%, ${slot.gradFrom}44 100%)`,
-                      borderTop: `2px solid ${slot.gradTo}60`,
-                    }}
+                    className="relative flex w-full items-center justify-center overflow-hidden rounded-t-md bg-surface"
+                    style={{ height: slot.barH, borderTop: `2px solid ${slot.tono}` }}
                   >
-                    {/* Shine line at top */}
-                    <div
-                      className="absolute top-0 inset-x-0 h-px"
-                      style={{
-                        background: `linear-gradient(90deg, transparent, ${slot.gradTo}90, transparent)`,
-                      }}
-                    />
                     <span
-                      className="font-black select-none"
-                      style={{
-                        fontSize: isGold ? "5rem" : "3.5rem",
-                        color: slot.textShade,
-                        opacity: 0.15,
-                        lineHeight: 1,
-                      }}
+                      className="tnum font-data leading-none font-bold select-none opacity-[0.12]"
+                      style={{ fontSize: isGold ? "5rem" : "3.5rem", color: slot.tono }}
                     >
                       {slot.rank}
                     </span>
@@ -425,14 +351,8 @@ export const LogrosPage: React.FC = () => {
             })}
           </div>
 
-          {/* Floor line */}
-          <div
-            className="max-w-2xl mx-auto mt-0 h-0.5"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 80%, transparent)",
-            }}
-          />
+          {/* Suelo del podio */}
+          <div className="mx-auto h-px max-w-2xl bg-line" />
         </motion.div>
       </AnimatePresence>
     </div>

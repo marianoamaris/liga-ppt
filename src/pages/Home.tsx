@@ -5,7 +5,6 @@ import { useInicio } from "../hooks/useInicio";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
 import { Marcador } from "../components/Home/Marcador";
 import { PATROCINADORES } from "../constants/PATROCINADORES";
-import { CHANGELOG_DATA } from "../constants/CHANGELOG";
 import type { Arquero, Goleador, Standing } from "../lib/api";
 
 /**
@@ -149,8 +148,6 @@ export const Home: React.FC = () => {
     error,
   } = useInicio();
   const { locales: catalogo, colorDe } = useEquiposEdicion(EDICION_ACTUAL);
-
-  const ultimaNovedad = CHANGELOG_DATA[0];
 
   const topGoleadores = goleadores.slice(0, 3).map((g: Goleador) => ({
     id: `${g.jugador}-${g.equipoId}`,
@@ -309,25 +306,24 @@ export const Home: React.FC = () => {
           </ul>
         </section>
 
-        {ultimaNovedad && (
-          <section className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-raised px-4 py-3">
-            <div className="min-w-0">
-              <div className="font-cond text-sm text-chalk">
-                Novedades · v{ultimaNovedad.version}
-              </div>
-              <p className="truncate text-[0.6875rem] text-chalk-3">
-                {ultimaNovedad.title}
-              </p>
+        {/* La liga está llena, pero el grupo de reservas sigue abierto */}
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-raised px-4 py-3">
+          <div className="min-w-0">
+            <div className="font-cond text-sm text-chalk">
+              ¿Quieres jugar en la Liga PPT?
             </div>
-            <button
-              type="button"
-              onClick={() => navigate("/anuncios")}
-              className="font-cond cursor-pointer rounded-sm bg-chalk px-3 py-2 text-xs text-ink transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
-            >
-              Ver anuncios
-            </button>
-          </section>
-        )}
+            <p className="text-[0.6875rem] text-chalk-3">
+              Apúntate al grupo de reservas y te avisamos cuando haya cupo.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/participa-en-la-liga-ppt")}
+            className="font-cond cursor-pointer rounded-sm bg-chalk px-3 py-2 text-xs text-ink transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+          >
+            Inscribirme
+          </button>
+        </section>
       </div>
     </div>
   );
