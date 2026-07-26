@@ -1,10 +1,14 @@
 /**
- * Resuelve la URL de la foto en `src/assets/FOTOS_JUGADORES/`
- * comparando el nombre del jugador con el nombre del archivo (sin extensión).
+ * Resuelve la URL de la foto de un jugador comparando el nombre con el del
+ * archivo (sin extensión).
+ *
+ * Se leen las miniaturas, no los originales: estos pesan entre 3 y 6 MB cada
+ * uno y se muestran en fichas de 64 px, así que la página de Historia llegaba
+ * a pedir cientos de megas. Las genera `scripts/generar-miniaturas.sh`.
  */
 
 const modules = import.meta.glob<string>(
-  "../assets/FOTOS_JUGADORES/*.{png,jpg,jpeg,webp}",
+  "../assets/FOTOS_JUGADORES_MIN/*.{png,jpg,jpeg,webp}",
   { eager: true, query: "?url", import: "default" }
 );
 
@@ -44,4 +48,14 @@ export function fotoJugadorPorNombre(nombre: string): string | null {
   let k = normKey(nombre);
   k = ALIASES[k] ?? k;
   return stemToUrl.get(k) ?? null;
+}
+
+/**
+ * Resuelve la foto a partir del archivo que consta en la base
+ * (`jugadores.foto_archivo`), que es el dato fiable: se calculó al migrar
+ * cruzando el padrón con los archivos reales, incluidos los alias.
+ */
+export function fotoJugadorPorArchivo(archivo: string | null): string | null {
+  if (!archivo) return null;
+  return stemToUrl.get(normKey(archivo.replace(/\.[^.]+$/i, ""))) ?? null;
 }

@@ -38,10 +38,10 @@ export const Historia: React.FC = () => {
   const [tab, setTab] = useState("jugadores");
   const [posicion, setPosicion] = useState<"todas" | Posicion>("todas");
   const [search, setSearch] = useState<string>("");
-  const { usuarios, loading, error } = useJugadores();
+  const { jugadores, loading, error } = useJugadores();
 
   // Conteo total de jugadores por posición
-  const conteoPorPosicion = usuarios.reduce(
+  const conteoPorPosicion = jugadores.reduce(
     (acc, u) => {
       acc[u.posicion] = (acc[u.posicion] || 0) + 1;
       return acc;
@@ -61,27 +61,27 @@ export const Historia: React.FC = () => {
       ? `No se pudo cargar el padrón: ${error}`
       : null;
 
-  const usuariosFiltrados = usuarios.filter((u) => {
-    // First apply search filter if there's a search term
-    if (search && !u.name.toLowerCase().includes(search.toLowerCase())) {
-      return false;
+  const usuariosFiltrados = jugadores.filter((u) => {
+    // La búsqueda también mira el apodo: mucha gente conoce a un jugador por él
+    if (search) {
+      const q = search.toLowerCase();
+      const coincide =
+        u.nombre.toLowerCase().includes(q) ||
+        (u.apodo?.toLowerCase().includes(q) ?? false);
+      if (!coincide) return false;
     }
 
     if (tab === "jugadores") {
-      if (posicion === "todas") return true;
-      return (
-        u.posicion &&
-        u.posicion.trim().toLowerCase() === posicion.trim().toLowerCase()
-      );
+      return posicion === "todas" || u.posicion === posicion;
     }
     if (tab === "admins") {
-      return u.esAdmin;
+      return u.es_admin;
     }
     return false;
   });
 
   return (
-    <div className="flex min-w-0 w-full max-w-full flex-col gap-8 p-3 lg:flex-row">
+    <div className="flex min-h-full w-full max-w-full min-w-0 flex-col gap-6 bg-ink p-4 text-chalk lg:flex-row">
       <SidebarTabs
         tabs={TABS}
         tabSeleccionada={tab}
@@ -89,113 +89,69 @@ export const Historia: React.FC = () => {
         setSearch={setSearch}
       />
       <div className="min-w-0 flex-1">
-        {tab === "jugadores" && (
-          <>
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-              {/* Filtros de posición */}
-              <div className="flex flex-wrap gap-2">
-                {POSICIONES.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      setPosicion(p.id);
-                      setSearch("");
-                    }}
-                    className={`px-3 py-1 rounded-full font-semibold border transition text-xs
-                      ${
-                        posicion === p.id
-                          ? "bg-blue-700 text-white border-blue-700"
-                          : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
-                      }
-                    `}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-              {/* Conteo total de jugadores por posición con tooltips y mayor tamaño */}
-              <div className="flex items-center gap-6">
-                <div
-                  className="relative flex flex-col items-center cursor-pointer group"
-                  title="Arqueros"
-                >
-                  <span className="text-2xl">🧤</span>
-                  <span className="text-lg font-bold text-gray-700">
-                    {conteoPorPosicion.arquero}
-                  </span>
-                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
-                    Arqueros
-                  </span>
+        {(tab === "jugadores" || tab === "admins") && (
+          <div className="flex flex-col gap-4">
+            {tab === "jugadores" && (
+              <>
+                {/* El conteo por posición vive en el propio filtro: antes era una
+                    fila de emojis aparte que repetía la misma información. */}
+                <div className="flex flex-wrap gap-2">
+                  {POSICIONES.map((p) => {
+                    const n =
+                      p.id === "todas"
+                        ? jugadores.length
+                        : conteoPorPosicion[p.id];
+                    const activo = posicion === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPosicion(p.id)}
+                        aria-pressed={activo}
+                        className={`font-cond flex items-center gap-2 rounded-sm border px-3 py-1.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
+                          activo
+                            ? "border-chalk-3 bg-raised text-chalk"
+                            : "border-line text-chalk-3 hover:text-chalk-2"
+                        }`}
+                      >
+                        {p.label}
+                        <span className="tnum font-data text-[0.625rem] text-chalk-3">
+                          {n}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <div
-                  className="relative flex flex-col items-center cursor-pointer group"
-                  title="Defensas"
-                >
-                  <span className="text-2xl">🛡️</span>
-                  <span className="text-lg font-bold text-gray-700">
-                    {conteoPorPosicion.defensa}
-                  </span>
-                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
-                    Defensas
-                  </span>
-                </div>
-                <div
-                  className="relative flex flex-col items-center cursor-pointer group"
-                  title="Mediocampistas"
-                >
-                  <span className="text-2xl">🎽</span>
-                  <span className="text-lg font-bold text-gray-700">
-                    {conteoPorPosicion.mediocampista}
-                  </span>
-                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
-                    Mediocampistas
-                  </span>
-                </div>
-                <div
-                  className="relative flex flex-col items-center cursor-pointer group"
-                  title="Delanteros"
-                >
-                  <span className="text-2xl">🥅</span>
-                  <span className="text-lg font-bold text-gray-700">
-                    {conteoPorPosicion.delantero}
-                  </span>
-                  <span className="absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
-                    Delanteros
-                  </span>
-                </div>
-              </div>
-            </div>
-            <SearchInput
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <div
-              className={
-                !usuariosFiltrados.length
-                  ? ""
-                  : "grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-              }
-            >
-              {!usuariosFiltrados.length ? (
-                <span className="text-sm text-center text-gray-500 md:text-base">
-                  {estadoPadron ?? "No hay jugadores para mostrar"}
-                </span>
-              ) : (
-                usuariosFiltrados.map((user) => (
-                  <UserCard key={user.username} user={user} />
-                ))
-              )}
-            </div>
-          </>
-        )}
-        {tab === "admins" && (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+
+                <SearchInput
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </>
+            )}
+
             {estadoPadron ? (
-              <span className="text-sm text-gray-500 md:text-base">{estadoPadron}</span>
+              <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+                {estadoPadron}
+              </p>
+            ) : usuariosFiltrados.length ? (
+              <>
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-3">
+                  {usuariosFiltrados.map((user) => (
+                    <UserCard key={user.slug} jugador={user} />
+                  ))}
+                </div>
+                <p className="font-cond text-[0.6875rem] text-chalk-3">
+                  {usuariosFiltrados.length}{" "}
+                  {usuariosFiltrados.length === 1 ? "jugador" : "jugadores"}
+                </p>
+              </>
             ) : (
-              usuariosFiltrados.map((user) => (
-                <UserCard key={user.username} user={user} />
-              ))
+              <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+                {search
+                  ? `Nadie coincide con «${search}».`
+                  : "No hay jugadores para mostrar."}
+              </p>
             )}
           </div>
         )}
