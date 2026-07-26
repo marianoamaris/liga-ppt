@@ -6,6 +6,19 @@ import { getTextColor, computeScores, formatElapsed } from "../components/anotad
 import { EDICION_ACTUAL } from "../config";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
 import type { EquipoLocal } from "../types/jugador";
+import {
+  ICONO_MODO,
+  IconoAnotador,
+  IconoArquero,
+  IconoAutogol,
+  IconoEmpate,
+  IconoGol,
+  IconoJornada,
+  IconoRapido,
+  IconoSalvador,
+  Puesto,
+  Tarjeta,
+} from "../components/common/iconos";
 import type { EquipoEnCancha, Evento } from "../components/anotador/types";
 
 /**
@@ -33,9 +46,7 @@ const MODO_LABEL: Record<string, string> = {
   semifinal: "Semifinal",
   final:     "Final",
 };
-const MODO_ICON: Record<string, string> = {
-  jornada: "⚽", cuartos: "🎯", semifinal: "⚡", final: "🏆",
-};
+
 
 function toLocalEquipo(
   eq: Partido["equipos"][number],
@@ -147,7 +158,7 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
           const eq = equipos.find((e) => e.equipo.id === ev.data.equipoGoleadorId);
           return (
             <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
-              {t}<span>⚽</span>
+              {t}<IconoGol className="size-3.5 shrink-0 text-chalk-2" />
               <span className="w-2 h-2 rounded-full shrink-0 ring-1 ring-chalk-3" style={{ backgroundColor: colorDe(ev.data.equipoGoleadorId) }} />
               <span className="font-medium text-chalk">{ev.data.goleador}</span>
               <span className="text-chalk-3 text-xs">· {eq?.equipo.nombre}</span>
@@ -158,7 +169,7 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
           const eq = equipos.find((e) => e.equipo.id === ev.data.equipoAutogolId);
           return (
             <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
-              {t}<span>🥅</span>
+              {t}<IconoAutogol className="size-3.5 shrink-0 text-vivo" />
               <span className="text-vivo font-medium">Autogol</span>
               <span className="text-chalk-3 text-xs">· {eq?.equipo.nombre}</span>
             </div>
@@ -169,7 +180,7 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
           const eqB = equipos.find((e) => e.equipo.id === ev.data.equipoBId);
           return (
             <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
-              {t}<span>🤝</span>
+              {t}<IconoEmpate className="size-3.5 shrink-0 text-chalk-3" />
               <span className="text-amarilla text-xs">{eqA?.equipo.nombre} vs {eqB?.equipo.nombre}</span>
             </div>
           );
@@ -177,7 +188,7 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
         if (ev.tipo === "amarilla") {
           return (
             <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
-              {t}<span>🟨</span>
+              {t}<Tarjeta tipo="amarilla" />
               <span className="w-2 h-2 rounded-full shrink-0 ring-1 ring-chalk-3" style={{ backgroundColor: colorDe(ev.data.equipoId) }} />
               <span className="font-medium text-chalk">{ev.data.jugador}</span>
               <span className="text-chalk-3 text-xs">· {RAZON[ev.data.razon]}</span>
@@ -187,7 +198,7 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
         if (ev.tipo === "roja") {
           return (
             <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
-              {t}<span>🟥</span>
+              {t}<Tarjeta tipo="roja" />
               <span className="w-2 h-2 rounded-full shrink-0 ring-1 ring-chalk-3" style={{ backgroundColor: colorDe(ev.data.equipoId) }} />
               <span className="font-medium text-chalk">{ev.data.jugador}</span>
               <span className="text-vivo text-xs font-semibold">· Expulsión</span>
@@ -213,14 +224,17 @@ function CanchaCard({ partido, numero }: { partido: Partido; numero: number }) {
           <span className="bg-raised text-chalk text-xs font-black px-2 py-0.5 rounded-lg">
             Cancha {numero}
           </span>
-          <span className="text-lg">{MODO_ICON[partido.modo] ?? "⚽"}</span>
+          {(() => { const I = ICONO_MODO[partido.modo] ?? IconoJornada; return <I className="size-4 text-chalk-2" />; })()}
           <span className="text-chalk font-bold text-sm">
             {MODO_LABEL[partido.modo] ?? partido.modo}
             {partido.jornada ? ` ${partido.jornada}` : ""}
           </span>
         </div>
         {partido.anotador_nombre && (
-          <span className="text-chalk-3 text-xs">🖊 {partido.anotador_nombre}</span>
+          <span className="text-chalk-3 text-xs inline-flex items-center gap-1.5">
+            <IconoAnotador className="size-3" />
+            {partido.anotador_nombre}
+          </span>
         )}
       </div>
 
@@ -251,7 +265,7 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
   return (
     <div className="bg-surface rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-line flex items-center gap-2">
-        <span className="text-lg">⚽</span>
+        <IconoGol className="size-4 text-chalk-2" />
         <h2 className="text-chalk font-bold text-sm">Goleadores</h2>
       </div>
       <div className="overflow-y-auto max-h-[420px] divide-y divide-line/40 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -353,7 +367,7 @@ function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: bo
   return (
     <div className="bg-surface rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-line flex items-center gap-2">
-        <span className="text-lg">🧤</span>
+        <IconoArquero className="size-4 text-chalk-2" />
         <h2 className="text-chalk font-bold text-sm">Valla menos vencida</h2>
       </div>
       <div className="overflow-y-auto max-h-[380px] divide-y divide-line/40 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -455,7 +469,6 @@ function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: bo
 
 // ── Top goles rápidos ─────────────────────────────────────────────────────────
 
-const MEDALS = ["🥇", "🥈", "🥉"] as const;
 
 function TopGolesRapidos({ goleadores, loading }: { goleadores: Goleador[]; loading: boolean }) {
   const { colorDe } = useCatalogo();
@@ -477,7 +490,7 @@ function TopGolesRapidos({ goleadores, loading }: { goleadores: Goleador[]; load
   return (
     <div className="bg-surface rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-line flex items-center gap-2">
-        <span className="text-lg">⚡</span>
+        <IconoRapido className="size-4 text-chalk-2" />
         <h2 className="text-chalk font-bold text-sm">Gol más rápido</h2>
       </div>
       <div className="divide-y divide-line/40">
@@ -497,7 +510,7 @@ function TopGolesRapidos({ goleadores, loading }: { goleadores: Goleador[]; load
             const textColor = getTextColor(g.equipoId);
             return (
               <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-                <span className="text-base shrink-0">{MEDALS[i]}</span>
+                <Puesto n={i + 1} />
                 <div className="flex-1 min-w-0">
                   <div className="text-chalk text-sm font-medium truncate">{g.jugador}</div>
                   <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -542,7 +555,7 @@ function TopGolesSalvadores({ goleadores, loading }: { goleadores: Goleador[]; l
   return (
     <div className="bg-surface rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-line flex items-center gap-2">
-        <span className="text-lg">🔥</span>
+        <IconoSalvador className="size-4 text-chalk-2" />
         <h2 className="text-chalk font-bold text-sm">Salvadores</h2>
         <span className="text-chalk-3 text-[10px] ml-auto">Último minuto</span>
       </div>
@@ -563,7 +576,7 @@ function TopGolesSalvadores({ goleadores, loading }: { goleadores: Goleador[]; l
             const textColor = getTextColor(g.equipoId);
             return (
               <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-                <span className="text-base shrink-0">{MEDALS[i]}</span>
+                <Puesto n={i + 1} />
                 <div className="flex-1 min-w-0">
                   <div className="text-chalk text-sm font-medium truncate">{g.jugador}</div>
                   <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -789,7 +802,7 @@ function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplin
   return (
     <div className="bg-surface rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-line flex items-center gap-2">
-        <span className="text-lg">🟨</span>
+        <Tarjeta tipo="amarilla" className="h-4 w-3" />
         <h2 className="text-chalk font-bold text-sm">Disciplina</h2>
       </div>
 
@@ -818,8 +831,8 @@ function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplin
                     <div className="w-2.5 h-2.5 rounded-full shrink-0 ring-[1.5px] ring-chalk-3" style={{ backgroundColor: color }} />
                     <span className="text-chalk text-sm font-medium flex-1">{eq.nombre}</span>
                     <div className="flex items-center gap-2 shrink-0">
-                      {totalAmarillas > 0 && <span className="text-amarilla text-xs font-bold">🟨 {totalAmarillas}</span>}
-                      {totalRojas     > 0 && <span className="text-vivo    text-xs font-bold">🟥 {totalRojas}</span>}
+                      {totalAmarillas > 0 && <span className="text-amarilla text-xs font-bold inline-flex items-center gap-1"><Tarjeta tipo="amarilla" />{totalAmarillas}</span>}
+                      {totalRojas     > 0 && <span className="text-vivo text-xs font-bold inline-flex items-center gap-1"><Tarjeta tipo="roja" />{totalRojas}</span>}
                     </div>
                     <span
                       className="text-chalk-3 text-[10px] shrink-0 transition-transform duration-200"
@@ -849,8 +862,8 @@ function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplin
                                 >
                                   <span className="text-chalk-2 text-xs flex-1 truncate">{j.jugador}</span>
                                   <div className="flex items-center gap-1.5 shrink-0">
-                                    {j.amarillas > 0 && <span className="text-amarilla text-xs font-bold">🟨 {j.amarillas}</span>}
-                                    {j.rojas     > 0 && <span className="text-vivo    text-xs font-bold">🟥 {j.rojas}</span>}
+                                    {j.amarillas > 0 && <span className="text-amarilla text-xs font-bold inline-flex items-center gap-1"><Tarjeta tipo="amarilla" />{j.amarillas}</span>}
+                                    {j.rojas     > 0 && <span className="text-vivo text-xs font-bold inline-flex items-center gap-1"><Tarjeta tipo="roja" />{j.rojas}</span>}
                                   </div>
                                   <span
                                     className="text-chalk-2 text-[10px] shrink-0 transition-transform duration-200"
@@ -871,7 +884,7 @@ function TablaDisciplina({ disciplina, loading }: { disciplina: JugadorDisciplin
                                       <div className="pl-10 pr-4 pb-2 pt-1 space-y-1 border-t border-line/20">
                                         {j.detalle.map((d, di) => (
                                           <div key={di} className="flex items-center gap-2">
-                                            <span className="text-xs shrink-0">{d.razon === "roja" ? "🟥" : "🟨"}</span>
+                                            <Tarjeta tipo={d.razon === "roja" ? "roja" : "amarilla"} />
                                             <span className="text-chalk-2 text-xs flex-1">{RAZON_LABEL[d.razon] ?? d.razon}</span>
                                             {d.jornada != null && <span className="text-chalk-3 text-[10px] shrink-0">J{d.jornada}</span>}
                                           </div>
