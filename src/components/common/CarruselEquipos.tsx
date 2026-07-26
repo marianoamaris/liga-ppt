@@ -2,16 +2,100 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { usePlantillasEdicion } from "../../hooks/useCatalogo";
 import { camisetaEquipo } from "../../utils/imagenesEquipos";
+import type { ArqueroEdicion, FilaClasificacion } from "../../types/jugador";
 
 /**
- * Carrusel de plantillas de una edición.
+ * Lo que se sabe de un equipo cuando no hay ni tarjeta ni plantilla. De las
+ * ediciones anteriores a la 19 solo constan la clasificación y, en algunas, el
+ * arquero: los goleadores históricos nunca registraron a qué equipo pertenecían.
+ */
+function FichaEquipo({
+  nombre,
+  color,
+  fila,
+  arquero,
+}: {
+  nombre: string;
+  color: string | null;
+  fila?: FilaClasificacion;
+  arquero?: ArqueroEdicion;
+}) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <span
+        className="size-14 rounded-full ring-2 ring-chalk-3"
+        style={{ backgroundColor: color ?? "#4B5563" }}
+      />
+      <h3 className="font-cond text-2xl text-chalk">{nombre}</h3>
+
+      {fila ? (
+        <div className="flex flex-wrap items-start justify-center gap-6">
+          <div>
+            <div className="tnum font-data text-2xl leading-none font-bold text-chalk">
+              {fila.posicion}º
+            </div>
+            <div className="font-cond mt-1 text-[0.625rem] text-chalk-3">Posición</div>
+          </div>
+          <div>
+            <div className="tnum font-data text-2xl leading-none font-bold text-chalk">
+              {fila.puntos}
+            </div>
+            <div className="font-cond mt-1 text-[0.625rem] text-chalk-3">Puntos</div>
+          </div>
+          {fila.victorias != null && (
+            <div>
+              <div className="tnum font-data text-2xl leading-none font-bold text-chalk">
+                {fila.victorias}·{fila.empates}·{fila.derrotas ?? "—"}
+              </div>
+              <div className="font-cond mt-1 text-[0.625rem] text-chalk-3">V·E·D</div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <p className="text-sm text-chalk-3">Sin registro en la tabla de esta edición.</p>
+      )}
+
+      {arquero && (
+        <p className="font-cond text-sm text-chalk-2">
+          <span aria-hidden>🧤 </span>
+          {arquero.jugador_nombre}
+          <span className="tnum font-data text-chalk-3">
+            {" "}
+            · {arquero.goles_recibidos} recibidos
+          </span>
+        </p>
+      )}
+
+      <p className="max-w-xs text-[0.6875rem] text-chalk-3">
+        La plantilla de esta edición no quedó registrada.
+      </p>
+    </div>
+  );
+}
+
+interface Props {
+  edicion: number;
+  /** Para las ediciones sin tarjeta ni plantilla: lo que sí consta del equipo. */
+  clasificacion?: FilaClasificacion[];
+  arqueros?: ArqueroEdicion[];
+}
+
+/**
+ * Carrusel de equipos de una edición.
  *
  * Sustituye a los tres carruseles que había, uno por edición y con los equipos
  * escritos a mano. Las tarjetas salen de `assets/LIGA_<n>/` según el color de
  * camiseta y los jugadores de `/ediciones/:n/plantillas`, así que una edición
- * nueva solo necesita sus imágenes y sus datos: ningún componente más.
+ * nueva solo necesita sus imágenes y sus datos.
+ *
+ * Las ediciones antiguas no tienen ni tarjeta ni plantilla registrada: de ellas
+ * se muestra lo que sí consta —posición, récord, arquero— en vez de un hueco.
  */
-export const CarruselEquipos: React.FC<{ edicion: number }> = ({ edicion }) => {
+export const CarruselEquipos: React.FC<Props> = ({
+  edicion,
+  clasificacion = [],
+  arqueros = [],
+}) => {
   const { equipos, loading, error } = usePlantillasEdicion(edicion);
   const [slide, setSlide] = useState(0);
   const inicioTactil = useRef<number | null>(null);
@@ -32,7 +116,7 @@ export const CarruselEquipos: React.FC<{ edicion: number }> = ({ edicion }) => {
   // Precarga para que al pasar de equipo la camiseta ya esté
   useEffect(() => {
     for (const eq of equipos) {
-      const url = camisetaEquipo(edicion, eq.color_slug);
+      const url = camisetaEquipo(edicion, eq.color_slug, eq.color_hex);
       if (!url) continue;
       const img = new Image();
       img.src = url;
@@ -58,7 +142,7 @@ export const CarruselEquipos: React.FC<{ edicion: number }> = ({ edicion }) => {
   if (!total) return null;
 
   const actual = equipos[slide];
-  const imagenActual = camisetaEquipo(edicion, actual.color_slug);
+  const imagenActual = camisetaEquipo(edicion, actual.color_slug, actual.color_hex);
 
   return (
     <section className="rounded-md border border-line bg-surface p-4">
@@ -92,8 +176,8 @@ export const CarruselEquipos: React.FC<{ edicion: number }> = ({ edicion }) => {
             decoding="async"
             className="absolute inset-0 mx-auto size-full object-contain"
           />
-        ) : (
-          // Ediciones sin tarjeta gráfica: la plantilla se lista en texto
+        ) : actual.jugadores.length > 0 ? (
+          // Sin tarjeta gráfica pero con plantilla registrada
           <ul className="absolute inset-0 flex flex-col flex-wrap content-start gap-x-6 gap-y-1 overflow-auto p-4">
             {actual.jugadores.map((j) => (
               <li key={j.nombre} className="font-cond text-sm text-chalk-2">
@@ -102,6 +186,13 @@ export const CarruselEquipos: React.FC<{ edicion: number }> = ({ edicion }) => {
               </li>
             ))}
           </ul>
+        ) : (
+          <FichaEquipo
+            nombre={actual.nombre}
+            color={actual.color_hex}
+            fila={clasificacion.find((c) => c.equipo_slug === actual.slug)}
+            arquero={arqueros.find((a) => a.equipo_slug === actual.slug)}
+          />
         )}
       </div>
 

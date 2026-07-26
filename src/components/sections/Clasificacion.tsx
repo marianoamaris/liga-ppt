@@ -359,7 +359,11 @@ export const Clasificacion: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-4">
-                <CarruselEquipos edicion={edicionElegida} />
+                <CarruselEquipos
+                  edicion={edicionElegida}
+                  clasificacion={historico.clasificacion}
+                  arqueros={historico.arqueros}
+                />
 
                 {historico.final && (
                   <Panel titulo="La final">
