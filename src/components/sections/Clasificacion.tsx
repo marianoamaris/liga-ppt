@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { EDICION_ACTUAL } from "../../config";
 import { useEdiciones, useHistoricoEdicion } from "../../hooks/useCatalogo";
+import { CarruselEquipos } from "../common/CarruselEquipos";
 import type {
   EdicionEquipo,
   FilaClasificacion,
@@ -358,6 +359,8 @@ export const Clasificacion: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-4">
+                <CarruselEquipos edicion={edicionElegida} />
+
                 {historico.final && (
                   <Panel titulo="La final">
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-sm bg-raised p-4">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { JORNADAS_LIGA20_TOTAL } from "../../constants/ANOTADOR_CONFIG";
+import { JORNADAS_TOTALES } from "../../constants/ANOTADOR_CONFIG";
 import { EDICION_ACTUAL } from "../../config";
 import { usePlantillasEdicion } from "../../hooks/useCatalogo";
 import { camisetaEquipo } from "../../utils/imagenesEquipos";
@@ -185,7 +185,7 @@ export function SetupJornada({ onIniciar }: Props) {
               onChange={(e) => setJornada(Number(e.target.value))}
               className="w-full bg-gray-700 text-white rounded-xl px-4 py-3.5 font-medium focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[52px]"
             >
-              {Array.from({ length: JORNADAS_LIGA20_TOTAL }, (_, i) => i + 1).map((n) => (
+              {Array.from({ length: JORNADAS_TOTALES }, (_, i) => i + 1).map((n) => (
                 <option key={n} value={n}>Jornada {n}</option>
               ))}
             </select>
