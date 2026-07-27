@@ -8,8 +8,24 @@ import type {
   HistoricoEdicion,
 } from "../../types/jugador";
 
-/** Los cuatro primeros disputan los playoffs. */
-const PLAZAS_PLAYOFF = 4;
+/**
+ * Cómo se reparte el cuadro final: el 1º y el 2º entran directos a semifinales,
+ * y del 3º al 6º juegan cuartos para acompañarlos. El resto queda fuera.
+ */
+const PLAZAS_SEMIFINAL = 2;
+const PLAZAS_CUARTOS = 6;
+
+/** Con menos equipos no hay cuadro que repartir, así que no se marca ninguna zona. */
+const MINIMO_PARA_PLAYOFFS = 7;
+
+type Zona = "semifinal" | "cuartos" | null;
+
+function zonaDe(posicion: number, totalEquipos: number): Zona {
+  if (totalEquipos < MINIMO_PARA_PLAYOFFS) return null;
+  if (posicion <= PLAZAS_SEMIFINAL) return "semifinal";
+  if (posicion <= PLAZAS_CUARTOS) return "cuartos";
+  return null;
+}
 
 function PuntoEquipo({ color }: { color: string | null }) {
   return (
@@ -77,18 +93,31 @@ function TablaPosiciones({
       </thead>
       <tbody>
         {filas.map((f) => {
-          const clasifica = f.posicion <= PLAZAS_PLAYOFF && filas.length > PLAZAS_PLAYOFF;
+          const zona = zonaDe(f.posicion, filas.length);
           return (
             <tr
               key={f.equipo_slug}
               className={`border-t border-line ${
-                clasifica ? "bg-raised/40" : ""
+                zona === "semifinal"
+                  ? "bg-raised/60"
+                  : zona === "cuartos"
+                    ? "bg-raised/25"
+                    : ""
               }`}
             >
               <td
                 className={`tnum font-data py-2 text-xs ${
-                  clasifica ? "text-chalk" : "text-chalk-3"
+                  zona ? "text-chalk" : "text-chalk-3"
                 }`}
+                style={
+                  zona
+                    ? {
+                        boxShadow: `inset 2px 0 0 var(--color-${
+                          zona === "semifinal" ? "chalk" : "chalk-3"
+                        })`,
+                      }
+                    : undefined
+                }
               >
                 {f.posicion}
               </td>
@@ -297,14 +326,7 @@ export const Clasificacion: React.FC = () => {
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.5fr_1fr] lg:items-start">
               <div className="flex flex-col gap-4">
-                <Panel
-                  titulo="Tabla general"
-                  nota={
-                    historico.clasificacion.length > PLAZAS_PLAYOFF
-                      ? `Los ${PLAZAS_PLAYOFF} primeros pasan a playoffs`
-                      : undefined
-                  }
-                >
+                <Panel titulo="Tabla general">
                   <div className="lg:hidden">
                     <TablaPosiciones
                       filas={historico.clasificacion}
@@ -321,6 +343,19 @@ export const Clasificacion: React.FC = () => {
                       compacta={false}
                     />
                   </div>
+
+                  {historico.clasificacion.length >= MINIMO_PARA_PLAYOFFS && (
+                    <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-line pt-3">
+                      <li className="flex items-center gap-2 text-[0.6875rem] text-chalk-3">
+                        <span className="h-3 w-0.5 shrink-0 bg-chalk" />
+                        1º y 2º · a semifinales
+                      </li>
+                      <li className="flex items-center gap-2 text-[0.6875rem] text-chalk-3">
+                        <span className="h-3 w-0.5 shrink-0 bg-chalk-3" />
+                        3º a 6º · a cuartos
+                      </li>
+                    </ul>
+                  )}
                 </Panel>
 
                 {historico.jornadas.length > 0 && (
