@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { EDICION_ACTUAL } from "../../config";
+import React, { useEffect, useMemo, useState } from "react";
+import { useSede } from "../../context/SedeContext";
 import { useEdiciones, useHistoricoEdicion } from "../../hooks/useCatalogo";
 import { CarruselEquipos } from "../common/CarruselEquipos";
 import type {
@@ -165,16 +165,19 @@ function SelectorEdicion({
   onElegir,
   onCerrar,
 }: {
-  actual: number;
+  actual: number | null;
   onElegir: (n: number) => void;
   onCerrar: () => void;
 }) {
-  const { ediciones, loading } = useEdiciones();
+  const { sedeId, sede } = useSede();
+  const { ediciones, loading } = useEdiciones(sedeId);
 
   return (
     <div className="rounded-md border border-line bg-surface p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h2 className="font-cond text-xs text-chalk-2">Elegir edición</h2>
+        <h2 className="font-cond text-xs text-chalk-2">
+          Elegir edición{sede ? ` · ${sede.nombre}` : ""}
+        </h2>
         <button
           type="button"
           onClick={onCerrar}
@@ -200,7 +203,7 @@ function SelectorEdicion({
                   : "border-line hover:bg-raised/60"
               }`}
             >
-              <span className="font-cond text-sm text-chalk">Edición {e.numero}</span>
+              <span className="font-cond text-sm text-chalk">Edición {e.numero_sede}</span>
               <span className="flex min-w-0 items-center gap-1.5 text-[0.6875rem] text-chalk-3">
                 {e.estado === "activa" ? (
                   `En juego${e.tematica ? ` · ${e.tematica}` : ""}`
@@ -242,13 +245,13 @@ function Cabecera({
           className="font-cond tnum grid size-full place-items-center bg-surface text-sm text-chalk-2"
           style={{ clipPath: "polygon(50% 0,100% 22%,100% 72%,50% 100%,0 72%,0 22%)" }}
         >
-          {edicion.numero}
+          {edicion.numero_sede}
         </span>
       </div>
 
       <div className="min-w-0 flex-1">
         <h1 className="font-cond text-xl text-chalk">
-          Edición {edicion.numero}
+          Edición {edicion.numero_sede}
           {edicion.tematica ? ` · ${edicion.tematica}` : ""}
         </h1>
         <p className="text-[0.6875rem] text-chalk-3">
@@ -276,8 +279,18 @@ function Cabecera({
 }
 
 export const Clasificacion: React.FC = () => {
-  const [edicionElegida, setEdicionElegida] = useState(EDICION_ACTUAL);
+  const { sedeId, edicionActual } = useSede();
+  // Null hasta que se sepa qué edición está en curso. Cambiar de ciudad
+  // devuelve a la edición en juego de esa ciudad: mantener la anterior
+  // mostraría una edición que no pertenece a la sede seleccionada.
+  const [edicionElegida, setEdicionElegida] = useState<number | null>(null);
   const [selectorAbierto, setSelectorAbierto] = useState(false);
+
+  useEffect(() => {
+    setEdicionElegida(edicionActual);
+    setSelectorAbierto(false);
+  }, [sedeId, edicionActual]);
+
   const { historico, loading, error } = useHistoricoEdicion(edicionElegida);
 
   const porSlug = useMemo(() => {

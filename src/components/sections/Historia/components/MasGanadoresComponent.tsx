@@ -1,17 +1,20 @@
 import React from "react";
 import { useTitulos } from "../../../../hooks/useCatalogo";
+import { useSede } from "../../../../context/SedeContext";
 import { fotoJugadorPorArchivo } from "../../../../utils/fotosJugadores";
 import { Puesto } from "../../../common/iconos";
 
 /**
- * Ranking de jugadores por títulos ganados.
+ * Ranking de jugadores por títulos ganados en la ciudad activa. Los récords no
+ * se mezclan entre sedes: cada una tiene sus propios más ganadores.
  *
  * A diferencia del resto del palmarés, aquí sí consta en qué ediciones se ganó
  * cada liga, así que se listan: es lo que convierte un número en una historia.
  * La Champions y el Mundial vienen sin año en la fuente y se muestran aparte.
  */
 const MasGanadoresComponent: React.FC = () => {
-  const { titulos, loading, error } = useTitulos();
+  const { sedeId } = useSede();
+  const { titulos, loading, error } = useTitulos(sedeId);
 
   return (
     <section className="flex flex-col gap-4">
@@ -29,6 +32,10 @@ const MasGanadoresComponent: React.FC = () => {
       ) : error ? (
         <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
           No se pudo cargar: {error}
+        </p>
+      ) : !titulos.length ? (
+        <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+          Esta ciudad todavía no tiene títulos repartidos.
         </p>
       ) : (
         <ul className="rounded-md border border-line bg-surface px-4">
@@ -61,13 +68,13 @@ const MasGanadoresComponent: React.FC = () => {
                 <div className="min-w-0 flex-1">
                   <div className="font-cond truncate text-sm text-chalk">{nombre}</div>
                   <div className="mt-1 flex flex-wrap gap-1">
-                    {t.ligas.map((n) => (
+                    {t.ligas.map((ed) => (
                       <span
-                        key={n}
+                        key={ed.numero}
                         className="tnum font-data rounded-sm bg-raised px-1.5 py-0.5 text-[0.625rem] text-chalk-2"
-                        title={`Campeón en la edición ${n}`}
+                        title={`Campeón en la edición ${ed.numero_sede}`}
                       >
-                        {n}
+                        {ed.numero_sede}
                       </span>
                     ))}
                     {t.champions > 0 && (

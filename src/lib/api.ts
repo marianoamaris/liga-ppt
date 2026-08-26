@@ -8,7 +8,10 @@ import type {
   HistoricoEdicion,
   Jugador,
   JugadorTitulos,
+  FilaRecord,
+  Sede,
   TipoPalmares,
+  TipoRecord,
   Posicion,
 } from "../types/jugador";
 import { supabase } from "./supabase";
@@ -220,30 +223,69 @@ export const jugadoresApi = {
     req<{ jugador: Jugador; resueltoPorAlias?: string }>(`/jugadores/${slug}`),
 };
 
+/**
+ * Los récords van separados por ciudad: la Bota de Oro de Valledupar no compite
+ * contra la de Bogotá. Todas las vistas pasan la sede activa.
+ */
 export const palmaresApi = {
   /** Sin tipo devuelve todo agrupado, que es lo que pinta Historia. */
-  todo: () => req<{ palmares: Record<TipoPalmares, FilaPalmares[]> }>("/palmares"),
-  porTipo: (tipo: TipoPalmares) =>
-    req<{ tipo: TipoPalmares; palmares: FilaPalmares[] }>(`/palmares?tipo=${tipo}`),
-  titulos: () => req<{ total: number; titulos: JugadorTitulos[] }>("/palmares/titulos"),
+  todo: (sede?: string) =>
+    req<{ palmares: Record<TipoPalmares, FilaPalmares[]> }>(
+      `/palmares${sede ? `?sede=${sede}` : ""}`
+    ),
+  porTipo: (tipo: TipoPalmares, sede?: string) =>
+    req<{ tipo: TipoPalmares; palmares: FilaPalmares[] }>(
+      `/palmares?tipo=${tipo}${sede ? `&sede=${sede}` : ""}`
+    ),
+  titulos: (sede?: string) =>
+    req<{ total: number; titulos: JugadorTitulos[] }>(
+      `/palmares/titulos${sede ? `?sede=${sede}` : ""}`
+    ),
+};
+
+export const recordsApi = {
+  /** Podios de récords de una ciudad, agrupados por tipo. */
+  todo: (sede?: string) =>
+    req<{ total: number; records: Record<TipoRecord, FilaRecord[]> }>(
+      `/records${sede ? `?sede=${sede}` : ""}`
+    ),
+};
+
+export const sedesApi = {
+  /** Ciudades activas, cada una con su edición en curso ya resuelta. */
+  list: () => req<{ total: number; sedes: Sede[] }>("/sedes"),
 };
 
 export const edicionesApi = {
-  list: () => req<{ total: number; ediciones: Edicion[] }>("/ediciones"),
-  finales: () =>
-    req<{ total: number; finales: EdicionFinal[] }>("/ediciones/finales"),
+  /** Sin `sede` devuelve las de todas las ciudades. */
+  list: (sede?: string) =>
+    req<{ total: number; ediciones: Edicion[] }>(
+      `/ediciones${sede ? `?sede=${sede}` : ""}`
+    ),
+  finales: (sede?: string) =>
+    req<{ total: number; finales: EdicionFinal[] }>(
+      `/ediciones/finales${sede ? `?sede=${sede}` : ""}`
+    ),
   get: (numero: number) =>
     req<{ edicion: Edicion; equipos: EdicionEquipo[]; final: EdicionFinal | null }>(
       `/ediciones/${numero}`
     ),
   equipos: (numero: number) =>
-    req<{ edicion: number; equipos: EdicionEquipo[] }>(`/ediciones/${numero}/equipos`),
+    req<{
+      edicion: number;
+      sede_id: string | null;
+      numero_sede: number | null;
+      equipos: EdicionEquipo[];
+    }>(`/ediciones/${numero}/equipos`),
   /** Edición completa: tabla, jornadas, goleadores, arqueros y final. */
   historico: (numero: number) => req<HistoricoEdicion>(`/historico/${numero}`),
   plantillas: (numero: number) =>
-    req<{ edicion: number; equipos: EquipoConPlantilla[] }>(
-      `/ediciones/${numero}/plantillas`
-    ),
+    req<{
+      edicion: number;
+      sede_id: string | null;
+      numero_sede: number | null;
+      equipos: EquipoConPlantilla[];
+    }>(`/ediciones/${numero}/plantillas`),
 };
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -281,10 +323,17 @@ export const partidosApi = {
   finalizar: (id: string) =>
     req<Partido>(`/partidos/${id}/finalizar`, { method: "PATCH" }),
 
-  getEnVivo: (jornada?: number) =>
-    req<{ enVivo: Partido[]; total: number }>(
-      `/en-vivo${jornada != null ? `?jornada=${jornada}` : ""}`
-    ),
+  /**
+   * `temporada` acota a una edición, y con ella a una ciudad. Sin el filtro la
+   * API devuelve todo partido abierto de la tabla: un partido en curso en
+   * Valledupar aparecería en la pantalla de Bogotá, con equipos que ni
+   * siquiera resuelven contra su catálogo.
+   */
+  getEnVivo: (temporada: number, jornada?: number) => {
+    const qs = new URLSearchParams({ temporada: String(temporada) });
+    if (jornada != null) qs.set("jornada", String(jornada));
+    return req<{ enVivo: Partido[]; total: number }>(`/en-vivo?${qs}`);
+  },
 
   list: (params: Record<string, string | number>) => {
     const qs = new URLSearchParams(
@@ -313,20 +362,26 @@ export interface JugadorDisciplina {
   detalle: DetalleTarjeta[];
 }
 
+/**
+ * `temporada` es la clave interna de la edición (`ediciones.numero`), no el
+ * número que se muestra. Sale de `useSede().edicionActual` o del selector de
+ * ediciones; no tiene valor por defecto a propósito, porque desde que hay más
+ * de una sede no existe «la edición actual» sin decir de qué ciudad.
+ */
 export const statsApi = {
-  clasificacion: (temporada = 20) =>
+  clasificacion: (temporada: number) =>
     req<{ temporada: number; standings: Standing[] }>(
       `/clasificacion?temporada=${temporada}`
     ),
-  goleadores: (temporada = 20) =>
+  goleadores: (temporada: number) =>
     req<{ temporada: number; goleadores: Goleador[] }>(
       `/goleadores?temporada=${temporada}`
     ),
-  arqueros: (temporada = 20) =>
+  arqueros: (temporada: number) =>
     req<{ temporada: number; arqueros: Arquero[] }>(
       `/arqueros?temporada=${temporada}`
     ),
-  disciplina: (temporada = 20) =>
+  disciplina: (temporada: number) =>
     req<{ disciplina: JugadorDisciplina[] }>(
       `/disciplina?temporada=${temporada}`
     ),

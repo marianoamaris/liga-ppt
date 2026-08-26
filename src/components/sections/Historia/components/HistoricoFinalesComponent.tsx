@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import type { ColorCamiseta, FinalHistorica } from "../../../../types/jugador";
 import { ETIQUETA_COLOR, resumenVictoriasPorColor } from "../../../../utils/finales";
 import { useFinales } from "../../../../hooks/useCatalogo";
+import { useSede } from "../../../../context/SedeContext";
 
 /**
  * Color real de cada camiseta. Se usa como relleno del punto que acompaña al
@@ -89,12 +90,13 @@ function FilaFinal({ f }: { f: FinalHistorica }) {
 }
 
 const HistoricoFinalesComponent: React.FC = () => {
-  const { finales, loading, error } = useFinales();
+  const { sedeId } = useSede();
+  const { finales, loading, error } = useFinales(sedeId);
   const resumen = useMemo(() => resumenVictoriasPorColor(finales), [finales]);
 
   // De la más reciente a la más antigua: es el orden en que se buscan
   const ordenadas = useMemo(
-    () => [...finales].sort((a, b) => b.temporada - a.temporada),
+    () => [...finales].sort((a, b) => b.numero - a.numero),
     [finales]
   );
 
@@ -117,11 +119,17 @@ const HistoricoFinalesComponent: React.FC = () => {
         <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
           No se pudieron cargar las finales: {error}
         </p>
+      ) : !ordenadas.length ? (
+        // Una sede recién abierta no tiene finales todavía; sin este aviso la
+        // pantalla se queda en blanco y parece rota.
+        <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+          Esta ciudad todavía no tiene finales jugadas.
+        </p>
       ) : (
         <>
           <ul className="rounded-md border border-line bg-surface px-4">
             {ordenadas.map((f) => (
-              <FilaFinal key={f.temporada} f={f} />
+              <FilaFinal key={f.numero} f={f} />
             ))}
           </ul>
 

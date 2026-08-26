@@ -1,20 +1,24 @@
 /**
  * Resuelve la camiseta de un equipo a partir de su color.
  *
- * Los archivos viven en `src/assets/LIGA_<n>/<Color>.png` y el nombre del color
- * es lo que la base guarda en `edicion_equipos.color_slug`.
+ * Los archivos viven en `src/assets/CAMISETAS/<sede>/<n>/<Color>.png`, donde
+ * `n` es el número de la edición **dentro de su sede** —el que ve el usuario—
+ * y no la clave interna: así la primera edición de Bogotá es `bog/1` y no
+ * `101`, que no le diría nada a quien deje caer ahí los diseños nuevos.
+ *
+ * El nombre del color es lo que la base guarda en `edicion_equipos.color_slug`.
  */
 
 const modules = import.meta.glob<string>(
-  "../assets/LIGA_*/*.{png,jpg,jpeg,webp}",
+  "../assets/CAMISETAS/*/*/*.{png,jpg,jpeg,webp}",
   { eager: true, query: "?url", import: "default" }
 );
 
-/** "../assets/LIGA_20/Amarillo.png" → clave "20/amarillo" */
+/** "../assets/CAMISETAS/vup/20/Amarillo.png" → clave "vup/20/amarillo" */
 function claveDeRuta(ruta: string): string | null {
-  const m = ruta.match(/LIGA_(\d+)\/([^/]+)\.[^.]+$/i);
+  const m = ruta.match(/CAMISETAS\/([^/]+)\/(\d+)\/([^/]+)\.[^.]+$/i);
   if (!m) return null;
-  return `${m[1]}/${m[2].toLowerCase()}`;
+  return `${m[1].toLowerCase()}/${m[2]}/${m[3].toLowerCase()}`;
 }
 
 const porClave = new Map<string, string>();
@@ -69,15 +73,19 @@ export function colorCamisetaDesdeHex(hex: string | null | undefined): string | 
 /**
  * URL de la camiseta, o null si esa edición no tiene imagen para ese color.
  *
+ * `numeroSede` es el número visible de la edición, no `ediciones.numero`.
+ *
  * Si el equipo no tiene `color_slug` registrado (pasa en las ediciones cuyos
  * equipos se derivaron de la tabla general) se deduce del hex, que sí consta.
  */
 export function camisetaEquipo(
-  edicion: number,
+  sede: string | null | undefined,
+  numeroSede: number | null | undefined,
   colorSlug: string | null | undefined,
   colorHex?: string | null
 ): string | null {
+  if (!sede || numeroSede == null) return null;
   const color = colorSlug ?? colorCamisetaDesdeHex(colorHex);
   if (!color) return null;
-  return porClave.get(`${edicion}/${color.toLowerCase()}`) ?? null;
+  return porClave.get(`${sede.toLowerCase()}/${numeroSede}/${color.toLowerCase()}`) ?? null;
 }

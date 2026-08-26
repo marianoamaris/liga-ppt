@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { JORNADAS_TOTALES } from "../../constants/ANOTADOR_CONFIG";
-import { EDICION_ACTUAL } from "../../config";
+import { useSede } from "../../context/SedeContext";
 import { usePlantillasEdicion } from "../../hooks/useCatalogo";
 import { camisetaEquipo } from "../../utils/imagenesEquipos";
 import type { EquipoConPlantilla } from "../../types/jugador";
 import type { EquipoEnCancha, ModoPartido, PartidoConfig } from "./types";
 
-function buildEquipo(equipo: EquipoConPlantilla): EquipoEnCancha {
+function buildEquipo(
+  equipo: EquipoConPlantilla,
+  sede: string | null,
+  numeroSede: number | null
+): EquipoEnCancha {
   return {
     equipo: {
       id: equipo.slug,
       nombre: equipo.nombre,
-      imagen: camisetaEquipo(equipo.edicion, equipo.color_slug) ?? "",
+      imagen: camisetaEquipo(sede, numeroSede, equipo.color_slug, equipo.color_hex) ?? "",
     },
     jugadores: equipo.jugadores.map(({ nombre }) => ({ nombre })),
     ...(equipo.arqueroDesignado
@@ -107,7 +111,9 @@ export function SetupJornada({ onIniciar }: Props) {
   const [modo, setModo] = useState<ModoPartido>("jornada");
   const [jornada, setJornada] = useState(1);
   const [slots, setSlots] = useState<(string | null)[]>([null, null, null]);
-  const { equipos, loading, error } = usePlantillasEdicion(EDICION_ACTUAL);
+  const { edicionActual } = useSede();
+  const { equipos, sede_id, numero_sede, loading, error } =
+    usePlantillasEdicion(edicionActual);
 
   const esPlayoff = modo !== "jornada";
   const slotCount = esPlayoff ? 2 : 3;
@@ -138,12 +144,16 @@ export function SetupJornada({ onIniciar }: Props) {
       onIniciar({
         modo: "jornada",
         jornada,
-        equipos: [buildEquipo(a), buildEquipo(b), buildEquipo(c)],
+        equipos: [
+          buildEquipo(a, sede_id, numero_sede),
+          buildEquipo(b, sede_id, numero_sede),
+          buildEquipo(c, sede_id, numero_sede),
+        ],
       });
     } else {
       onIniciar({
         modo,
-        equipos: [buildEquipo(a), buildEquipo(b)],
+        equipos: [buildEquipo(a, sede_id, numero_sede), buildEquipo(b, sede_id, numero_sede)],
       });
     }
   }

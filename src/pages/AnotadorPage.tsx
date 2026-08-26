@@ -4,7 +4,7 @@ import { PartidoEnVivo } from "../components/anotador/PartidoEnVivo";
 import { ResumenPartido } from "../components/anotador/ResumenPartido";
 import { useAuth } from "../context/AuthContext";
 import { partidosApi, type ApiEquipo, type Partido } from "../lib/api";
-import { EDICION_ACTUAL } from "../config";
+import { useSede } from "../context/SedeContext";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
 import type { EquipoLocal } from "../types/jugador";
 import type {
@@ -146,7 +146,8 @@ export function AnotadorPage() {
   const [phase, setPhase] = useState<Phase>("login");
   const [partido, setPartido] = useState<PartidoVivo | null>(null);
   const backendIdRef = useRef<string | null>(null);
-  const { locales: catalogo } = useEquiposEdicion(EDICION_ACTUAL);
+  const { sede, edicionActual } = useSede();
+  const { locales: catalogo } = useEquiposEdicion(edicionActual);
 
   // ── Restore session on mount ─────────────────────────────────────────────────
   useEffect(() => {
@@ -191,6 +192,14 @@ export function AnotadorPage() {
   const handleIniciar = useCallback(
     async (config: PartidoConfig) => {
       if (!profile) return;
+      // Sin edición en curso el partido no se puede archivar en ninguna parte:
+      // `temporada` es la clave que lo ata a una edición y a una sede.
+      if (edicionActual == null) {
+        console.error(
+          `Anotador: la sede ${sede?.nombre ?? "seleccionada"} no tiene una edición activa`
+        );
+        return;
+      }
       const localNow = Date.now();
       const nuevo: PartidoVivo = { config, eventos: EVENTOS_VACIO, iniciadoEn: localNow };
       setPartido(nuevo);
@@ -198,7 +207,7 @@ export function AnotadorPage() {
 
       try {
         const created = await partidosApi.create({
-          temporada: 20,
+          temporada: edicionActual,
           modo: config.modo,
           ...(config.modo === "jornada" ? { jornada: config.jornada } : {}),
           equipos: toApiEquipos(config.equipos),
@@ -213,7 +222,9 @@ export function AnotadorPage() {
         console.error("Backend: no se pudo crear partido", err);
       }
     },
-    [profile]
+    // `edicionActual` cambia al cambiar de ciudad: sin él en las dependencias
+    // el anotador seguiría archivando partidos en la edición de la sede anterior.
+    [profile, edicionActual, sede?.nombre]
   );
 
   const handleUpdatePartido = useCallback((p: PartidoVivo | null) => {

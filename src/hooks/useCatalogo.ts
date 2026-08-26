@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { edicionesApi, jugadoresApi, palmaresApi } from "../lib/api";
+import { edicionesApi, jugadoresApi, palmaresApi, recordsApi } from "../lib/api";
 import {
   finalAHistorica,
   jugadorAUsuarioLiga,
@@ -14,6 +14,8 @@ import {
   type Jugador,
   type JugadorTitulos,
   type TipoPalmares,
+  type FilaRecord,
+  type TipoRecord,
   type UsuarioLiga,
 } from "../types/jugador";
 import { camisetaEquipo } from "../utils/imagenesEquipos";
@@ -92,12 +94,18 @@ export function useJugadores(opciones: { incluirInciertos?: boolean } = {}) {
   return { jugadores: datos, usuarios, buscarPorUsername, loading, error };
 }
 
-/** Catálogo de ediciones, de la más reciente a la más antigua. */
-export function useEdiciones() {
+/**
+ * Catálogo de ediciones, de la más reciente a la más antigua.
+ *
+ * Con `sede` se acota a una ciudad —lo que necesita un selector de edición, que
+ * de otro modo mezclaría dos «Edición 1»—; sin ella devuelve toda la historia
+ * de la liga, que es lo que muestran las vistas de récords.
+ */
+export function useEdiciones(sede?: string) {
   const { datos, loading, error } = useAsync<Edicion[]>(
-    () => edicionesApi.list().then((r) => r.ediciones),
+    () => edicionesApi.list(sede).then((r) => r.ediciones),
     [],
-    []
+    [sede]
   );
   return { ediciones: datos, loading, error };
 }
@@ -120,12 +128,15 @@ export function useEdicion(numero: number | null) {
   return { ...datos, loading, error };
 }
 
-/** Finales de todas las ediciones, de la más reciente a la más antigua. */
-export function useFinales() {
+/**
+ * Finales de todas las ediciones, de la más reciente a la más antigua.
+ * Con `sede` se limita a una ciudad.
+ */
+export function useFinales(sede?: string) {
   const { datos, loading, error } = useAsync<EdicionFinal[]>(
-    () => edicionesApi.finales().then((r) => r.finales),
+    () => edicionesApi.finales(sede).then((r) => r.finales),
     [],
-    []
+    [sede]
   );
 
   /** Misma forma que el antiguo `FINALES_HISTORICAS`, en orden ascendente. */
@@ -150,12 +161,12 @@ export function useHistoricoEdicion(numero: number | null) {
   return { historico: datos, loading, error };
 }
 
-/** Todo el palmarés histórico, agrupado por tipo de récord. */
-export function usePalmares() {
+/** Palmarés histórico de una sede, agrupado por tipo de récord. */
+export function usePalmares(sede?: string) {
   const { datos, loading, error } = useAsync<Record<TipoPalmares, FilaPalmares[]>>(
-    () => palmaresApi.todo().then((r) => r.palmares),
+    () => palmaresApi.todo(sede).then((r) => r.palmares),
     {} as Record<TipoPalmares, FilaPalmares[]>,
-    []
+    [sede]
   );
 
   const de = useMemo(
@@ -166,43 +177,74 @@ export function usePalmares() {
   return { palmares: datos, de, loading, error };
 }
 
-/** Jugadores con títulos, con el detalle de las ediciones que ganaron. */
-export function useTitulos() {
+/** Jugadores con títulos de una sede, con el detalle de las ediciones que ganaron. */
+export function useTitulos(sede?: string) {
   const { datos, loading, error } = useAsync<JugadorTitulos[]>(
-    () => palmaresApi.titulos().then((r) => r.titulos),
+    () => palmaresApi.titulos(sede).then((r) => r.titulos),
     [],
-    []
+    [sede]
   );
   return { titulos: datos, loading, error };
 }
 
+/** Récords históricos de una sede, agrupados por tipo. */
+export function useRecords(sede?: string) {
+  const { datos, loading, error } = useAsync<Record<TipoRecord, FilaRecord[]>>(
+    () => recordsApi.todo(sede).then((r) => r.records),
+    {} as Record<TipoRecord, FilaRecord[]>,
+    [sede]
+  );
+
+  const de = useMemo(
+    () => (tipo: TipoRecord): FilaRecord[] => datos[tipo] ?? [],
+    [datos]
+  );
+
+  return { records: datos, de, loading, error };
+}
+
 /** Equipos de una edición, con sus colores y camisetas. */
 export function useEquiposEdicion(numero: number | null) {
-  const { datos, loading, error } = useAsync<EdicionEquipo[]>(
-    () => (numero == null ? Promise.resolve([]) : edicionesApi.equipos(numero).then((r) => r.equipos)),
-    [],
+  const vacio = { equipos: [] as EdicionEquipo[], sede_id: null, numero_sede: null };
+
+  const { datos, loading, error } = useAsync<{
+    equipos: EdicionEquipo[];
+    sede_id: string | null;
+    numero_sede: number | null;
+  }>(
+    () =>
+      numero == null
+        ? Promise.resolve(vacio)
+        : edicionesApi.equipos(numero).then((r) => ({
+            equipos: r.equipos,
+            sede_id: r.sede_id,
+            numero_sede: r.numero_sede,
+          })),
+    vacio,
     [numero]
   );
+
+  const { equipos: filas, sede_id, numero_sede } = datos;
 
   /** slug de equipo → color, reemplazo directo de TEAM_COLORS. */
   const colores = useMemo(() => {
     const mapa = new Map<string, string | [string, string]>();
-    for (const e of datos) {
+    for (const e of filas) {
       if (!e.color_hex) continue;
       mapa.set(e.slug, e.color_hex_2 ? [e.color_hex, e.color_hex_2] : e.color_hex);
     }
     return mapa;
-  }, [datos]);
+  }, [filas]);
 
   /** Forma que consumen las vistas de partido, con la camiseta ya resuelta. */
   const locales: EquipoLocal[] = useMemo(
     () =>
-      datos.map((e) => ({
+      filas.map((e) => ({
         id: e.slug,
         nombre: e.nombre,
-        imagen: (numero != null && camisetaEquipo(numero, e.color_slug)) || "",
+        imagen: camisetaEquipo(sede_id, numero_sede, e.color_slug, e.color_hex) ?? "",
       })),
-    [datos, numero]
+    [filas, sede_id, numero_sede]
   );
 
   const porId = useMemo(() => {
@@ -220,18 +262,34 @@ export function useEquiposEdicion(numero: number | null) {
     [colores]
   );
 
-  return { equipos: datos, locales, porId, colores, colorDe, loading, error };
+  return { equipos: filas, locales, porId, colores, colorDe, sede_id, numero_sede, loading, error };
 }
 
-/** Equipos de una edición junto con sus plantillas. */
+/**
+ * Equipos de una edición junto con sus plantillas.
+ *
+ * Devuelve también la sede y el número visible porque las camisetas se guardan
+ * por sede y edición, y `numero` a secas ya no basta para encontrarlas.
+ */
 export function usePlantillasEdicion(numero: number | null) {
-  const { datos, loading, error } = useAsync<EquipoConPlantilla[]>(
+  const vacio = {
+    equipos: [] as EquipoConPlantilla[],
+    sede_id: null as string | null,
+    numero_sede: null as number | null,
+  };
+
+  const { datos, loading, error } = useAsync<typeof vacio>(
     () =>
       numero == null
-        ? Promise.resolve([])
-        : edicionesApi.plantillas(numero).then((r) => r.equipos),
-    [],
+        ? Promise.resolve(vacio)
+        : edicionesApi.plantillas(numero).then((r) => ({
+            equipos: r.equipos,
+            sede_id: r.sede_id,
+            numero_sede: r.numero_sede,
+          })),
+    vacio,
     [numero]
   );
-  return { equipos: datos, loading, error };
+
+  return { ...datos, loading, error };
 }

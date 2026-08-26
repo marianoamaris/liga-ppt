@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { EDICION_ACTUAL } from "../config";
+import { useSede } from "../context/SedeContext";
 import { useInicio } from "../hooks/useInicio";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
 import { Marcador } from "../components/Home/Marcador";
@@ -147,7 +147,8 @@ export const Home: React.FC = () => {
     loading,
     error,
   } = useInicio();
-  const { locales: catalogo, colorDe } = useEquiposEdicion(EDICION_ACTUAL);
+  const { sede, edicionActual, numeroSede } = useSede();
+  const { locales: catalogo, colorDe } = useEquiposEdicion(edicionActual);
 
   const topGoleadores = goleadores.slice(0, 3).map((g: Goleador) => ({
     id: `${g.jugador}-${g.equipoId}`,
@@ -197,7 +198,11 @@ export const Home: React.FC = () => {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.55fr_1fr] lg:items-start">
           <div className="flex flex-col gap-4">
             <Panel
-              titulo={`Clasificación · Edición ${EDICION_ACTUAL}`}
+              titulo={
+                numeroSede != null
+                  ? `Clasificación · Edición ${numeroSede} · ${sede?.nombre ?? ""}`
+                  : "Clasificación"
+              }
               accion="Ver todo"
               onAccion={() => navigate("/clasificacion")}
             >

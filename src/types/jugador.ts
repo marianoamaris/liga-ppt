@@ -21,8 +21,38 @@ export interface Jugador {
   identidad_incierta: boolean;
 }
 
-export interface Edicion {
+/** Fila de la tabla `sedes`: una ciudad donde se juega la liga. */
+export interface Sede {
+  id: string;
+  nombre: string;
+  ciudad: string;
+  color_hex: string | null;
+  rango_base: number;
+  activa: boolean;
+  orden: number | null;
+  /** Edición en curso de esta sede; null si no hay ninguna abierta. */
+  edicion_activa: EdicionRef | null;
+}
+
+/**
+ * Cómo se nombra una edición. `numero` es la clave interna y global con la que
+ * se consulta la API; lo que se muestra es `numero_sede` junto a la sede,
+ * porque hay una «edición 1» por cada ciudad.
+ */
+export interface EdicionRef {
   numero: number;
+  sede_id: string;
+  numero_sede: number;
+  nombre?: string | null;
+  estado?: "historica" | "activa" | "proxima";
+}
+
+export interface Edicion {
+  /** Clave interna y global. No mostrar: para eso está `numero_sede`. */
+  numero: number;
+  sede_id: string;
+  /** Número de la edición dentro de su sede; el que ve el usuario. */
+  numero_sede: number;
   nombre: string | null;
   subtitulo: string | null;
   tematica: string | null;
@@ -76,6 +106,9 @@ export type ResultadoFinal = "1" | "2" | "empate" | "pendiente";
 /** Fila de `edicion_finales`, tal cual la devuelve la API. */
 export interface EdicionFinal {
   edicion: number;
+  /** Resueltos por la API a partir de `edicion`; null si la edición no existe. */
+  sede_id: string | null;
+  numero_sede: number | null;
   equipo1_slug: string;
   equipo2_slug: string;
   equipo1_nombre: string;
@@ -90,7 +123,11 @@ export interface EdicionFinal {
 
 /** Forma que consumía la vista cuando los datos vivían en `HISTORICO_FINALES.ts`. */
 export interface FinalHistorica {
+  /** Clave interna y global de la edición; sirve de key, no se muestra. */
+  numero: number;
+  /** Número visible de la edición dentro de su sede. */
   temporada: number;
+  sede_id: string | null;
   equipo1: string;
   equipo2: string;
   goles1: number | null;
@@ -103,7 +140,11 @@ export interface FinalHistorica {
 
 export function finalAHistorica(f: EdicionFinal): FinalHistorica {
   return {
-    temporada: f.edicion,
+    numero: f.edicion,
+    // Las finales anteriores a las sedes se sirven con numero_sede resuelto;
+    // el fallback solo cubre una edición huérfana en la base.
+    temporada: f.numero_sede ?? f.edicion,
+    sede_id: f.sede_id,
     equipo1: f.equipo1_nombre,
     equipo2: f.equipo2_nombre,
     goles1: f.goles1,
@@ -175,7 +216,7 @@ export type TipoPalmares =
 export type JugadorRef = Pick<
   Jugador,
   "slug" | "nombre" | "apodo" | "foto_archivo"
-> & { posicion?: Posicion };
+> & { posicion?: Posicion; username?: string | null };
 
 export interface FilaPalmares {
   jugador_nombre: string;
@@ -189,10 +230,45 @@ export interface FilaPalmares {
 export interface JugadorTitulos {
   jugador_nombre: string;
   jugador: JugadorRef | null;
-  ligas: number[];
+  /** Ediciones ganadas; llegan con sede porque hay una «edición 1» por ciudad. */
+  ligas: EdicionRef[];
   champions: number;
   mundial: number;
   total: number;
+}
+
+export type TipoRecord =
+  | "mas_goles_liga"
+  | "mas_goles_jornada"
+  | "menos_goles_recibidos"
+  | "mas_puntos_equipo"
+  | "mas_puntos_jornada"
+  | "menos_puntos_jornada"
+  | "menos_puntos_equipo";
+
+/**
+ * Un puesto del podio de un récord. Conviven dos familias en la misma forma:
+ * los de jugador traen `jugador_nombre`, los de equipo `equipo_nombre` y su
+ * balance. Nunca las dos a la vez — la base lo garantiza con un CHECK.
+ */
+export interface FilaRecord {
+  sede_id: string;
+  tipo: TipoRecord;
+  posicion: number;
+  valor: number;
+
+  jugador_nombre: string | null;
+  jugadores: JugadorRef | null;
+
+  equipo_nombre: string | null;
+  equipo_color: string | null;
+  victorias: number | null;
+  empates: number | null;
+  derrotas: number | null;
+
+  /** Clave interna; para mostrar está `numero_sede`. */
+  edicion: number | null;
+  numero_sede: number | null;
 }
 
 export interface PlantillaJugador {

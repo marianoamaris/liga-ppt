@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import type { Posicion } from "../../../types/jugador";
 import { useJugadores } from "../../../hooks/useCatalogo";
+import { useSede } from "../../../context/SedeContext";
+import { SelectorSede } from "../../common/SelectorSede";
 import { SidebarTabs } from "../../common/SidebarTabs";
 import { UserCard } from "../../common/UserCard";
 import MasGanadoresComponent from "./components/MasGanadoresComponent";
@@ -33,6 +35,7 @@ export const Historia: React.FC = () => {
   const [tab, setTab] = useState("jugadores");
   const [posicion, setPosicion] = useState<"todas" | Posicion>("todas");
   const [search, setSearch] = useState<string>("");
+  const { sede } = useSede();
   const { jugadores, loading, error } = useJugadores();
 
   // Conteo total de jugadores por posición
@@ -84,6 +87,16 @@ export const Historia: React.FC = () => {
         setSearch={setSearch}
       />
       <div className="min-w-0 flex-1">
+        {/* Toda esta pantalla es de una ciudad: sus récords no se mezclan con los
+            de la otra. El selector va aquí, y no solo en la navegación, porque es
+            donde se decide qué historia se está leyendo. */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <h1 className="font-cond text-lg text-chalk">
+            Historia{sede ? ` · ${sede.nombre}` : ""}
+          </h1>
+          <SelectorSede className="w-full max-w-[16rem]" mostrarEdicion={false} />
+        </div>
+
         {(tab === "jugadores" || tab === "admins") && (
           <div className="flex flex-col gap-4">
             {tab === "jugadores" && (

@@ -74,7 +74,7 @@ function FichaEquipo({
 }
 
 interface Props {
-  edicion: number;
+  edicion: number | null;
   /** Para las ediciones sin tarjeta ni plantilla: lo que sí consta del equipo. */
   clasificacion?: FilaClasificacion[];
   arqueros?: ArqueroEdicion[];
@@ -96,7 +96,7 @@ export const CarruselEquipos: React.FC<Props> = ({
   clasificacion = [],
   arqueros = [],
 }) => {
-  const { equipos, loading, error } = usePlantillasEdicion(edicion);
+  const { equipos, sede_id, numero_sede, loading, error } = usePlantillasEdicion(edicion);
   const [slide, setSlide] = useState(0);
   const inicioTactil = useRef<number | null>(null);
 
@@ -116,12 +116,12 @@ export const CarruselEquipos: React.FC<Props> = ({
   // Precarga para que al pasar de equipo la camiseta ya esté
   useEffect(() => {
     for (const eq of equipos) {
-      const url = camisetaEquipo(edicion, eq.color_slug, eq.color_hex);
+      const url = camisetaEquipo(sede_id, numero_sede, eq.color_slug, eq.color_hex);
       if (!url) continue;
       const img = new Image();
       img.src = url;
     }
-  }, [equipos, edicion]);
+  }, [equipos, sede_id, numero_sede]);
 
   if (error) {
     return (
@@ -142,7 +142,7 @@ export const CarruselEquipos: React.FC<Props> = ({
   if (!total) return null;
 
   const actual = equipos[slide];
-  const imagenActual = camisetaEquipo(edicion, actual.color_slug, actual.color_hex);
+  const imagenActual = camisetaEquipo(sede_id, numero_sede, actual.color_slug, actual.color_hex);
 
   return (
     <section className="rounded-md border border-line bg-surface p-4">

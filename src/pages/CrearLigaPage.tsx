@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, type FormEvent } from "rea
 import { useJugadores } from "../hooks/useCatalogo";
 import { ligaConfigApi, type TeamConfig } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
+import { useSede } from "../context/SedeContext";
 
 // slug = identificador del backend (color field en la BD)
 // hex  = solo para display en el frontend
@@ -350,7 +351,15 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 export function CrearLigaPage() {
   const { profile, loading: authLoading, logout } = useAuth();
   const [authed, setAuthed] = useState(false);
-  const [temporada, setTemporada] = useState(20);
+  const { sede, edicionActual, numeroSede } = useSede();
+  // `temporada` es la clave interna de la edición, no el número que se
+  // muestra: teclear "1" aquí apuntaría a la primera edición de Valledupar,
+  // no a la de Bogotá. Por eso arranca en la edición activa de la sede.
+  const [temporada, setTemporada] = useState(0);
+
+  useEffect(() => {
+    if (edicionActual != null) setTemporada(edicionActual);
+  }, [edicionActual]);
   const [slots, setSlots] = useState<Slot[]>(
     SLOT_COLORS.map((sc) => ({ ...sc, nombre: "", jugadores: [] }))
   );
@@ -453,6 +462,11 @@ export function CrearLigaPage() {
                 min={1}
               />
             </h1>
+            {numeroSede != null && (
+              <span className="text-xs text-white/50">
+                Edición {numeroSede} · {sede?.nombre}
+              </span>
+            )}
             <button
               className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/50 hover:border-white/20 hover:text-white/70 transition-colors"
               onClick={load}

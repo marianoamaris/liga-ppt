@@ -1,5 +1,6 @@
 import React from "react";
 import { usePalmares } from "../../../../hooks/useCatalogo";
+import { useSede } from "../../../../context/SedeContext";
 import { fotoJugadorPorArchivo } from "../../../../utils/fotosJugadores";
 import { Puesto } from "../../../common/iconos";
 import type { FilaPalmares, TipoPalmares } from "../../../../types/jugador";
@@ -87,7 +88,8 @@ export const TablaPalmares: React.FC<Props> = ({
   descripcion,
   columnaDetalle,
 }) => {
-  const { de, loading, error } = usePalmares();
+  const { sedeId } = useSede();
+  const { de, loading, error } = usePalmares(sedeId);
   const filas = de(tipo);
   const maximo = filas[0]?.cantidad ?? 0;
 

@@ -7,7 +7,7 @@ import {
   type Partido,
   type Standing,
 } from "../lib/api";
-import { EDICION_ACTUAL } from "../config";
+import { useSede } from "../context/SedeContext";
 import { useEdiciones, useFinales, useJugadores } from "./useCatalogo";
 
 /** Cada cuánto se refresca el marcador del Inicio. */
@@ -26,7 +26,7 @@ interface EstadoInicio {
  * Datos de la edición en curso para el Inicio. Refresca en segundo plano
  * mientras hay partidos abiertos, para que el marcador no se quede viejo.
  */
-function useEdicionEnCurso(): EstadoInicio {
+function useEdicionEnCurso(edicion: number | null): EstadoInicio {
   const [estado, setEstado] = useState<EstadoInicio>({
     enVivo: [],
     standings: [],
@@ -39,13 +39,28 @@ function useEdicionEnCurso(): EstadoInicio {
   useEffect(() => {
     let cancelado = false;
 
-    async function cargar() {
+    // Sin edición en curso no hay nada que pedir. `loading` se apaga igual: si
+    // esta ciudad no tiene liga abierta, quedarse cargando para siempre haría
+    // parecer que la petición nunca vuelve.
+    if (edicion == null) {
+      setEstado({
+        enVivo: [],
+        standings: [],
+        goleadores: [],
+        arqueros: [],
+        loading: false,
+        error: null,
+      });
+      return;
+    }
+
+    async function cargar(numero: number) {
       try {
         const [vivo, clasif, gol, arq] = await Promise.all([
-          partidosApi.getEnVivo(),
-          statsApi.clasificacion(EDICION_ACTUAL),
-          statsApi.goleadores(EDICION_ACTUAL),
-          statsApi.arqueros(EDICION_ACTUAL),
+          partidosApi.getEnVivo(numero),
+          statsApi.clasificacion(numero),
+          statsApi.goleadores(numero),
+          statsApi.arqueros(numero),
         ]);
         if (cancelado) return;
         setEstado({
@@ -66,20 +81,20 @@ function useEdicionEnCurso(): EstadoInicio {
       }
     }
 
-    cargar();
-    const id = setInterval(cargar, REFRESCO_MS);
+    cargar(edicion);
+    const id = setInterval(() => cargar(edicion), REFRESCO_MS);
     return () => {
       cancelado = true;
       clearInterval(id);
     };
-  }, []);
+  }, [edicion]);
 
   return estado;
 }
 
-/** Campeón de la última edición cerrada, con el marcador de su final. */
-function useCampeonVigente() {
-  const { finales } = useFinales();
+/** Campeón de la última edición cerrada de la sede, con el marcador de su final. */
+function useCampeonVigente(sede: string) {
+  const { finales } = useFinales(sede);
 
   return useMemo(() => {
     const cerradas = finales.filter(
@@ -105,11 +120,14 @@ function useCampeonVigente() {
  * y el tamaño de la liga.
  */
 export function useInicio() {
-  const edicion = useEdicionEnCurso();
-  const { ediciones } = useEdiciones();
-  const { finales } = useFinales();
+  const { sedeId, edicionActual } = useSede();
+  const edicion = useEdicionEnCurso(edicionActual);
+  // El resumen es de la ciudad que se está mirando, no de la liga entera:
+  // «20 ediciones» al lado de la clasificación de Bogotá sería engañoso.
+  const { ediciones } = useEdiciones(sedeId);
+  const { finales } = useFinales(sedeId);
   const { jugadores } = useJugadores();
-  const campeonVigente = useCampeonVigente();
+  const campeonVigente = useCampeonVigente(sedeId);
 
   /* El partido a destacar: el que lleva más tiempo abierto (la API los
      devuelve del más reciente al más antiguo). */

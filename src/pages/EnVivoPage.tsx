@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
 import { supabase } from "../lib/supabase";
 import { getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
-import { EDICION_ACTUAL } from "../config";
+import { useSede } from "../context/SedeContext";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
 import type { EquipoLocal } from "../types/jugador";
 import {
@@ -613,6 +613,7 @@ const COL = {
 
 function TablaClasificacion({ standings, loading }: { standings: ReturnType<typeof mergeStandings>; loading: boolean }) {
   const { equipos: catalogo, colorDe } = useCatalogo();
+  const { numeroSede } = useSede();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -620,7 +621,11 @@ function TablaClasificacion({ standings, loading }: { standings: ReturnType<type
       <div className="px-4 py-3 border-b border-line flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-vivo animate-pulse" />
         <h2 className="text-chalk font-bold text-sm">Clasificación en vivo</h2>
-        <span className="text-chalk-3 text-xs ml-auto">Temporada 20</span>
+        {/* El número visible de la edición, no `ediciones.numero`: en Bogotá
+            la clave interna es 101 y aquí se lee «Edición 1». */}
+        {numeroSede != null && (
+          <span className="text-chalk-3 text-xs ml-auto">Edición {numeroSede}</span>
+        )}
       </div>
 
       {/* Header fijo */}
@@ -1295,13 +1300,28 @@ export function EnVivoPage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingRankings, setLoadingRankings] = useState(true);
   const [lastUpdate, setLastUpdate]     = useState<Date | null>(null);
-  const { locales: catalogo, colorDe }   = useEquiposEdicion(EDICION_ACTUAL);
+  const { sede, sedeId, edicionActual }  = useSede();
+  const { equipos, sede_id: sedeDeLosEquipos, locales: catalogo, colorDe, loading: loadingEquipos } =
+    useEquiposEdicion(edicionActual);
+
+  /**
+   * Una edición recién abierta existe pero todavía no tiene equipos: no hay
+   * partidos que mirar ni clasificación que calcular. Se distingue de «no hay
+   * edición» porque aquí la liga sí va a empezar.
+   *
+   * Se comprueba de qué sede son los equipos cargados, y no solo si hay
+   * alguno: al cambiar de ciudad hay un render en que `edicionActual` ya es la
+   * nueva pero `equipos` todavía son los de la anterior. Sin este contraste se
+   * dispara una tanda de peticiones contra una edición que no ha empezado.
+   */
+  const edicionArrancada =
+    edicionActual != null && sedeDeLosEquipos === sedeId && equipos.length > 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const channelRef = useRef<any>(null);
 
-  async function fetchActivos() {
+  async function fetchActivos(edicion: number) {
     try {
-      const { enVivo } = await partidosApi.getEnVivo();
+      const { enVivo } = await partidosApi.getEnVivo(edicion);
       const activos = enVivo
         .filter((p) => !p.finalizado_en)
         .sort((a, b) => new Date(a.iniciado_en).getTime() - new Date(b.iniciado_en).getTime());
@@ -1314,9 +1334,9 @@ export function EnVivoPage() {
     }
   }
 
-  async function fetchStandings() {
+  async function fetchStandings(edicion: number) {
     try {
-      const { standings } = await statsApi.clasificacion(20);
+      const { standings } = await statsApi.clasificacion(edicion);
       setBase(standings);
     } catch {
       // silent
@@ -1325,12 +1345,12 @@ export function EnVivoPage() {
     }
   }
 
-  async function fetchRankings() {
+  async function fetchRankings(edicion: number) {
     try {
       const [{ goleadores: g }, { arqueros: a }, { disciplina: d }] = await Promise.all([
-        statsApi.goleadores(20),
-        statsApi.arqueros(20),
-        statsApi.disciplina(20),
+        statsApi.goleadores(edicion),
+        statsApi.arqueros(edicion),
+        statsApi.disciplina(edicion),
       ]);
       setGoleadores(g);
       setArqueros(a);
@@ -1342,23 +1362,39 @@ export function EnVivoPage() {
     }
   }
 
-  function refreshAll() {
-    fetchActivos();
-    fetchStandings();
-    fetchRankings();
-  }
-
   useEffect(() => {
-    refreshAll();
+    // Si la ciudad no está jugando no se pide nada, no se hace polling cada 8s
+    // y no se abre el canal de Realtime. Antes esta pantalla sondeaba la API
+    // indefinidamente aunque no hubiera absolutamente nada que mostrar.
+    if (!edicionArrancada) {
+      setPartidos([]);
+      setBase([]);
+      setGoleadores([]);
+      setArqueros([]);
+      setDisciplina([]);
+      setLoadingMatch(false);
+      setLoadingStats(false);
+      setLoadingRankings(false);
+      return;
+    }
+
+    const edicion = edicionActual;
+    const refrescar = () => {
+      fetchActivos(edicion);
+      fetchStandings(edicion);
+      fetchRankings(edicion);
+    };
+
+    refrescar();
 
     // Polling fallback cada 8s — garantiza actualizaciones aunque Realtime se caiga
-    const intervalo = setInterval(refreshAll, 8_000);
+    const intervalo = setInterval(refrescar, 8_000);
 
     // Realtime: notifica cambios al instante cuando el canal está estable
     if (supabase) {
       channelRef.current = supabase
         .channel("en-vivo")
-        .on("postgres_changes", { event: "*", schema: "public", table: "partidos" }, refreshAll)
+        .on("postgres_changes", { event: "*", schema: "public", table: "partidos" }, refrescar)
         .subscribe();
     }
 
@@ -1366,7 +1402,7 @@ export function EnVivoPage() {
       clearInterval(intervalo);
       channelRef.current?.unsubscribe();
     };
-  }, []);
+  }, [edicionActual, edicionArrancada]);
 
   // Canchas numeradas por orden de inicio
   const canchas = partidos.slice(0, 3);
@@ -1445,6 +1481,28 @@ export function EnVivoPage() {
       </button>
     </div>
   );
+
+  // Sin liga en marcha no hay en vivo, ni clasificación, ni rankings: pintar la
+  // pantalla entera con tablas vacías haría creer que algo falló.
+  if (!edicionArrancada && !loadingEquipos) {
+    const sinEdicion = edicionActual == null;
+    return (
+      <div className="min-h-full bg-ink p-4 md:p-6">
+        <div className="mx-auto mt-16 max-w-md rounded-md border border-line bg-surface px-4 py-6 text-center">
+          <p className="font-cond text-base text-chalk">
+            {sinEdicion
+              ? `${sede?.nombre ?? "Esta ciudad"} no tiene una edición en curso`
+              : `La edición de ${sede?.nombre ?? "esta ciudad"} todavía no ha arrancado`}
+          </p>
+          <p className="mt-2 text-sm text-chalk-3">
+            {sinEdicion
+              ? "Cuando arranque la liga aquí, los partidos aparecerán en esta pantalla."
+              : "Faltan los equipos. En cuanto se registren y empiece la primera jornada, los partidos aparecerán aquí."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <EquiposCtx.Provider value={{ equipos: catalogo, colorDe }}>

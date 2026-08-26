@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { NAVEGACION } from "../../constants/navegacion";
+import { SelectorSede } from "./SelectorSede";
 
 /**
  * Navegación de escritorio. Los destinos van agrupados por frecuencia de uso
@@ -20,6 +21,8 @@ export const Sidebar: React.FC<{ className?: string }> = ({ className = "" }) =>
       />
       <span className="font-cond text-base text-chalk">Liga PPT</span>
     </div>
+
+    <SelectorSede className="mb-2 px-4" />
 
     {NAVEGACION.map((grupo) => (
       <div key={grupo.id} className="flex flex-col gap-0.5">

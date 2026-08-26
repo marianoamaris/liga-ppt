@@ -5,6 +5,7 @@ import {
   GRUPOS_SECUNDARIOS,
   ICONO_MAS,
 } from "../../constants/navegacion";
+import { SelectorSede } from "./SelectorSede";
 
 const claseDestino = (activo: boolean) =>
   `font-cond flex flex-1 flex-col items-center gap-1 py-2 text-[0.625rem] transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-chalk ${
@@ -58,6 +59,11 @@ export const BarraInferior: React.FC = () => {
           id="cajon-navegacion"
           className="fixed inset-x-0 bottom-[3.75rem] z-50 max-h-[65vh] overflow-y-auto border-t border-line bg-surface px-4 pt-4 pb-5 md:hidden"
         >
+          <div className="mb-4">
+            <h2 className="font-cond mb-2 text-[0.625rem] text-chalk-3">Ciudad</h2>
+            <SelectorSede />
+          </div>
+
           {GRUPOS_SECUNDARIOS.map((grupo) => (
             <div key={grupo.id} className="mb-4 last:mb-0">
               <h2 className="font-cond mb-2 text-[0.625rem] text-chalk-3">
