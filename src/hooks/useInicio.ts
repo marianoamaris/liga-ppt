@@ -126,7 +126,7 @@ export function useInicio() {
   // «20 ediciones» al lado de la clasificación de Bogotá sería engañoso.
   const { ediciones } = useEdiciones(sedeId);
   const { finales } = useFinales(sedeId);
-  const { jugadores } = useJugadores();
+  const { jugadores } = useJugadores({ sede: sedeId });
   const campeonVigente = useCampeonVigente(sedeId);
 
   /* El partido a destacar: el que lleva más tiempo abierto (la API los

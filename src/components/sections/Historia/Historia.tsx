@@ -35,8 +35,9 @@ export const Historia: React.FC = () => {
   const [tab, setTab] = useState("jugadores");
   const [posicion, setPosicion] = useState<"todas" | Posicion>("todas");
   const [search, setSearch] = useState<string>("");
-  const { sede } = useSede();
-  const { jugadores, loading, error } = useJugadores();
+  const { sede, sedeId } = useSede();
+  // Toda esta pantalla es de una ciudad, también su padrón.
+  const { jugadores, loading, error } = useJugadores({ sede: sedeId });
 
   // Conteo total de jugadores por posición
   const conteoPorPosicion = jugadores.reduce(

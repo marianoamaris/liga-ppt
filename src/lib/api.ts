@@ -255,12 +255,15 @@ export const ligaConfigApi = {
 // Reemplazan a USUARIOS_LIGA.ts, TEAM_COLORS, LIGA_*_EQUIPOS y PLANTILLAS_LIGA*.
 
 export const jugadoresApi = {
-  list: (params: { q?: string; posicion?: Posicion; activo?: "true" | "false" | "todos"; inciertos?: boolean } = {}) => {
+  list: (params: { q?: string; posicion?: Posicion; activo?: "true" | "false" | "todos"; inciertos?: boolean; sede?: string } = {}) => {
     const qs = new URLSearchParams();
     if (params.q) qs.set("q", params.q);
     if (params.posicion) qs.set("posicion", params.posicion);
     if (params.activo) qs.set("activo", params.activo);
     if (params.inciertos) qs.set("inciertos", "true");
+    // Sin sede devuelve el padrón completo, que es lo que necesita Crear Liga
+    // para poder reutilizar a alguien que juega en la otra ciudad.
+    if (params.sede) qs.set("sede", params.sede);
     const query = qs.toString();
     return req<{ total: number; jugadores: Jugador[] }>(
       `/jugadores${query ? `?${query}` : ""}`

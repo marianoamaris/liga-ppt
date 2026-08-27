@@ -58,16 +58,28 @@ function useAsync<T>(fn: () => Promise<T>, inicial: T, deps: unknown[]): Estado<
   return estado;
 }
 
-/** Padrón de jugadores. Por defecto solo los activos y de identidad confirmada. */
-export function useJugadores(opciones: { incluirInciertos?: boolean } = {}) {
-  const { incluirInciertos = false } = opciones;
+/**
+ * Padrón de jugadores. Por defecto solo los activos y de identidad confirmada.
+ *
+ * Con `sede` se limita a quienes juegan en esa ciudad; sin ella devuelve el
+ * padrón entero, que es único para toda la liga. Quien juegue en dos ciudades
+ * aparece en ambas.
+ */
+export function useJugadores(
+  opciones: { incluirInciertos?: boolean; sede?: string } = {}
+) {
+  const { incluirInciertos = false, sede } = opciones;
   const { datos, loading, error } = useAsync<Jugador[]>(
     () =>
       jugadoresApi
-        .list({ activo: incluirInciertos ? "todos" : "true", inciertos: incluirInciertos })
+        .list({
+          activo: incluirInciertos ? "todos" : "true",
+          inciertos: incluirInciertos,
+          ...(sede ? { sede } : {}),
+        })
         .then((r) => r.jugadores),
     [],
-    [incluirInciertos]
+    [incluirInciertos, sede]
   );
 
   /** Misma forma que el antiguo `USUARIOS_LIGA`, para las vistas aún sin migrar. */
