@@ -1,13 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CONTACTO_LIGA_EMAIL,
   NETLIFY_FORM_GRUPO_RESERVAS,
 } from "../constants/ACTUALIZACION_DATOS_JUGADOR";
+import { useSede } from "../context/SedeContext";
+import { horarioDeSede } from "../utils/horarios";
 
 const POSICIONES = ["Arquero", "Defensa", "Mediocampista", "Delantero"] as const;
 type Posicion = (typeof POSICIONES)[number];
 
 export const ActualizacionDatosJugadorPage: React.FC = () => {
+  const { sedes, sedeId } = useSede();
+  // La ciudad decide el horario que se pide confirmar, así que se pregunta
+  // antes que nada. Arranca en la que el visitante venía mirando.
+  const [sedeElegida, setSedeElegida] = useState(sedeId);
+  useEffect(() => setSedeElegida(sedeId), [sedeId]);
+
+  const sede = sedes.find((s) => s.id === sedeElegida) ?? null;
+  const horario = sede ? horarioDeSede(sede) : null;
+
   const [exito, setExito] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +56,7 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
     try {
       const raw = new FormData(form);
       raw.set("posiciones", [...posiciones].join(", "));
+      raw.set("ciudad", sede?.nombre ?? sedeElegida);
       const params = new URLSearchParams();
       raw.forEach((value, key) => {
         params.append(key, typeof value === "string" ? value : "");
@@ -79,6 +91,7 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
             </span>
             <h1 className="font-cond text-center text-2xl text-chalk">
               Participar en la Liga PPT
+              {sede && <span className="text-chalk-2"> · {sede.nombre}</span>}
             </h1>
 
             <p className="text-center text-sm text-chalk-2">
@@ -96,8 +109,14 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                 avisamos al grupo de reservas para que alguien pueda entrar de inmediato.
               </li>
               <li>
-                Las jornadas son los <strong>jueves a las 6:00 PM</strong>. Es requisito estar disponible
-                esa noche de forma habitual.
+                {horario ? (
+                  <>
+                    En {sede?.nombre} las jornadas son <strong>{horario}</strong>. Es requisito estar
+                    disponible esas noches de forma habitual.
+                  </>
+                ) : (
+                  "Es requisito estar disponible de forma habitual la noche de las jornadas."
+                )}
               </li>
               <li>
                 Una vez aprobado, te agregamos al grupo de WhatsApp de reservas.
@@ -159,6 +178,47 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
                 <label htmlFor="bot-field-hp">No completar</label>
                 <input id="bot-field-hp" name="bot-field" tabIndex={-1} autoComplete="off" />
               </div>
+
+              {/* Ciudad — va primero porque determina el horario que se confirma abajo */}
+              {sedes.length > 1 && (
+                <div className="flex flex-col gap-2">
+                  <span className="font-cond text-sm text-chalk-2">
+                    ¿En qué ciudad quieres jugar? <span className="text-vivo">*</span>
+                  </span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {sedes.map((s) => {
+                      const activa = s.id === sedeElegida;
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => setSedeElegida(s.id)}
+                          aria-pressed={activa}
+                          className={`font-cond rounded-sm border px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
+                            activa
+                              ? "border-chalk-3 bg-raised text-chalk"
+                              : "border-line text-chalk-3 hover:text-chalk-2"
+                          }`}
+                          style={
+                            activa && s.color_hex
+                              ? { boxShadow: `inset 0 -2px 0 ${s.color_hex}` }
+                              : undefined
+                          }
+                        >
+                          {s.nombre}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-chalk-3">
+                    {horario
+                      ? `Jornadas ${horario}.`
+                      : "Cargando el horario de la ciudad…"}
+                  </p>
+                </div>
+              )}
+              {/* Netlify recibe la ciudad aunque solo haya una */}
+              <input type="hidden" name="ciudad" value={sede?.nombre ?? sedeElegida} />
 
               {/* Nombre */}
               <div className="flex flex-col gap-1">
@@ -243,17 +303,24 @@ export const ActualizacionDatosJugadorPage: React.FC = () => {
               </div>
 
               {/* Disponibilidad - confirmación */}
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              {/* Destaca sobre fondo oscuro, no con una tarjeta clara: el texto
+                  secundario sobre crema quedaba en 1.7:1, muy lejos del 4.5:1
+                  que se fija el proyecto. */}
+              <div className="rounded-sm border border-vivo/40 bg-vivo/10 p-4">
                 <label className="flex cursor-pointer items-start gap-3">
                   <input
                     type="checkbox"
-                    name="disponibilidad_jueves"
+                    name="disponibilidad"
                     required
                     className="mt-0.5 size-4 shrink-0 accent-chalk"
                   />
                   <span className="text-sm text-chalk-2">
-                    Confirmo que puedo estar <strong>disponible todos los jueves a las 6:00 PM</strong> para
-                    participar en las jornadas de la Liga PPT. Entiendo que esta es una condición
+                    Confirmo que puedo estar{" "}
+                    <strong>
+                      disponible {horario ?? "la noche de las jornadas"}
+                    </strong>{" "}
+                    para participar en las jornadas de la Liga PPT
+                    {sede ? ` en ${sede.nombre}` : ""}. Entiendo que esta es una condición
                     indispensable para pertenecer al grupo de reservas.
                   </span>
                 </label>

@@ -268,12 +268,15 @@ export function useEquiposEdicion(numero: number | null) {
 /**
  * Equipos de una edición junto con sus plantillas.
  *
- * Devuelve también la sede y el número visible porque las camisetas se guardan
- * por sede y edición, y `numero` a secas ya no basta para encontrarlas.
+ * Devuelve la sede y el número visible porque las camisetas se guardan por sede
+ * y edición, y `numero` a secas ya no basta para encontrarlas. Devuelve además
+ * `edicion`: mientras carga una edición nueva, `equipos` sigue conteniendo los
+ * de la anterior, y quien pinte estos datos necesita poder distinguirlo.
  */
 export function usePlantillasEdicion(numero: number | null) {
   const vacio = {
     equipos: [] as EquipoConPlantilla[],
+    edicion: null as number | null,
     sede_id: null as string | null,
     numero_sede: null as number | null,
   };
@@ -284,6 +287,7 @@ export function usePlantillasEdicion(numero: number | null) {
         ? Promise.resolve(vacio)
         : edicionesApi.plantillas(numero).then((r) => ({
             equipos: r.equipos,
+            edicion: r.edicion,
             sede_id: r.sede_id,
             numero_sede: r.numero_sede,
           })),

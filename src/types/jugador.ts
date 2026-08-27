@@ -19,6 +19,8 @@ export interface Jugador {
   ligas_ganadas: number;
   goles_historicos: number;
   identidad_incierta: boolean;
+  /** Ciudades en las que juega. El padrón es único: alguien puede estar en varias. */
+  sedes?: string[];
 }
 
 /** Fila de la tabla `sedes`: una ciudad donde se juega la liga. */
@@ -30,6 +32,11 @@ export interface Sede {
   rango_base: number;
   activa: boolean;
   orden: number | null;
+  /** Días de jornada en numeración ISO: 1 = lunes … 7 = domingo. */
+  dias_jornada: number[];
+  /** Hora local, como "19:00:00". */
+  hora_inicio: string;
+  hora_fin: string;
   /** Edición en curso de esta sede; null si no hay ninguna abierta. */
   edicion_activa: EdicionRef | null;
 }
@@ -59,8 +66,12 @@ export interface Edicion {
   descripcion: string | null;
   estado: "historica" | "activa" | "proxima";
   total_jornadas: number;
+  /** Cupo de plantilla de esta edición; Valledupar juega con 8 y Bogotá con 10. */
+  jugadores_por_equipo: number;
   campeon_slug: string | null;
   subcampeon_slug: string | null;
+  /** Solo en el listado. Cero significa edición abierta pero sin equipos montados. */
+  total_equipos?: number;
   /** Resueltos por la API a partir del slug; solo en el listado de ediciones. */
   campeon_nombre?: string | null;
   campeon_color?: string | null;
@@ -269,6 +280,21 @@ export interface FilaRecord {
   /** Clave interna; para mostrar está `numero_sede`. */
   edicion: number | null;
   numero_sede: number | null;
+}
+
+/** Un jugador dentro de la plantilla que se está armando en Crear Liga. */
+export interface EntradaPlantilla {
+  nombre: string;
+  /** Presente si salió del padrón; null si es un nombre nuevo aún sin crear. */
+  jugador_id: string | null;
+  es_arquero: boolean;
+  es_capitan: boolean;
+}
+
+export interface EquipoBorrador {
+  nombre: string;
+  color_slug: string;
+  jugadores: EntradaPlantilla[];
 }
 
 export interface PlantillaJugador {

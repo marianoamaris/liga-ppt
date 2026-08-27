@@ -7,6 +7,7 @@ import type {
   FilaPalmares,
   HistoricoEdicion,
   Jugador,
+  EquipoBorrador,
   JugadorTitulos,
   FilaRecord,
   Sede,
@@ -190,6 +191,53 @@ export interface TeamConfig {
   arquero?: string;
   capitan?: string;
 }
+
+/**
+ * Guarda los equipos y plantillas de una edición.
+ *
+ * Escribe en `edicion_equipos` / `edicion_plantillas`, que es de donde leen el
+ * anotador, la clasificación y el carrusel. La antigua `ligaConfigApi` apuntaba
+ * a `liga_equipos`, una tabla que no consultaba ninguna pantalla.
+ */
+export const ligasApi = {
+  /**
+   * Crea la siguiente liga de una ciudad. El número no se manda: lo deduce el
+   * backend del historial de esa sede, y reutiliza una edición sin equipos si
+   * la hubiera en vez de saltarse el número.
+   */
+  crear: (body: {
+    sede_id: string;
+    jugadores_por_equipo: number;
+    equipos: EquipoBorrador[];
+  }) =>
+    req<{
+      ok: boolean;
+      numero: number;
+      numero_sede: number;
+      sede_id: string;
+      creada: boolean;
+      estado: string;
+      equipos: number;
+      jugadores: number;
+      creados: string[];
+    }>("/ediciones", { method: "POST", body: JSON.stringify(body) }),
+};
+
+export const plantillasApi = {
+  guardar: (edicion: number, equipos: EquipoBorrador[]) =>
+    req<{
+      ok: boolean;
+      edicion: number;
+      sede_id: string;
+      equipos: number;
+      jugadores: number;
+      /** Nombres que no existían en el padrón y se acaban de dar de alta. */
+      creados: string[];
+    }>(`/ediciones/${edicion}/plantillas`, {
+      method: "PUT",
+      body: JSON.stringify({ equipos }),
+    }),
+};
 
 export const ligaConfigApi = {
   get: (temporada: number) =>

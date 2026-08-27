@@ -1,12 +1,17 @@
-import React, { useState, useRef, useEffect, useMemo, type FormEvent } from "react";
-import { useJugadores } from "../hooks/useCatalogo";
-import { ligaConfigApi, type TeamConfig } from "../lib/api";
+import { useState, useRef, useEffect, useMemo, type FormEvent } from "react";
+import { useEdiciones, useJugadores } from "../hooks/useCatalogo";
+import { ligasApi } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useSede } from "../context/SedeContext";
+import type { EntradaPlantilla, EquipoBorrador, Jugador } from "../types/jugador";
 
-// slug = identificador del backend (color field en la BD)
-// hex  = solo para display en el frontend
-const SLOT_COLORS = [
+/**
+ * Los nueve petos con los que se juega. `slug` es lo que guarda la base como
+ * identidad del equipo dentro de la edición; el hex es solo para pintarlo aquí
+ * —el definitivo lo pone el backend, para que el mismo color se vea igual en
+ * todas las ediciones.
+ */
+const COLORES = [
   { slug: "verde",    hex: "#22C55E", label: "Verde" },
   { slug: "rojo",     hex: "#D00027", label: "Rojo" },
   { slug: "azul",     hex: "#2563EB", label: "Azul" },
@@ -18,10 +23,22 @@ const SLOT_COLORS = [
   { slug: "blanco",   hex: "#FFFFFF", label: "Blanco" },
 ];
 
-export const SLUG_TO_HEX: Record<string, string> = Object.fromEntries(
-  SLOT_COLORS.map((s) => [s.slug, s.hex])
+const SLUG_TO_HEX: Record<string, string> = Object.fromEntries(
+  COLORES.map((s) => [s.slug, s.hex])
 );
 
+/** Una jornada necesita tres equipos para poder repartirse. */
+const MIN_EQUIPOS = 3;
+const MAX_EQUIPOS = COLORES.length;
+
+/**
+ * Cupo de plantilla. Deja de ser una constante en cuanto hay más de una ciudad:
+ * Valledupar juega con 8 y Bogotá con 10, así que se elige al crear la liga y
+ * se guarda en la edición.
+ */
+const CUPO_MIN = 5;
+const CUPO_MAX = 15;
+const CUPO_POR_DEFECTO = 8;
 
 function isLight(hex: string): boolean {
   const c = hex.replace("#", "");
@@ -31,59 +48,102 @@ function isLight(hex: string): boolean {
   return (r * 299 + g * 587 + b * 114) / 1000 > 140;
 }
 
-// Slot mantiene hex para display; slug es lo que va al backend como "color"
-type Slot = {
-  slug: string;
-  hex: string;
-  label: string;
-  nombre: string;
-  jugadores: string[];
-  arquero?: string;
-  capitan?: string;
-};
+const hexDe = (slug: string) => SLUG_TO_HEX[slug] ?? "#4B5563";
+const labelDe = (slug: string) =>
+  COLORES.find((c) => c.slug === slug)?.label ?? slug;
 
-function PlayerSearch({
+/**
+ * El borrador lleva una identidad propia además de los campos que viaja al
+ * backend. Sin ella habría que indexar las tarjetas por su posición, y al
+ * eliminar una del medio React reasignaría a las siguientes el estado interno
+ * de la borrada: el texto a medio escribir en el buscador saltaría de tarjeta.
+ */
+type Borrador = EquipoBorrador & { _id: string };
+
+const nuevoId = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `e-${Math.random().toString(36).slice(2)}`;
+
+function equipoVacio(colorSlug: string): Borrador {
+  return { _id: nuevoId(), nombre: "", color_slug: colorSlug, jugadores: [] };
+}
+
+/** Punto de partida de una edición sin equipos: el mínimo jugable, en blanco. */
+function borradorVacio(): Borrador[] {
+  return COLORES.slice(0, MIN_EQUIPOS).map((c) => equipoVacio(c.slug));
+}
+
+// ── Buscador de jugadores ───────────────────────────────────────────────────
+
+/**
+ * Busca en el padrón, que es único para toda la liga: alguien que juega en
+ * Valledupar aparece igual al armar un equipo de Bogotá, y seleccionarlo
+ * reutiliza su ficha en vez de duplicarla. Solo cuando nadie coincide se ofrece
+ * darlo de alta.
+ */
+function BuscadorJugador({
   onAdd,
-  assigned,
-  placeholder = "Buscar o escribir nombre…",
+  asignados,
+  placeholder = "Buscar o crear jugador…",
 }: {
-  onAdd: (name: string) => void;
-  assigned: string[];
+  onAdd: (entrada: { nombre: string; jugador_id: string | null }) => void;
+  asignados: string[];
   placeholder?: string;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { usuarios } = useJugadores();
+  const { jugadores } = useJugadores();
 
-  const todos = useMemo(
-    () => usuarios.map((u) => u.name).sort((a, b) => a.localeCompare(b)),
-    [usuarios]
+  const disponibles = useMemo(
+    () =>
+      [...jugadores]
+        .filter((j) => !asignados.includes(j.nombre))
+        .sort((a, b) => a.nombre.localeCompare(b.nombre)),
+    [jugadores, asignados]
   );
 
-  const filtered = todos.filter(
-    (p) =>
-      !assigned.includes(p) &&
-      p.toLowerCase().includes(query.toLowerCase())
+  const q = query.trim().toLowerCase();
+  const filtrados = useMemo(
+    () =>
+      (q
+        ? disponibles.filter(
+            (j) =>
+              j.nombre.toLowerCase().includes(q) ||
+              (j.apodo?.toLowerCase().includes(q) ?? false)
+          )
+        : disponibles
+      ).slice(0, 30),
+    [disponibles, q]
+  );
+
+  // Solo se ofrece crear cuando no hay una coincidencia exacta: es la salvaguarda
+  // contra dar de alta a alguien dos veces por una tilde.
+  const hayExacto = useMemo(
+    () => jugadores.some((j) => j.nombre.toLowerCase() === q),
+    [jugadores, q]
   );
 
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node))
-        setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  function handleAdd(name: string) {
-    onAdd(name);
+  function elegir(j: Jugador) {
+    onAdd({ nombre: j.nombre, jugador_id: j.id });
     setQuery("");
     setOpen(false);
   }
 
-  function handleKey(e: React.KeyboardEvent) {
-    if (e.key === "Enter" && query.trim()) handleAdd(query.trim());
+  function crear() {
+    if (!query.trim()) return;
+    onAdd({ nombre: query.trim(), jugador_id: null });
+    setQuery("");
+    setOpen(false);
   }
 
   return (
@@ -94,18 +154,48 @@ function PlayerSearch({
         value={query}
         onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
-        onKeyDown={handleKey}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter") return;
+          e.preventDefault();
+          if (filtrados.length) elegir(filtrados[0]);
+          else crear();
+        }}
       />
-      {open && (filtered.length > 0 || query.trim()) && (
-        <ul className="absolute z-50 mt-1 max-h-44 w-full overflow-y-auto rounded-lg border border-white/10 bg-[#1a1a1a] shadow-xl">
-          {filtered.map((p) => (
-            <li key={p} className="cursor-pointer px-3 py-2 text-sm text-white/80 hover:bg-white/10" onMouseDown={() => handleAdd(p)}>
-              {p}
+
+      {open && (
+        <ul className="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-white/10 bg-[#1a1a1a] shadow-xl">
+          {filtrados.map((j) => (
+            <li
+              key={j.id}
+              className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm text-white/80 hover:bg-white/10"
+              onMouseDown={() => elegir(j)}
+            >
+              <span className="truncate">
+                {j.nombre}
+                {j.apodo && <span className="ml-1 text-white/30">«{j.apodo}»</span>}
+              </span>
+              {/* En qué ciudades ya juega: avisa de que reutilizas a alguien. */}
+              {!!j.sedes?.length && (
+                <span className="shrink-0 text-[10px] uppercase tracking-wider text-white/30">
+                  {j.sedes.join(" · ")}
+                </span>
+              )}
             </li>
           ))}
-          {query.trim() && !filtered.find((p) => p.toLowerCase() === query.toLowerCase()) && (
-            <li className="cursor-pointer border-t border-white/10 px-3 py-2 text-sm text-white/50 hover:bg-white/10" onMouseDown={() => handleAdd(query.trim())}>
-              + Agregar "{query.trim()}"
+
+          {!filtrados.length && !query.trim() && (
+            <li className="px-3 py-2 text-sm text-white/30">
+              Todos los jugadores ya están asignados
+            </li>
+          )}
+
+          {query.trim() && !hayExacto && (
+            <li
+              className="cursor-pointer border-t border-white/10 px-3 py-2 text-sm text-white/60 hover:bg-white/10"
+              onMouseDown={crear}
+            >
+              + Crear «{query.trim()}»
+              <span className="ml-1 text-white/30">— no está en el padrón</span>
             </li>
           )}
         </ul>
@@ -114,180 +204,209 @@ function PlayerSearch({
   );
 }
 
-function TeamCard({
-  slot,
-  allSlots,
+// ── Tarjeta de equipo ───────────────────────────────────────────────────────
+
+function TarjetaEquipo({
+  equipo,
+  todos,
+  coloresLibres,
+  cupo,
   onChange,
+  onEliminar,
 }: {
-  slot: Slot;
-  allSlots: Slot[];
-  onChange: (updated: Slot) => void;
+  equipo: Borrador;
+  todos: Borrador[];
+  coloresLibres: string[];
+  cupo: number;
+  onChange: (e: Borrador) => void;
+  /** null cuando quitarlo dejaría la liga por debajo del mínimo jugable. */
+  onEliminar: (() => void) | null;
 }) {
-  const light = isLight(slot.hex);
+  // Confirmación en la propia tarjeta y no un diálogo del navegador: borrar un
+  // equipo con plantilla se lleva por delante trabajo de varios minutos.
+  const [confirmando, setConfirmando] = useState(false);
+  const hex = hexDe(equipo.color_slug);
+  const light = isLight(hex);
   const headerText = light ? "#111111" : "#FFFFFF";
-  const isBorderNeeded = slot.slug === "blanco";
 
-  // All names taken across all slots (jugadores + arqueros)
-  const allAssigned = allSlots.flatMap((s) => [
-    ...s.jugadores,
-    ...(s.arquero ? [s.arquero] : []),
-  ]);
+  const asignados = todos.flatMap((e) => e.jugadores.map((j) => j.nombre));
+  const total = equipo.jugadores.length;
+  const lleno = total >= cupo;
 
-  const teamMembers = [
-    ...(slot.arquero ? [slot.arquero] : []),
-    ...slot.jugadores,
-  ];
+  const arquero = equipo.jugadores.find((j) => j.es_arquero) ?? null;
+  const deCampo = equipo.jugadores.filter((j) => !j.es_arquero);
 
-  function setArquero(name: string) {
-    const next: Slot = { ...slot, arquero: name };
-    if (slot.capitan === name) delete next.capitan;
-    onChange(next);
+  function agregar(entrada: { nombre: string; jugador_id: string | null }, comoArquero: boolean) {
+    if (equipo.jugadores.some((j) => j.nombre === entrada.nombre)) return;
+    const nuevo: EntradaPlantilla = {
+      ...entrada,
+      es_arquero: comoArquero,
+      es_capitan: false,
+    };
+    onChange({ ...equipo, jugadores: [...equipo.jugadores, nuevo] });
   }
 
-  function clearArquero() {
-    const next: Slot = { ...slot };
-    delete next.arquero;
-    if (slot.capitan === slot.arquero) delete next.capitan;
-    onChange(next);
+  function quitar(nombre: string) {
+    onChange({ ...equipo, jugadores: equipo.jugadores.filter((j) => j.nombre !== nombre) });
   }
 
-  function addPlayer(name: string) {
-    if (!slot.jugadores.includes(name))
-      onChange({ ...slot, jugadores: [...slot.jugadores, name] });
+  function setCapitan(nombre: string) {
+    onChange({
+      ...equipo,
+      jugadores: equipo.jugadores.map((j) => ({ ...j, es_capitan: j.nombre === nombre })),
+    });
   }
-
-  function removePlayer(name: string) {
-    const next: Slot = { ...slot, jugadores: slot.jugadores.filter((j) => j !== name) };
-    if (slot.capitan === name) delete next.capitan;
-    onChange(next);
-  }
-
-  const MAX = 8;
-  const totalCount = slot.jugadores.length + (slot.arquero ? 1 : 0);
-  const isFull = totalCount >= MAX;
 
   return (
-    <div
-      className={`flex flex-col rounded-2xl overflow-hidden border ${
-        isBorderNeeded ? "border-white/20" : "border-transparent"
-      } bg-[#111] shadow-lg`}
-    >
-      {/* Color header */}
-      <div className="px-4 py-3 flex items-center gap-3" style={{ backgroundColor: slot.hex }}>
-        <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: light ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.35)" }} />
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111] shadow-lg">
+      {/* Cabecera de color */}
+      <div className="flex items-center gap-3 px-4 py-3" style={{ backgroundColor: hex }}>
+        <select
+          value={equipo.color_slug}
+          onChange={(e) => onChange({ ...equipo, color_slug: e.target.value })}
+          aria-label="Color del peto"
+          className="cursor-pointer rounded border-0 bg-black/15 px-1.5 py-1 text-[11px] font-bold outline-none"
+          style={{ color: headerText }}
+        >
+          {[equipo.color_slug, ...coloresLibres].map((c) => (
+            <option key={c} value={c} className="bg-[#1a1a1a] text-white">
+              {labelDe(c)}
+            </option>
+          ))}
+        </select>
+
         <input
-          className="flex-1 bg-transparent text-base font-bold outline-none"
+          className="min-w-0 flex-1 bg-transparent text-base font-bold outline-none placeholder-current/50"
           style={{ color: headerText }}
           placeholder="Nombre del equipo…"
-          value={slot.nombre}
-          onChange={(e) => onChange({ ...slot, nombre: e.target.value })}
+          value={equipo.nombre}
+          onChange={(e) => onChange({ ...equipo, nombre: e.target.value })}
         />
+
         <span
           className="text-[12px] font-bold tabular-nums"
-          style={{ color: isFull ? (light ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.9)") : (light ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.45)") }}
+          style={{ color: light ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.7)" }}
         >
-          {totalCount}/{MAX}
+          {total}/{cupo}
         </span>
+
+        {onEliminar && (
+          <button
+            onClick={() => (confirmando ? onEliminar() : setConfirmando(true))}
+            onBlur={() => setConfirmando(false)}
+            title={confirmando ? "Confirmar borrado" : "Eliminar equipo"}
+            className="shrink-0 rounded px-1.5 py-0.5 text-[11px] font-bold transition-colors"
+            style={{
+              color: confirmando ? "#FFFFFF" : light ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.6)",
+              backgroundColor: confirmando ? "#D00027" : "transparent",
+            }}
+          >
+            {confirmando ? "¿Eliminar?" : "×"}
+          </button>
+        )}
       </div>
 
-      {/* Body */}
       <div className="flex flex-col divide-y divide-white/5">
-
-        {/* Arquero slot */}
-        <div className="p-4 space-y-2">
+        {/* Arquero */}
+        <div className="space-y-2 p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Arquero</p>
-          {slot.arquero ? (
-            <div className="flex items-center justify-between rounded-xl bg-white/5 border border-white/10 px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span className="text-base">🧤</span>
-                <span className="text-sm text-white/90 font-medium">{slot.arquero}</span>
-              </div>
+          {arquero ? (
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+              <span className="flex items-center gap-2 text-sm font-medium text-white/90">
+                <span>🧤</span>
+                {arquero.nombre}
+                {!arquero.jugador_id && (
+                  <span className="text-[10px] uppercase tracking-wider text-emerald-400/70">nuevo</span>
+                )}
+              </span>
               <button
-                className="text-white/30 hover:text-red-400 transition-colors text-lg leading-none"
-                onClick={clearArquero}
+                className="text-lg leading-none text-white/30 transition-colors hover:text-red-400"
+                onClick={() => quitar(arquero.nombre)}
               >
                 ×
               </button>
             </div>
-          ) : isFull ? (
-            <p className="text-xs text-white/20 italic">Límite alcanzado</p>
+          ) : lleno ? (
+            <p className="text-xs italic text-white/20">Límite alcanzado</p>
           ) : (
-            <PlayerSearch
-              onAdd={setArquero}
-              assigned={allAssigned}
+            <BuscadorJugador
+              onAdd={(e) => agregar(e, true)}
+              asignados={asignados}
               placeholder="Asignar arquero…"
             />
           )}
         </div>
 
-        {/* Jugadores */}
-        <div className="p-4 space-y-3">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Jugadores de campo</p>
-          <div className="flex flex-wrap gap-2 min-h-[28px]">
-            {slot.jugadores.map((j) => (
+        {/* Jugadores de campo */}
+        <div className="space-y-3 p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">
+            Jugadores de campo
+          </p>
+          <div className="flex min-h-[28px] flex-wrap gap-2">
+            {deCampo.map((j) => (
               <span
-                key={j}
+                key={j.nombre}
                 className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs ${
-                  slot.capitan === j
-                    ? "bg-yellow-400/20 text-yellow-300 border border-yellow-400/30"
-                    : "bg-white/8 text-white/75 border border-white/10"
+                  j.es_capitan
+                    ? "border border-yellow-400/30 bg-yellow-400/20 text-yellow-300"
+                    : "border border-white/10 bg-white/8 text-white/75"
                 }`}
               >
-                {slot.capitan === j && <span className="text-[10px]">©</span>}
-                {j}
+                {j.es_capitan && <span className="text-[10px]">©</span>}
+                {j.nombre}
+                {!j.jugador_id && (
+                  <span className="text-[9px] uppercase text-emerald-400/70">nuevo</span>
+                )}
                 <button
-                  className="ml-1 text-white/30 hover:text-red-400 transition-colors leading-none"
-                  onClick={() => removePlayer(j)}
+                  className="ml-1 leading-none text-white/30 transition-colors hover:text-red-400"
+                  onClick={() => quitar(j.nombre)}
                 >
                   ×
                 </button>
               </span>
             ))}
-            {slot.jugadores.length === 0 && (
-              <span className="text-xs text-white/20 italic">Sin jugadores</span>
-            )}
+            {!deCampo.length && <span className="text-xs italic text-white/20">Sin jugadores</span>}
           </div>
-          {isFull ? (
-            <p className="text-xs text-white/20 italic">Límite de 8 jugadores alcanzado</p>
+
+          {lleno ? (
+            <p className="text-xs italic text-white/20">
+              Límite de {cupo} jugadores alcanzado
+            </p>
           ) : (
-            <PlayerSearch
-              onAdd={addPlayer}
-              assigned={allAssigned}
+            <BuscadorJugador
+              onAdd={(e) => agregar(e, false)}
+              asignados={asignados}
               placeholder="Agregar jugador…"
             />
           )}
         </div>
 
         {/* Capitán */}
-        <div className="p-4 space-y-2">
+        <div className="space-y-2 p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Capitán</p>
-          {teamMembers.length === 0 ? (
-            <p className="text-xs text-white/20 italic">Agrega jugadores primero</p>
+          {!equipo.jugadores.length ? (
+            <p className="text-xs italic text-white/20">Agrega jugadores primero</p>
           ) : (
             <select
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/30 appearance-none"
-              value={slot.capitan ?? ""}
-              onChange={(e) => {
-                const next = { ...slot };
-                if (e.target.value) next.capitan = e.target.value;
-                else delete next.capitan;
-                onChange(next);
-              }}
+              className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+              value={equipo.jugadores.find((j) => j.es_capitan)?.nombre ?? ""}
+              onChange={(e) => setCapitan(e.target.value)}
             >
               <option value="" className="bg-[#1a1a1a] text-white/40">— Sin capitán —</option>
-              {teamMembers.map((m) => (
-                <option key={m} value={m} className="bg-[#1a1a1a] text-white">
-                  {m === slot.arquero ? `🧤 ${m}` : m}
+              {equipo.jugadores.map((j) => (
+                <option key={j.nombre} value={j.nombre} className="bg-[#1a1a1a] text-white">
+                  {j.es_arquero ? `🧤 ${j.nombre}` : j.nombre}
                 </option>
               ))}
             </select>
           )}
         </div>
-
       </div>
     </div>
   );
 }
+
+// ── Login ───────────────────────────────────────────────────────────────────
 
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const { login } = useAuth();
@@ -311,31 +430,31 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-4">
       <div className="w-full max-w-xs space-y-6">
         <div className="text-center">
-          <img src="/ligaPPT-escudo.png" alt="Liga PPT" className="w-14 h-14 mx-auto mb-3 object-contain" />
-          <h1 className="text-white text-xl font-black">Crear Liga</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Liga PPT · Zona Admin</p>
+          <img src="/ligaPPT-escudo.png" alt="Liga PPT" className="mx-auto mb-3 h-14 w-14 object-contain" />
+          <h1 className="text-xl font-black text-white">Crear Liga</h1>
+          <p className="mt-0.5 text-sm text-gray-500">Liga PPT · Zona Admin</p>
         </div>
-        <form onSubmit={handleSubmit} className="bg-[#111] rounded-2xl p-6 space-y-4 border border-white/10 shadow-2xl">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-white/10 bg-[#111] p-6 shadow-2xl">
           <div className="space-y-1.5">
-            <label className="text-gray-400 text-xs uppercase tracking-wider font-semibold block">Correo</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400">Correo</label>
             <input
               type="email" required autoComplete="email" value={email}
               onChange={(e) => setEmail(e.target.value)} placeholder="correo@ejemplo.com"
-              className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder-white/20 border border-white/10"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-white/20"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-gray-400 text-xs uppercase tracking-wider font-semibold block">Contraseña</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400">Contraseña</label>
             <input
               type="password" required autoComplete="current-password" value={password}
               onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
-              className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder-white/20 border border-white/10"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-white/20"
             />
           </div>
-          {error && <p className="text-red-400 text-xs">{error}</p>}
+          {error && <p className="text-xs text-red-400">{error}</p>}
           <button
             type="submit" disabled={loading}
             className="w-full rounded-xl bg-white py-3.5 text-sm font-bold text-black disabled:opacity-50"
@@ -348,21 +467,24 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
+// ── Página ──────────────────────────────────────────────────────────────────
+
 export function CrearLigaPage() {
   const { profile, loading: authLoading, logout } = useAuth();
   const [authed, setAuthed] = useState(false);
-  const { sede, edicionActual, numeroSede } = useSede();
-  // `temporada` es la clave interna de la edición, no el número que se
-  // muestra: teclear "1" aquí apuntaría a la primera edición de Valledupar,
-  // no a la de Bogotá. Por eso arranca en la edición activa de la sede.
-  const [temporada, setTemporada] = useState(0);
 
-  useEffect(() => {
-    if (edicionActual != null) setTemporada(edicionActual);
-  }, [edicionActual]);
-  const [slots, setSlots] = useState<Slot[]>(
-    SLOT_COLORS.map((sc) => ({ ...sc, nombre: "", jugadores: [] }))
-  );
+  const { sedes, sedeId } = useSede();
+  const { jugadores } = useJugadores();
+  const porId = useMemo(() => new Map(jugadores.map((j) => [j.id, j])), [jugadores]);
+  // La sede se elige aquí y no se toma de la navegación: administrar la liga de
+  // otra ciudad no debería cambiar lo que ves en el resto de la app.
+  const [sedeElegida, setSedeElegida] = useState(sedeId);
+  const { ediciones, loading: cargandoEdiciones } = useEdiciones(sedeElegida);
+  const [cupo, setCupo] = useState(CUPO_POR_DEFECTO);
+
+  // Tres equipos visibles desde el primer render: es el mínimo jugable, así que
+  // no hay ningún estado válido con menos.
+  const [equipos, setEquipos] = useState<Borrador[]>(borradorVacio);
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [msg, setMsg] = useState("");
 
@@ -370,130 +492,218 @@ export function CrearLigaPage() {
     if (!authLoading && profile) setAuthed(true);
   }, [authLoading, profile]);
 
+  useEffect(() => setSedeElegida(sedeId), [sedeId]);
+
+  // Cambiar de ciudad reinicia el borrador: los equipos de una no sirven en otra.
+  useEffect(() => {
+    setEquipos(borradorVacio());
+    setStatus("idle");
+    setMsg("");
+  }, [sedeElegida]);
+
+  /**
+   * Qué edición va a crearse.
+   *
+   * Esta pantalla solo abre ligas nuevas, así que el número no se elige: es el
+   * siguiente de la ciudad. La excepción son las ediciones sin equipos, que son
+   * un número reservado y no una liga: se reutilizan, porque si no la edición 1
+   * de Bogotá quedaría huérfana y la ciudad arrancaría en la 2. El backend
+   * aplica esta misma regla al guardar; aquí solo se anticipa para poder
+   * anunciarla.
+   */
+  const proxima = useMemo(() => {
+    if (cargandoEdiciones || ediciones[0]?.sede_id !== sedeElegida) return null;
+    const reservada = [...ediciones]
+      .filter((e) => (e.total_equipos ?? 0) === 0)
+      .sort((a, b) => a.numero_sede - b.numero_sede)[0];
+    if (reservada) return { numero_sede: reservada.numero_sede, reutiliza: true };
+
+    const max = Math.max(0, ...ediciones.map((e) => e.numero_sede));
+    return { numero_sede: max + 1, reutiliza: false };
+  }, [ediciones, cargandoEdiciones, sedeElegida]);
+
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white/30 text-sm">
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] text-sm text-white/30">
         Cargando…
       </div>
     );
   }
 
-  if (!authed) {
-    return <LoginForm onSuccess={() => setAuthed(true)} />;
+  if (!authed) return <LoginForm onSuccess={() => setAuthed(true)} />;
+
+  const usados = equipos.map((e) => e.color_slug);
+  const coloresLibres = COLORES.map((c) => c.slug).filter((c) => !usados.includes(c));
+
+  function eliminarEquipo(indice: number) {
+    setEquipos((prev) => prev.filter((_, i) => i !== indice));
   }
 
-  async function load() {
-    setStatus("loading");
-    try {
-      const data = await ligaConfigApi.get(temporada);
-      const updated = SLOT_COLORS.map((sc) => {
-        const found = data.equipos.find((e) => e.color === sc.slug);
-        return found
-          ? {
-              ...sc,
-              nombre: found.nombre,
-              jugadores: found.jugadores,
-              ...(found.arquero ? { arquero: found.arquero } : {}),
-              ...(found.capitan ? { capitan: found.capitan } : {}),
-            }
-          : { ...sc, nombre: "", jugadores: [] };
-      });
-      setSlots(updated);
-      setStatus("idle");
-    } catch {
-      setStatus("idle");
-    }
+  function cambiarCantidad(n: number) {
+    setEquipos((prev) => {
+      if (n === prev.length) return prev;
+      if (n < prev.length) return prev.slice(0, n);
+
+      const libres = COLORES.map((c) => c.slug).filter(
+        (c) => !prev.some((e) => e.color_slug === c)
+      );
+      const extra = Array.from({ length: n - prev.length }, (_, i) =>
+        equipoVacio(libres[i] ?? COLORES[0].slug)
+      );
+      return [...prev, ...extra];
+    });
   }
 
-  async function save() {
-    // Validación client-side: nombres vacíos en cards con jugadores
-    const invalid = slots.filter(
-      (s) => !s.nombre.trim() && (s.jugadores.length > 0 || s.arquero)
-    );
-    if (invalid.length > 0) {
+  async function crear() {
+    const sinNombre = equipos.filter((e) => !e.nombre.trim());
+    if (sinNombre.length) {
       setStatus("error");
-      setMsg(`Faltan nombres en: ${invalid.map((s) => s.label).join(", ")}`);
+      setMsg(`Faltan nombres en ${sinNombre.length} equipo(s).`);
       return;
     }
 
     setStatus("loading");
     setMsg("");
     try {
-      // Construir payload: usar slug como "color", omitir arquero/capitan si están vacíos
-      const equipos: TeamConfig[] = slots
-        .filter((s) => s.nombre.trim() || s.jugadores.length > 0 || s.arquero)
-        .map((s) => ({
-          nombre: s.nombre,
-          color: s.slug,
-          jugadores: s.jugadores,
-          ...(s.arquero ? { arquero: s.arquero } : {}),
-          ...(s.capitan ? { capitan: s.capitan } : {}),
-        }));
+      const r = await ligasApi.crear({
+        sede_id: sedeElegida,
+        jugadores_por_equipo: cupo,
+        // `_id` es identidad de la interfaz, no del dominio: no se envía.
+        equipos: equipos.map((e) => ({
+          nombre: e.nombre,
+          color_slug: e.color_slug,
+          jugadores: e.jugadores,
+        })),
+      });
 
-      await ligaConfigApi.save(temporada, equipos);
       setStatus("ok");
-      setMsg("Guardado correctamente");
-    } catch (e: any) {
+      setMsg(
+        `Liga creada: edición ${r.numero_sede} de ${nombreSede}, ` +
+          `${r.equipos} equipos y ${r.jugadores} jugadores` +
+          (r.estado === "proxima" ? " (queda como próxima)" : "") +
+          "." +
+          (r.creados.length ? ` Nuevos en el padrón: ${r.creados.join(", ")}.` : "")
+      );
+      setEquipos(borradorVacio());
+    } catch (e) {
       setStatus("error");
-      setMsg(e.message ?? "Error al guardar");
+      setMsg(e instanceof Error ? e.message : "Error al crear la liga");
     }
   }
 
-  function updateSlot(index: number, updated: Slot) {
-    setSlots((prev) => prev.map((s, i) => (i === index ? updated : s)));
-  }
+  const nombreSede = sedes.find((s) => s.id === sedeElegida)?.nombre ?? sedeElegida;
 
-  const totalJugadores = slots.reduce((acc, s) => acc + s.jugadores.length + (s.arquero ? 1 : 0), 0);
-  const equiposNombrados = slots.filter((s) => s.nombre.trim()).length;
+  /**
+   * Qué significa cada jugador del borrador para esta ciudad. La distinción
+   * importa: quien ya juega en Valledupar y entra a Bogotá no es un alta en el
+   * padrón —conserva su ficha y su palmarés— pero sí es alguien que empieza a
+   * jugar en una ciudad nueva, y conviene verlo antes de guardar.
+   */
+  const enBorrador = equipos.flatMap((e) => e.jugadores);
+  const totalJugadores = enBorrador.length;
+  const altasPadron = enBorrador.filter((j) => !j.jugador_id).length;
+  const seSumanASede = enBorrador.filter(
+    (j) => j.jugador_id && !porId.get(j.jugador_id)?.sedes?.includes(sedeElegida)
+  ).length;
+
+  /** Cuántos juegan ya en esta ciudad; en una recién abierta, cero. */
+  const jugadoresDeLaSede = jugadores.filter((j) =>
+    j.sedes?.includes(sedeElegida)
+  ).length;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <div className="sticky top-0 z-40 border-b border-white/5 bg-[#0a0a0a]/90 backdrop-blur px-6 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <h1 className="text-lg font-bold tracking-tight">
-              Liga PPT{" "}
-              <input
-                type="number"
-                className="ml-1 w-16 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-center text-lg font-bold outline-none focus:border-white/30"
-                value={temporada}
-                onChange={(e) => setTemporada(Number(e.target.value))}
-                min={1}
-              />
-            </h1>
-            {numeroSede != null && (
-              <span className="text-xs text-white/50">
-                Edición {numeroSede} · {sede?.nombre}
-              </span>
-            )}
-            <button
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/50 hover:border-white/20 hover:text-white/70 transition-colors"
-              onClick={load}
-              disabled={status === "loading"}
-            >
-              Cargar existente
-            </button>
+      <div className="sticky top-0 z-40 border-b border-white/5 bg-[#0a0a0a]/90 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <h1 className="text-lg font-bold tracking-tight">Crear Liga</h1>
+
+            {/* Ciudad */}
+            <div className="flex gap-1 rounded-lg border border-white/10 p-1">
+              {sedes.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSedeElegida(s.id)}
+                  aria-pressed={s.id === sedeElegida}
+                  className={`rounded px-3 py-1 text-xs font-semibold transition-colors ${
+                    s.id === sedeElegida ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"
+                  }`}
+                  style={
+                    s.id === sedeElegida && s.color_hex
+                      ? { boxShadow: `inset 0 -2px 0 ${s.color_hex}` }
+                      : undefined
+                  }
+                >
+                  {s.nombre}
+                </button>
+              ))}
+            </div>
+
+            {/* La edición no se elige: este módulo solo abre ligas nuevas y el
+                número es el siguiente de la ciudad. */}
+            <span className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs">
+              {proxima ? (
+                <>
+                  Edición <strong className="text-white">{proxima.numero_sede}</strong>
+                </>
+              ) : (
+                <span className="text-white/30">Calculando…</span>
+              )}
+            </span>
+
+            {/* Cupo de plantilla: Valledupar juega con 8 y Bogotá con 10 */}
+            <label className="flex items-center gap-2 text-xs text-white/40">
+              Por equipo
+              <select
+                value={cupo}
+                onChange={(e) => setCupo(Number(e.target.value))}
+                className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-white outline-none focus:border-white/30"
+              >
+                {Array.from({ length: CUPO_MAX - CUPO_MIN + 1 }, (_, i) => i + CUPO_MIN).map((n) => (
+                  <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
+                ))}
+              </select>
+            </label>
+
+            {/* Cantidad de equipos */}
+            <label className="flex items-center gap-2 text-xs text-white/40">
+              Equipos
+              <select
+                value={equipos.length}
+                onChange={(e) => cambiarCantidad(Number(e.target.value))}
+                className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-white outline-none focus:border-white/30"
+              >
+                {Array.from({ length: MAX_EQUIPOS - MIN_EQUIPOS + 1 }, (_, i) => i + MIN_EQUIPOS).map((n) => (
+                  <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
+                ))}
+              </select>
+            </label>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-xs text-white/30">
-              {equiposNombrados}/9 equipos · {totalJugadores} jugadores
+              {equipos.length} equipos · {totalJugadores} jugadores
+              {altasPadron > 0 && (
+                <span className="text-emerald-400/70"> · {altasPadron} altas</span>
+              )}
+              {seSumanASede > 0 && (
+                <span className="text-sky-400/70"> · {seSumanASede} llegan de otra ciudad</span>
+              )}
             </span>
             <button
-              onClick={save}
-              disabled={status === "loading"}
+              onClick={crear}
+              disabled={status === "loading" || !proxima}
               className={`rounded-xl px-5 py-2 text-sm font-semibold transition-all ${
-                status === "loading"
-                  ? "bg-white/10 text-white/30 cursor-not-allowed"
+                status === "loading" || !proxima
+                  ? "cursor-not-allowed bg-white/10 text-white/30"
                   : "bg-white text-black hover:bg-white/90 active:scale-95"
               }`}
             >
-              {status === "loading" ? "Guardando…" : "Guardar"}
+              {status === "loading" ? "Creando…" : "Crear liga"}
             </button>
             <button
               onClick={() => { logout(); setAuthed(false); }}
-              className="rounded-xl border border-white/10 px-3 py-2 text-xs text-white/40 hover:text-white/60 transition-colors"
+              className="rounded-xl border border-white/10 px-3 py-2 text-xs text-white/40 transition-colors hover:text-white/60"
             >
               Salir
             </button>
@@ -501,25 +711,41 @@ export function CrearLigaPage() {
         </div>
 
         {msg && (
-          <div
-            className={`mx-auto mt-2 max-w-6xl text-xs ${
-              status === "ok" ? "text-green-400" : "text-red-400"
-            }`}
-          >
+          <div className={`mx-auto mt-2 max-w-6xl text-xs ${status === "ok" ? "text-green-400" : "text-red-400"}`}>
             {msg}
           </div>
         )}
+
+        {proxima && (
+          <p className="mx-auto mt-1 max-w-6xl text-[11px] text-white/30">
+            Se creará la edición {proxima.numero_sede} de {nombreSede}
+            {proxima.reutiliza && " (ya estaba abierta sin equipos)"}.{" "}
+            {jugadoresDeLaSede === 0 ? (
+              <span className="text-white/40">
+                {nombreSede} todavía no tiene jugadores: los que agregues serán los primeros.
+              </span>
+            ) : (
+              <>{jugadoresDeLaSede} jugadores juegan ya en {nombreSede}.</>
+            )}
+          </p>
+        )}
       </div>
 
-      {/* Grid */}
       <div className="mx-auto max-w-6xl px-6 py-8">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {slots.map((slot, i) => (
-            <TeamCard
-              key={slot.slug}
-              slot={slot}
-              allSlots={slots}
-              onChange={(updated) => updateSlot(i, updated)}
+          {equipos.map((equipo, i) => (
+            <TarjetaEquipo
+              key={equipo._id}
+              equipo={equipo}
+              todos={equipos}
+              coloresLibres={coloresLibres}
+              cupo={cupo}
+              onChange={(actualizado) =>
+                setEquipos((prev) => prev.map((e, j) => (j === i ? actualizado : e)))
+              }
+              onEliminar={
+                equipos.length > MIN_EQUIPOS ? () => eliminarEquipo(i) : null
+              }
             />
           ))}
         </div>
