@@ -12,13 +12,19 @@ export type Patrocinador = {
   descripcion: string;
   logo: string;
   /**
+   * Ciudades donde el negocio acompaña a la liga. Es una lista porque una
+   * cadena puede patrocinar en varias; los seis actuales son de Valledupar,
+   * y varios lo dicen en su propia descripción.
+   */
+  sedes: string[];
+  /**
    * Usuario de Instagram (sin @). Si no coincide con el perfil real,
    * cámbialo aquí; la URL se arma como https://www.instagram.com/{usuario}/
    */
   instagramHandle: string;
 };
 
-/** Aliados de la Liga PPT (perfiles oficiales en Instagram). */
+/** Aliados de la Liga PPT (perfiles oficiales en Instagram), por ciudad. */
 export const PATROCINADORES: Patrocinador[] = [
   {
     id: "rey-estampado",
@@ -27,6 +33,7 @@ export const PATROCINADORES: Patrocinador[] = [
       "Estampados para camisetas, política, publicidad y mucho más. Personaliza tu ropa con calidad.",
     logo: logoRey,
     instagramHandle: "el_reydelestampado",
+    sedes: ["vup"],
   },
   {
     id: "salon-mariano-amaris",
@@ -34,6 +41,7 @@ export const PATROCINADORES: Patrocinador[] = [
     descripcion: "Lugar ideal para celebrar tus eventos: reuniones, fiestas y momentos especiales.",
     logo: logoSalon,
     instagramHandle: "saloneventosma",
+    sedes: ["vup"],
   },
   {
     id: "frens-burger",
@@ -41,6 +49,7 @@ export const PATROCINADORES: Patrocinador[] = [
     descripcion: "Las mejores hamburguesas de Valledupar, sabor y buena atención.",
     logo: logoFrens,
     instagramHandle: "frensburgers.vup",
+    sedes: ["vup"],
   },
   {
     id: "vv-accesorios",
@@ -49,6 +58,7 @@ export const PATROCINADORES: Patrocinador[] = [
       "Celulares, accesorios y todo lo relacionado con tecnología para equipar tu día a día.",
     logo: logoVV,
     instagramHandle: "vv_accesorios",
+    sedes: ["vup"],
   },
   {
     id: "andariego",
@@ -57,6 +67,7 @@ export const PATROCINADORES: Patrocinador[] = [
       "Comida mexicana y cocina oculta: sabores auténticos para compartir en Valledupar.",
     logo: logoAndariego,
     instagramHandle: "andariegomxco",
+    sedes: ["vup"],
   },
   {
     id: "donde-varo",
@@ -65,5 +76,6 @@ export const PATROCINADORES: Patrocinador[] = [
       "Comidas rápidas y las mejores salchipapas de Valledupar, calidad y buen ambiente.",
     logo: logoDondeVaro,
     instagramHandle: "dondevaro",
+    sedes: ["vup"],
   },
 ];
