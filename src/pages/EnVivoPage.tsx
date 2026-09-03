@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
+import { edicionesApi, partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
 import { supabase } from "../lib/supabase";
 import { getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
 import { useSede } from "../context/SedeContext";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
-import type { EquipoLocal } from "../types/jugador";
+import type { EquipoLocal, PartidoPlayoff } from "../types/jugador";
+import { CuadroPlayoffs } from "../components/common/CuadroPlayoffs";
 import {
   ICONO_MODO,
   IconoAnotador,
@@ -1196,17 +1197,58 @@ function PlayoffMatchup({
 
 function PlayoffSection({
   standings,
+  llaves,
+  numeroSede,
   loading,
 }: {
   standings: Standings;
+  llaves: PartidoPlayoff[];
+  numeroSede: number | null;
   loading: boolean;
 }) {
-  const { colorDe } = useCatalogo();
+  const { equipos: catalogo, colorDe } = useCatalogo();
 
   if (loading) {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => <div key={i} className="h-44 bg-surface rounded-lg animate-pulse" />)}
+      </div>
+    );
+  }
+
+  // El cuadro real manda en cuanto se juega la primera llave; hasta entonces
+  // esta pantalla solo puede proyectar los cruces a partir de la tabla.
+  const empezado = llaves.length > 0;
+  const hayFinal = llaves.some((ll) => ll.ronda === "final" && !ll.en_juego && ll.ganador_slug);
+  const nombreDe = (slug: string) =>
+    catalogo.find((e) => e.id === slug)?.nombre ??
+    llaves.find((ll) => ll.equipo1_slug === slug)?.equipo1_nombre ??
+    llaves.find((ll) => ll.equipo2_slug === slug)?.equipo2_nombre ??
+    slug.replace(/-/g, " ");
+
+  if (empezado) {
+    const campeon = llaves.find((ll) => ll.ronda === "final")?.ganador_slug ?? null;
+    return (
+      <div className="space-y-5 max-w-4xl mx-auto">
+        <div className="bg-surface rounded-lg px-4 py-3 border border-line">
+          <h2 className="text-chalk font-bold text-sm">
+            Cuadro final{numeroSede != null ? ` · Liga #${numeroSede}` : ""}
+          </h2>
+          <p className="text-chalk-3 text-xs mt-0.5">
+            {hayFinal
+              ? "Cuadro completo. Queda guardado en la edición."
+              : "Se actualiza con cada llave que termina."}
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-lg px-4 py-4 border border-line">
+          <CuadroPlayoffs
+            llaves={llaves}
+            nombreDe={nombreDe}
+            colorDe={(slug) => colorDe(slug)}
+            campeonSlug={campeon}
+          />
+        </div>
       </div>
     );
   }
@@ -1227,7 +1269,9 @@ function PlayoffSection({
       {/* Banner */}
       <div className="bg-surface rounded-lg px-4 py-3 border border-line flex items-center justify-between">
         <div>
-          <h2 className="text-chalk font-bold text-sm">Playoff · Liga #20</h2>
+          <h2 className="text-chalk font-bold text-sm">
+            Playoff{numeroSede != null ? ` · Liga #${numeroSede}` : ""}
+          </h2>
           <p className="text-chalk-3 text-xs mt-0.5">#3–#6 juegan playoff · #1 y #2 van directo a semis</p>
         </div>
         <span className="bg-amber-900/30 text-amber-400 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border border-amber-800/30">
@@ -1295,12 +1339,14 @@ export function EnVivoPage() {
   const [goleadores, setGoleadores]     = useState<Goleador[]>([]);
   const [arqueros, setArqueros]         = useState<Arquero[]>([]);
   const [disciplina, setDisciplina]     = useState<JugadorDisciplina[]>([]);
+  const [playoffs, setPlayoffs]         = useState<PartidoPlayoff[]>([]);
+  const [loadingPlayoffs, setLoadingPlayoffs] = useState(true);
   const [filtro, setFiltro]             = useState<FiltroCancha>("todas");
   const [loadingMatch, setLoadingMatch] = useState(true);
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingRankings, setLoadingRankings] = useState(true);
   const [lastUpdate, setLastUpdate]     = useState<Date | null>(null);
-  const { sede, sedeId, edicionActual }  = useSede();
+  const { sede, sedeId, edicionActual, numeroSede }  = useSede();
   const { equipos, sede_id: sedeDeLosEquipos, locales: catalogo, colorDe, loading: loadingEquipos } =
     useEquiposEdicion(edicionActual);
 
@@ -1362,6 +1408,36 @@ export function EnVivoPage() {
     }
   }
 
+  /**
+   * El cuadro final se pide aparte y solo con la pestaña abierta: sale de
+   * `/historico`, que es una consulta bastante más pesada que las del directo
+   * y no tendría sentido repetirla cada 8s para una pantalla que nadie mira.
+   */
+  useEffect(() => {
+    if (!edicionArrancada || tab !== "playoff") return;
+
+    const edicion = edicionActual;
+    let vigente = true;
+
+    const traer = async () => {
+      try {
+        const historico = await edicionesApi.historico(edicion);
+        if (vigente) setPlayoffs(historico.playoffs ?? []);
+      } catch {
+        // silent
+      } finally {
+        if (vigente) setLoadingPlayoffs(false);
+      }
+    };
+
+    traer();
+    const intervalo = setInterval(traer, 10_000);
+    return () => {
+      vigente = false;
+      clearInterval(intervalo);
+    };
+  }, [edicionActual, edicionArrancada, tab]);
+
   useEffect(() => {
     // Si la ciudad no está jugando no se pide nada, no se hace polling cada 8s
     // y no se abre el canal de Realtime. Antes esta pantalla sondeaba la API
@@ -1372,9 +1448,11 @@ export function EnVivoPage() {
       setGoleadores([]);
       setArqueros([]);
       setDisciplina([]);
+      setPlayoffs([]);
       setLoadingMatch(false);
       setLoadingStats(false);
       setLoadingRankings(false);
+      setLoadingPlayoffs(false);
       return;
     }
 
@@ -1577,7 +1655,12 @@ export function EnVivoPage() {
       )}
 
       {tab === "playoff" && (
-        <PlayoffSection standings={standings} loading={loadingStats} />
+        <PlayoffSection
+          standings={standings}
+          llaves={playoffs}
+          numeroSede={numeroSede}
+          loading={loadingStats || loadingPlayoffs}
+        />
       )}
     </div>
     </EquiposCtx.Provider>

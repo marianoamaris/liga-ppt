@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSede } from "../../context/SedeContext";
 import { useEdiciones, useHistoricoEdicion } from "../../hooks/useCatalogo";
 import { CarruselEquipos } from "../common/CarruselEquipos";
+import { CuadroPlayoffs } from "../common/CuadroPlayoffs";
 import type {
   EdicionEquipo,
   FilaClasificacion,
@@ -370,6 +371,22 @@ export const Clasificacion: React.FC = () => {
                     </ul>
                   )}
                 </Panel>
+
+                {/* El cuadro va justo después de la tabla: es su continuación
+                    natural, la tabla reparte los puestos que aquí se juegan. */}
+                {historico.playoffs?.length > 0 && (
+                  <Panel
+                    titulo="Cuadro final"
+                    nota={historico.playoffs.some((ll) => ll.en_juego) ? "En juego" : undefined}
+                  >
+                    <CuadroPlayoffs
+                      llaves={historico.playoffs}
+                      nombreDe={nombreDe}
+                      colorDe={colorDe}
+                      campeonSlug={historico.edicion.campeon_slug}
+                    />
+                  </Panel>
+                )}
 
                 {historico.jornadas.length > 0 && (
                   <Panel titulo="Jornadas" nota={`${historico.jornadas.length}`}>

@@ -203,6 +203,28 @@ export interface ArqueroEdicion {
   pj: number | null;
 }
 
+/** Rondas del cuadro final, en el orden en que se juegan. */
+export type RondaPlayoff = "cuartos" | "semifinal" | "final";
+
+/**
+ * Una llave del cuadro final. Sale de un partido de playoff; la final puede
+ * venir además de `edicion_finales`, y entonces no tiene partido asociado.
+ */
+export interface PartidoPlayoff {
+  partido_id: string | null;
+  ronda: RondaPlayoff;
+  /** Posición dentro de su ronda: llave 1, llave 2… */
+  orden: number;
+  equipo1_slug: string;
+  equipo2_slug: string;
+  equipo1_nombre: string;
+  equipo2_nombre: string;
+  goles1: number | null;
+  goles2: number | null;
+  ganador_slug: string | null;
+  en_juego: boolean;
+}
+
 /** Respuesta de `/historico/:numero`, ya sea de agregados o de partidos. */
 export interface HistoricoEdicion {
   edicion: Edicion;
@@ -212,6 +234,7 @@ export interface HistoricoEdicion {
   goleadores: GoleadorEdicion[];
   arqueros: ArqueroEdicion[];
   final: EdicionFinal | null;
+  playoffs: PartidoPlayoff[];
   origen: "agregados" | "partidos";
 }
 
