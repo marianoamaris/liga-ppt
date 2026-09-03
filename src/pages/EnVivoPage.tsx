@@ -211,16 +211,40 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
           const eq = equipos.find((e) => e.equipo.id === ev.data.ganadorId);
           const { penales } = ev.data;
           return (
-            <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
-              {t}<IconoDesempate className="size-3.5 shrink-0 text-chalk-2" />
-              <span className="w-2 h-2 rounded-full shrink-0 ring-1 ring-chalk-3" style={{ backgroundColor: colorDe(ev.data.ganadorId) }} />
-              <span className="font-medium text-chalk">{eq?.equipo.nombre}</span>
-              <span className="text-chalk-3 text-xs">
-                ·{" "}
-                {ev.data.metodo === "tabla"
-                  ? "pasa por tabla"
-                  : `pasa en penales ${penales?.golesA ?? 0}–${penales?.golesB ?? 0}`}
-              </span>
+            <div key={ev.data.id} className="px-4 py-2">
+              <div className="flex items-center gap-2 text-sm">
+                {t}<IconoDesempate className="size-3.5 shrink-0 text-chalk-2" />
+                <span className="w-2 h-2 rounded-full shrink-0 ring-1 ring-chalk-3" style={{ backgroundColor: colorDe(ev.data.ganadorId) }} />
+                <span className="font-medium text-chalk">{eq?.equipo.nombre}</span>
+                <span className="text-chalk-3 text-xs">
+                  ·{" "}
+                  {ev.data.metodo === "tabla"
+                    ? "pasa por tabla"
+                    : `pasa en penales ${penales?.golesA ?? 0}–${penales?.golesB ?? 0}`}
+                </span>
+              </div>
+              {/* La tanda, cobro a cobro: relleno el que entró, hueco el fallado. */}
+              {penales?.tiros?.length ? (
+                <ul className="mt-1.5 ml-[3.25rem] flex flex-wrap gap-x-3 gap-y-1">
+                  {penales.tiros.map((tiro) => (
+                    <li key={tiro.id} className="flex items-center gap-1.5">
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0 border"
+                        style={{
+                          borderColor: colorDe(tiro.equipoId),
+                          backgroundColor: tiro.convertido
+                            ? colorDe(tiro.equipoId)
+                            : "transparent",
+                        }}
+                      />
+                      <span className="text-chalk-2 text-[11px]">{tiro.jugador}</span>
+                      {!tiro.convertido && (
+                        <span className="text-chalk-3 text-[10px]">falló</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           );
         }

@@ -110,16 +110,50 @@ function Llave({
         </div>
       )}
       {/* El empate no queda en empate: pasa alguien, y por qué pasó es parte
-          del resultado tanto como el marcador. */}
+          del resultado tanto como el marcador. La tanda se despliega para no
+          llenar el cuadro con seis líneas por llave. */}
       {!llave.en_juego && llave.definicion && (
-        <div className="flex items-center gap-1.5 border-t border-line px-3 py-1.5">
-          <IconoDesempate className="size-3 shrink-0 text-chalk-3" />
-          <span className="font-cond text-[0.625rem] text-chalk-3">
-            {llave.definicion.metodo === "tabla"
-              ? "Pasa por posición en la tabla"
-              : `Penales ${llave.definicion.penales1 ?? 0}–${llave.definicion.penales2 ?? 0}`}
-          </span>
-        </div>
+        llave.definicion.tiros?.length ? (
+          <details className="border-t border-line">
+            <summary className="font-cond flex cursor-pointer list-none items-center gap-1.5 px-3 py-1.5 text-[0.625rem] text-chalk-3 [&::-webkit-details-marker]:hidden">
+              <IconoDesempate className="size-3 shrink-0" />
+              Penales {llave.definicion.penales1 ?? 0}–{llave.definicion.penales2 ?? 0}
+              <span aria-hidden className="ml-auto">
+                +
+              </span>
+            </summary>
+            <ul className="px-3 pb-2">
+              {llave.definicion.tiros.map((t) => (
+                <li key={t.id} className="flex items-center gap-2 py-0.5">
+                  <span
+                    className="size-2 shrink-0 rounded-full border"
+                    style={{
+                      borderColor: colorDe(t.equipoId) ?? "#4B5563",
+                      backgroundColor: t.convertido
+                        ? (colorDe(t.equipoId) ?? "#4B5563")
+                        : "transparent",
+                    }}
+                  />
+                  <span className="font-cond min-w-0 flex-1 truncate text-[0.6875rem] text-chalk-2">
+                    {t.jugador}
+                  </span>
+                  <span className="font-cond shrink-0 text-[0.625rem] text-chalk-3">
+                    {t.convertido ? "gol" : "falló"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : (
+          <div className="flex items-center gap-1.5 border-t border-line px-3 py-1.5">
+            <IconoDesempate className="size-3 shrink-0 text-chalk-3" />
+            <span className="font-cond text-[0.625rem] text-chalk-3">
+              {llave.definicion.metodo === "tabla"
+                ? "Pasa por posición en la tabla"
+                : `Penales ${llave.definicion.penales1 ?? 0}–${llave.definicion.penales2 ?? 0}`}
+            </span>
+          </div>
+        )
       )}
       {!llave.en_juego && !decidida && !llave.definicion && llave.goles1 != null && (
         <div className="border-t border-line px-3 py-1.5">

@@ -2,19 +2,21 @@ import { useEffect, useState } from "react";
 import { statsApi, type Standing } from "../../lib/api";
 import { useSede } from "../../context/SedeContext";
 import { getColor, makeId } from "./utils";
-import type { EquipoEnCancha, EventoDefinicion, ModoPartido } from "./types";
+import { estadoTanda, TIROS_TANDA } from "./tandaPenales";
+import type { EquipoEnCancha, EventoDefinicion, ModoPartido, TiroPenal } from "./types";
 
 /**
  * Desempate de un playoff que acabó igualado.
  *
  * En cuartos gana el que venía mejor en la tabla general, así que aquí solo se
  * confirma: la posición se consulta a la API en vez de dejarla a la memoria del
- * anotador. En semifinal y final se van a penales al mejor de tres y, si siguen
- * iguales, a muerte súbita; el panel cuenta los convertidos y no deja cerrar
- * mientras el marcador de penales siga empatado.
+ * anotador.
+ *
+ * En semifinal y final se cobra penal por penal, eligiendo al ejecutor de la
+ * plantilla y marcando si convirtió o falló. El turno, el cierre anticipado y
+ * la muerte súbita los decide `tandaPenales`; aquí solo se pinta y no se deja
+ * confirmar hasta que la tanda tenga ganador de verdad.
  */
-
-const PENALES_TANDA = 3;
 
 interface Props {
   modo: Exclude<ModoPartido, "jornada">;
@@ -119,26 +121,56 @@ function PorTabla({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo">)
   );
 }
 
+/** Los cobros de un equipo, en orden: convertido lleno, fallado hueco. */
+function Marcas({ tiros, color }: { tiros: TiroPenal[]; color: string }) {
+  if (!tiros.length) {
+    return <span className="text-gray-700 text-xs">sin cobrar</span>;
+  }
+  return (
+    <span className="flex gap-1">
+      {tiros.map((t) => (
+        <span
+          key={t.id}
+          title={`${t.jugador} · ${t.convertido ? "convertido" : "fallado"}`}
+          className="size-3 rounded-full border-2"
+          style={{
+            borderColor: color,
+            backgroundColor: t.convertido ? color : "transparent",
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
 function PorPenales({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo">) {
   const [eqA, eqB] = equipos;
-  const [golesA, setGolesA] = useState(0);
-  const [golesB, setGolesB] = useState(0);
+  const [tiros, setTiros] = useState<TiroPenal[]>([]);
 
-  const tanda = Math.max(golesA, golesB) > PENALES_TANDA;
-  const hayGanador = golesA !== golesB;
-  const ganador = golesA > golesB ? eqA : eqB;
+  const estado = estadoTanda(tiros, eqA.equipo.id);
+  const equipoDelTurno = estado.turno === "A" ? eqA : estado.turno === "B" ? eqB : null;
+  const ganador = estado.ganador === "A" ? eqA : estado.ganador === "B" ? eqB : null;
+
+  function cobrar(jugador: string, convertido: boolean) {
+    if (!equipoDelTurno) return;
+    setTiros((prev) => [
+      ...prev,
+      { id: makeId(), equipoId: equipoDelTurno.equipo.id, jugador, convertido },
+    ]);
+  }
 
   function confirmar() {
-    if (!hayGanador) return;
+    if (!ganador) return;
     onDefinir({
       id: makeId(),
       metodo: "penales",
       ganadorId: ganador.equipo.id,
       penales: {
         equipoAId: eqA.equipo.id,
-        golesA,
+        golesA: estado.golesA,
         equipoBId: eqB.equipo.id,
-        golesB,
+        golesB: estado.golesB,
+        tiros,
       },
       tiempoEnMarcador,
     });
@@ -147,56 +179,86 @@ function PorPenales({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo"
   return (
     <div className="space-y-3">
       <p className="text-gray-400 text-sm">
-        Empate al final del tiempo. Penales al mejor de {PENALES_TANDA}
-        {tanda ? " · muerte súbita" : ""}.
+        Empate al final del tiempo. Penales al mejor de {TIROS_TANDA}
+        {estado.muerteSubita && !estado.decidida ? " · muerte súbita" : ""}.
       </p>
 
-      <div className="grid grid-cols-2 gap-2">
-        {([[eqA, golesA, setGolesA], [eqB, golesB, setGolesB]] as const).map(
-          ([eq, goles, setGoles]) => (
-            <div
-              key={eq.equipo.id}
-              className="bg-gray-800/80 rounded-2xl p-3 text-center space-y-2"
-              style={{ border: `1px solid ${getColor(eq.equipo.id)}40` }}
-            >
-              <div
-                className="text-sm font-bold truncate"
-                style={{ color: getColor(eq.equipo.id) }}
+      {/* Pizarra de la tanda */}
+      <div className="bg-gray-800/60 rounded-2xl p-3 space-y-2">
+        {([eqA, eqB] as const).map((eq) => {
+          const color = getColor(eq.equipo.id);
+          const suyos = tiros.filter((t) => t.equipoId === eq.equipo.id);
+          const goles = eq === eqA ? estado.golesA : estado.golesB;
+          return (
+            <div key={eq.equipo.id} className="flex items-center gap-3">
+              <span
+                className="text-sm font-bold truncate flex-1 min-w-0"
+                style={{ color }}
               >
                 {eq.equipo.nombre}
-              </div>
-              <div className="text-white text-4xl font-black tabular-nums leading-none">
+              </span>
+              <Marcas tiros={suyos} color={color} />
+              <span className="text-white text-xl font-black tabular-nums w-5 text-right">
                 {goles}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setGoles((g) => Math.max(0, g - 1))}
-                  className="flex-1 min-h-[44px] bg-gray-900 hover:bg-gray-700 active:bg-gray-600 text-gray-400 rounded-xl text-lg font-bold transition-colors"
-                  aria-label={`Quitar penal a ${eq.equipo.nombre}`}
-                >
-                  −
-                </button>
-                <button
-                  onClick={() => setGoles((g) => g + 1)}
-                  className="flex-1 min-h-[44px] bg-green-600/25 hover:bg-green-600/40 active:bg-green-600/60 text-green-300 border border-green-600/40 rounded-xl text-lg font-bold transition-colors"
-                  aria-label={`Anotar penal de ${eq.equipo.nombre}`}
-                >
-                  +
-                </button>
-              </div>
+              </span>
             </div>
-          )
-        )}
+          );
+        })}
       </div>
+
+      {/* Quién cobra ahora */}
+      {equipoDelTurno && (
+        <div className="space-y-2">
+          <p className="text-gray-500 text-[11px] uppercase tracking-wider font-semibold">
+            {estado.muerteSubita
+              ? "Muerte súbita · cobra"
+              : `Tiro ${estado.numeroDelTurno} de ${TIROS_TANDA} · cobra`}{" "}
+            <span style={{ color: getColor(equipoDelTurno.equipo.id) }}>
+              {equipoDelTurno.equipo.nombre}
+            </span>
+          </p>
+
+          {equipoDelTurno.jugadores.map((j) => (
+            <div key={j.nombre} className="flex gap-1.5">
+              <span className="flex-1 min-h-[44px] px-3 flex items-center bg-gray-800/80 rounded-xl text-white text-sm font-medium">
+                {j.nombre}
+              </span>
+              <button
+                onClick={() => cobrar(j.nombre, true)}
+                className="min-h-[44px] w-14 shrink-0 bg-green-600/25 hover:bg-green-600/40 active:bg-green-600/60 text-green-300 border border-green-600/40 rounded-xl text-lg transition-colors"
+                aria-label={`${j.nombre} convirtió`}
+              >
+                ⚽
+              </button>
+              <button
+                onClick={() => cobrar(j.nombre, false)}
+                className="min-h-[44px] w-14 shrink-0 bg-red-900/20 hover:bg-red-900/35 active:bg-red-900/50 text-red-400 border border-red-900/40 rounded-xl text-lg transition-colors"
+                aria-label={`${j.nombre} falló`}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tiros.length > 0 && !estado.decidida && (
+        <button
+          onClick={() => setTiros((prev) => prev.slice(0, -1))}
+          className="w-full min-h-[44px] text-gray-500 hover:text-gray-300 text-sm transition-colors"
+        >
+          ↩ Deshacer último penal
+        </button>
+      )}
 
       <button
         onClick={confirmar}
-        disabled={!hayGanador}
+        disabled={!ganador}
         className="w-full min-h-[52px] bg-green-600 hover:bg-green-500 active:bg-green-700 disabled:bg-gray-800 disabled:text-gray-600 text-white font-bold rounded-2xl transition-colors"
       >
-        {hayGanador
-          ? `Pasa ${ganador.equipo.nombre} · ${golesA}–${golesB}`
-          : "Van iguales en penales"}
+        {ganador
+          ? `Pasa ${ganador.equipo.nombre} · ${estado.golesA}–${estado.golesB}`
+          : "La tanda sigue abierta"}
       </button>
     </div>
   );

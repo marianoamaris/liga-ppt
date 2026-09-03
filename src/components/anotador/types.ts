@@ -68,6 +68,14 @@ export type MetodoDefinicion = "tabla" | "penales";
  * muerte súbita. El marcador del partido no se toca: el desempate no es un gol,
  * así que viaja como su propio evento y de ahí lo lee el cuadro.
  */
+/** Un penal de la tanda, en el orden en que se cobró. */
+export interface TiroPenal {
+  id: string;
+  equipoId: string;
+  jugador: string;
+  convertido: boolean;
+}
+
 export interface EventoDefinicion {
   id: string;
   metodo: MetodoDefinicion;
@@ -78,6 +86,8 @@ export interface EventoDefinicion {
     golesA: number;
     equipoBId: string;
     golesB: number;
+    /** Cada cobro con su ejecutor; `golesA`/`golesB` son su resumen. */
+    tiros?: TiroPenal[];
   };
   tiempoEnMarcador: number;
 }

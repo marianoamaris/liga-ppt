@@ -206,6 +206,14 @@ export interface ArqueroEdicion {
 /** Rondas del cuadro final, en el orden en que se juegan. */
 export type RondaPlayoff = "cuartos" | "semifinal" | "final";
 
+/** Un penal de la tanda, en el orden en que se cobró. */
+export interface TiroPenal {
+  id: string;
+  equipoId: string;
+  jugador: string;
+  convertido: boolean;
+}
+
 /**
  * Cómo se resolvió una llave que acabó empatada: los cuartos por posición en la
  * tabla general, semifinal y final desde el punto de penal.
@@ -215,6 +223,8 @@ export interface DefinicionPlayoff {
   /** Penales convertidos, en el mismo orden que los equipos de la llave. */
   penales1: number | null;
   penales2: number | null;
+  /** La tanda completa, en el orden en que se cobró. */
+  tiros: TiroPenal[];
 }
 
 /**
