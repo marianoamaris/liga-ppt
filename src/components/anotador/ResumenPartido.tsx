@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { getColor, computeScores } from "./utils";
+import { useSede } from "../../context/SedeContext";
+import { getColor, computeScores, formatElapsed } from "./utils";
 import type { ModoPartido, PartidoVivo, RazonAmarilla } from "./types";
 
 const RAZON_LABEL: Record<RazonAmarilla, string> = {
@@ -32,6 +33,7 @@ interface Props {
 
 export function ResumenPartido({ partido, onNuevoPartido }: Props) {
   const [copiado, setCopiado] = useState(false);
+  const { sede, numeroSede } = useSede();
   const { config, eventos } = partido;
   const { equipos, modo } = config;
   const esPlayoff = modo !== "jornada";
@@ -77,6 +79,30 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
       });
     }
   }
+
+  /** Goles en orden de partido, con el minuto en que cayeron. */
+  const golesConMinuto = eventos.flatMap((ev) => {
+    if (ev.tipo === "gol") {
+      return [{
+        id: ev.data.id,
+        minuto: formatElapsed(ev.data.tiempoEnMarcador),
+        quien: ev.data.goleador,
+        equipoId: ev.data.equipoGoleadorId,
+        esAutogol: false,
+      }];
+    }
+    if (ev.tipo === "autogol") {
+      const eq = equipos.find((e) => e.equipo.id === ev.data.equipoAutogolId);
+      return [{
+        id: ev.data.id,
+        minuto: formatElapsed(ev.data.tiempoEnMarcador),
+        quien: `Autogol · ${eq?.equipo.nombre ?? ""}`,
+        equipoId: ev.data.equipoGanadorId,
+        esAutogol: true,
+      }];
+    }
+    return [];
+  });
 
   // ── Playoff result view ────────────────────────────────────────────────────
   if (esPlayoff) {
@@ -150,6 +176,32 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
                       </div>
                     );
                   })}
+              </div>
+            </div>
+          )}
+
+          {/* Cronología: en un partido de 50 minutos el minuto del gol es
+              parte del resultado, no un detalle del registro. */}
+          {golesConMinuto.length > 0 && (
+            <div className="bg-gray-900 rounded-2xl p-4">
+              <h2 className="text-white font-bold mb-3 flex items-center gap-2">
+                ⏱ Minuto de los goles
+              </h2>
+              <div className="space-y-2">
+                {golesConMinuto.map(({ id, minuto, quien, equipoId, esAutogol }) => (
+                  <div key={id} className="flex items-center gap-2.5 py-1">
+                    <span className="text-gray-500 text-xs w-12 shrink-0 font-mono tabular-nums">
+                      {minuto}
+                    </span>
+                    <span className="text-base shrink-0">{esAutogol ? "🥅" : "⚽"}</span>
+                    <span
+                      className="text-sm font-medium truncate"
+                      style={{ color: getColor(equipoId) }}
+                    >
+                      {quien}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -240,7 +292,9 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
           <div className="text-5xl mb-2">🏁</div>
           <h1 className="text-white text-2xl font-bold">Partido Finalizado</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Jornada {config.jornada} · Liga PPT #19
+            Jornada {config.jornada}
+            {sede ? ` · ${sede.nombre}` : ""}
+            {numeroSede != null ? ` #${numeroSede}` : ""}
           </p>
         </div>
 

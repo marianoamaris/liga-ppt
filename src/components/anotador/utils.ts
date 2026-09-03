@@ -1,4 +1,4 @@
-import type { EquipoEnCancha, Evento, TeamScore } from "./types";
+import type { EquipoEnCancha, Evento, ModoPartido, TeamScore } from "./types";
 
 export const LIGA20_COLORES: Record<string, string> = {
   brighton:          "#FFD700",
@@ -13,6 +13,20 @@ export const LIGA20_COLORES: Record<string, string> = {
 };
 
 export const DURACION_PARTIDO = 8 * 60; // 480 segundos
+
+/**
+ * Duración reglamentaria de cada modo, en segundos.
+ *
+ * La jornada son mini-partidos de 8 minutos que se reinician con cada gol; los
+ * playoffs se juegan a un solo tiempo corrido, y la final dura diez minutos más
+ * que las rondas previas.
+ */
+export const DURACION_POR_MODO: Record<ModoPartido, number> = {
+  jornada: DURACION_PARTIDO,
+  cuartos: 50 * 60,
+  semifinal: 50 * 60,
+  final: 60 * 60,
+};
 
 export function getColor(id: string): string {
   return LIGA20_COLORES[id] ?? "#4B5563";

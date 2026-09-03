@@ -1,14 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MarcadorVivo } from "./MarcadorVivo";
 import { AmarillaModal } from "./AmarillaModal";
 import { RojaModal } from "./RojaModal";
+import { useReloj } from "./useReloj";
 import {
   getColor,
   formatElapsed,
   makeId,
   computeScores,
   amarillasPorJugador,
-  DURACION_PARTIDO,
+  DURACION_POR_MODO,
 } from "./utils";
 import type {
   EquipoEnCancha,
@@ -140,8 +141,6 @@ function PlayerColumn({ eq, eqIdx, contrarioId, modo, scores, amarillas, onGol, 
 // ── Main component ─────────────────────────────────────────────────────────────
 export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) {
   const [pairIdx, setPairIdx] = useState(0);
-  const [tiempoRestante, setTiempoRestante] = useState(DURACION_PARTIDO);
-  const [corriendo, setCorriendo] = useState(false);
   const [targetAmarilla, setTargetAmarilla] = useState<TargetCard>(null);
   const [targetRoja, setTargetRoja] = useState<TargetCard>(null);
   const [logAbierto, setLogAbierto] = useState(false);
@@ -151,15 +150,16 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   const { modo, equipos } = config;
   const esPlayoff = modo !== "jornada";
 
-  // Countdown (only relevant for jornada)
-  useEffect(() => {
-    if (esPlayoff || !corriendo || tiempoRestante <= 0) {
-      if (!esPlayoff && tiempoRestante <= 0 && corriendo) setCorriendo(false);
-      return;
-    }
-    const t = setTimeout(() => setTiempoRestante((s) => Math.max(0, s - 1)), 1000);
-    return () => clearTimeout(t);
-  }, [corriendo, tiempoRestante, esPlayoff]);
+  // Un reloj para los cuatro modos: la jornada lo reinicia con cada gol, el
+  // playoff lo deja correr hasta agotar los 50 o 60 minutos.
+  const duracion = DURACION_POR_MODO[modo];
+  const {
+    transcurrido,
+    restante: tiempoRestante,
+    corriendo,
+    alternar,
+    reiniciar,
+  } = useReloj(partido.iniciadoEn, duracion);
 
   // Current pair for jornada
   const [idxA, idxB] = esPlayoff ? [0, 1] : PAIRS[pairIdx];
@@ -171,12 +171,11 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   const scores = computeScores(equipos, eventos);
   const amarillas = amarillasPorJugador(eventos);
 
-  // Para jornada: tiempo transcurrido en el mini-partido actual (0–480s).
-  // Para playoff: reloj de pared desde iniciadoEn (sin cronómetro propio).
-  const elapsedSec = () =>
-    esPlayoff
-      ? Math.floor((Date.now() - partido.iniciadoEn) / 1000)
-      : DURACION_PARTIDO - tiempoRestante;
+  // Minuto del partido en que se registra el evento. En jornada es el del
+  // mini-partido en curso; en playoff, el del partido entero. Antes el playoff
+  // usaba el reloj de pared desde el inicio, así que los tiempos incluían el
+  // descanso y todo lo que pasara con el cronómetro parado.
+  const elapsedSec = () => transcurrido;
 
   function pushEvento(ev: Evento) {
     onUpdatePartido({ ...partido, eventos: [...eventos, ev] });
@@ -190,9 +189,8 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
     pushEvento({ tipo: "gol", data });
 
     if (!esPlayoff) {
-      // Reset and pause timer
-      setTiempoRestante(DURACION_PARTIDO);
-      setCorriendo(false);
+      // El gol cierra el mini-partido: reloj a cero y en pausa.
+      reiniciar();
       // Auto-rotate: winner stays, loser exits, waiting team comes in
       const winnerIdx = equipos.findIndex((e) => e.equipo.id === equipoGoleadorId);
       const loserIdx = equipos.findIndex((e) => e.equipo.id === equipoArqueroId);
@@ -216,8 +214,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
     pushEvento({ tipo: "autogol", data });
 
     if (!esPlayoff) {
-      setTiempoRestante(DURACION_PARTIDO);
-      setCorriendo(false);
+      reiniciar();
       const winnerIdx = equipos.findIndex((e) => e.equipo.id === equipoGanadorId);
       const loserIdx = equipos.findIndex((e) => e.equipo.id === equipoAutogolId);
       const waiterIdx = ([0, 1, 2] as const).find(
@@ -288,8 +285,9 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
         jornada={config.jornada}
         tiempoRestante={tiempoRestante}
         corriendo={corriendo}
-        onToggle={() => setCorriendo((c) => !c)}
-        onReiniciar={() => { setCorriendo(false); setTiempoRestante(DURACION_PARTIDO); }}
+        duracion={duracion}
+        onToggle={alternar}
+        onReiniciar={reiniciar}
       />
 
       <div className="flex-1 overflow-y-auto">
