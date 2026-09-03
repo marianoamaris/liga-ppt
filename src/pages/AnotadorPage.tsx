@@ -103,7 +103,9 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         <div className="text-center">
           <img src="/ligaPPT-escudo.png" alt="Liga PPT" className="w-14 h-14 mx-auto mb-3 object-contain" />
           <h1 className="text-white text-xl font-black">Zona Anotadores</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Liga PPT · Edición #20</p>
+          {/* La edición no se nombra aquí: antes del login todavía no se sabe
+              qué ciudad se va a anotar, y la de la pantalla siguiente manda. */}
+          <p className="text-gray-500 text-sm mt-0.5">Liga PPT</p>
         </div>
         <form onSubmit={handleSubmit} className="bg-gray-900 rounded-2xl p-6 space-y-4 border border-gray-800 shadow-2xl">
           <div className="space-y-1.5">

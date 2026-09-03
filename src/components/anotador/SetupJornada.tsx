@@ -31,6 +31,14 @@ const MODOS: { key: ModoPartido; label: string; icon: string }[] = [
   { key: "final",     label: "Final",    icon: "🏆" },
 ];
 
+/** Lo que se lee en el botón de arranque; el modo elegido tiene que cantarse. */
+const ETIQUETA_ARRANQUE: Record<ModoPartido, string> = {
+  jornada: "Partido",
+  cuartos: "Cuartos",
+  semifinal: "Semifinal",
+  final: "Final",
+};
+
 interface SlotProps {
   slot: number;
   equipoId: string | null;
@@ -111,7 +119,7 @@ export function SetupJornada({ onIniciar }: Props) {
   const [modo, setModo] = useState<ModoPartido>("jornada");
   const [jornada, setJornada] = useState(1);
   const [slots, setSlots] = useState<(string | null)[]>([null, null, null]);
-  const { edicionActual } = useSede();
+  const { sedes, sede, sedeId, cambiarSede, edicionActual, numeroSede } = useSede();
   const { equipos, sede_id, numero_sede, loading, error } =
     usePlantillasEdicion(edicionActual);
 
@@ -162,9 +170,44 @@ export function SetupJornada({ onIniciar }: Props) {
     <div className="min-h-screen bg-gray-950 overflow-y-auto">
       <div className="max-w-lg mx-auto px-4 pt-8 pb-10 space-y-4">
         <div className="text-center pb-2">
-          <p className="text-gray-500 text-sm">Liga PPT · Edición #20</p>
+          <p className="text-gray-500 text-sm">
+            {sede?.nombre ?? "Liga PPT"}
+            {numeroSede != null ? ` · Edición #${numeroSede}` : ""}
+          </p>
           <h1 className="text-white text-2xl font-bold mt-1">Configurar Partido</h1>
         </div>
+
+        {/*
+          El partido se archiva en la edición de la ciudad activa, y esta
+          pantalla vive fuera del layout público: sin este selector la ciudad
+          se hereda de lo último que se miró en la web, y anotar la final de
+          Valledupar en la edición de Bogotá no se nota hasta el día después.
+        */}
+        {sedes.length > 1 && (
+          <div className="grid grid-cols-2 gap-1.5 bg-gray-800/60 p-1.5 rounded-2xl">
+            {sedes.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => cambiarSede(s.id)}
+                aria-pressed={s.id === sedeId}
+                className={`min-h-[44px] rounded-xl text-sm font-semibold transition-all ${
+                  s.id === sedeId
+                    ? "bg-gray-900 text-white shadow-lg"
+                    : "text-gray-500 hover:text-gray-300"
+                }`}
+              >
+                {s.nombre}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {edicionActual == null && (
+          <p className="rounded-2xl bg-red-900/30 px-4 py-3 text-sm text-red-300">
+            {sede?.nombre ?? "Esta ciudad"} no tiene una edición en curso: el partido no se
+            puede guardar. Cambia de ciudad o abre la edición antes de anotar.
+          </p>
+        )}
 
         {/* Mode selector — 2×2 grid */}
         <div className="grid grid-cols-2 gap-1.5 bg-gray-800/60 p-1.5 rounded-2xl">
@@ -234,7 +277,7 @@ export function SetupJornada({ onIniciar }: Props) {
           className="w-full min-h-[56px] bg-green-600 hover:bg-green-500 active:bg-green-700 disabled:bg-gray-800 disabled:text-gray-600 text-white font-bold rounded-2xl text-lg transition-colors active:scale-[0.98]"
         >
           {listos
-            ? `🚀 Iniciar ${modo === "jornada" ? "Partido" : modo === "semifinal" ? "Semifinal" : "Final"}`
+            ? `🚀 Iniciar ${ETIQUETA_ARRANQUE[modo]}`
             : `Selecciona ${slotCount === 2 ? "los 2 equipos" : "los 3 equipos"}`}
         </button>
       </div>
