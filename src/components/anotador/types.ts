@@ -57,12 +57,38 @@ export interface EventoAutogol {
   tiempoEnMarcador: number;
 }
 
+/** Cómo se desempató un playoff que terminó igualado. */
+export type MetodoDefinicion = "tabla" | "penales";
+
+/**
+ * Desempate de un playoff.
+ *
+ * Los cuartos igualados los gana el equipo mejor ubicado en la tabla general;
+ * semifinal y final van a penales al mejor de tres y, si siguen empatados, a
+ * muerte súbita. El marcador del partido no se toca: el desempate no es un gol,
+ * así que viaja como su propio evento y de ahí lo lee el cuadro.
+ */
+export interface EventoDefinicion {
+  id: string;
+  metodo: MetodoDefinicion;
+  ganadorId: string;
+  /** Penales convertidos por cada equipo, muerte súbita incluida. */
+  penales?: {
+    equipoAId: string;
+    golesA: number;
+    equipoBId: string;
+    golesB: number;
+  };
+  tiempoEnMarcador: number;
+}
+
 export type Evento =
   | { tipo: "gol"; data: EventoGol }
   | { tipo: "autogol"; data: EventoAutogol }
   | { tipo: "empate"; data: EventoEmpate }
   | { tipo: "amarilla"; data: EventoAmarilla }
-  | { tipo: "roja"; data: EventoRoja };
+  | { tipo: "roja"; data: EventoRoja }
+  | { tipo: "definicion"; data: EventoDefinicion };
 
 export interface TeamScore {
   victorias: number;

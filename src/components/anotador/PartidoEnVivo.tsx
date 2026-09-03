@@ -3,6 +3,7 @@ import { MarcadorVivo } from "./MarcadorVivo";
 import { AmarillaModal } from "./AmarillaModal";
 import { RojaModal } from "./RojaModal";
 import { useReloj } from "./useReloj";
+import { DefinicionPlayoff } from "./DefinicionPlayoff";
 import {
   getColor,
   formatElapsed,
@@ -19,6 +20,7 @@ import type {
   EventoEmpate,
   EventoAmarilla,
   EventoRoja,
+  EventoDefinicion,
   ModoPartido,
   RazonAmarilla,
   PartidoVivo,
@@ -171,6 +173,16 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
   const scores = computeScores(equipos, eventos);
   const amarillas = amarillasPorJugador(eventos);
 
+  // El playoff se define cuando el reloj llega a cero con el marcador igualado:
+  // en cuartos por tabla, en semifinal y final desde el punto de penal.
+  const empatados =
+    esPlayoff &&
+    (scores.get(equipoA.equipo.id)?.victorias ?? 0) ===
+      (scores.get(equipoB.equipo.id)?.victorias ?? 0);
+  const definicion = [...eventos]
+    .reverse()
+    .find((ev) => ev.tipo === "definicion")?.data as EventoDefinicion | undefined;
+
   // Minuto del partido en que se registra el evento. En jornada es el del
   // mini-partido en curso; en playoff, el del partido entero. Antes el playoff
   // usaba el reloj de pared desde el inicio, así que los tiempos incluían el
@@ -292,6 +304,34 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
 
       <div className="flex-1 overflow-y-auto">
         <div className="p-3 space-y-3 pb-8">
+
+          {/* ── Desempate del playoff ── */}
+          {esPlayoff && tiempoRestante === 0 && empatados && !definicion && (
+            <DefinicionPlayoff
+              modo={modo}
+              equipos={[equipoA, equipoB]}
+              tiempoEnMarcador={transcurrido}
+              onDefinir={(data) => pushEvento({ tipo: "definicion", data })}
+            />
+          )}
+
+          {definicion && (
+            <div className="bg-gray-900 rounded-2xl px-4 py-3 border border-green-800/40 flex items-center gap-2">
+              <span className="text-lg shrink-0">⚖️</span>
+              <p className="text-sm text-gray-300">
+                Pasa{" "}
+                <span
+                  className="font-bold"
+                  style={{ color: getColor(definicion.ganadorId) }}
+                >
+                  {equipos.find((e) => e.equipo.id === definicion.ganadorId)?.equipo.nombre}
+                </span>{" "}
+                {definicion.metodo === "tabla"
+                  ? "por posición en la tabla"
+                  : `en penales ${definicion.penales?.golesA ?? 0}–${definicion.penales?.golesB ?? 0}`}
+              </p>
+            </div>
+          )}
 
           {/* ── Pair selector (jornada only) ── */}
           {!esPlayoff && (
@@ -477,7 +517,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                           </div>
                         </div>
                       );
-                    } else {
+                    } else if (ev.tipo === "roja") {
                       const eqRoja = equipos.find((e) => e.equipo.id === ev.data.equipoId);
                       const color = getColor(ev.data.equipoId);
                       return (
@@ -492,6 +532,30 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
                             </span>
                             <span className="text-gray-600 text-xs"> · {eqRoja?.equipo.nombre}</span>
                             <div className="text-red-500 text-xs font-semibold">Expulsión</div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      const eqGana = equipos.find((e) => e.equipo.id === ev.data.ganadorId);
+                      const { penales } = ev.data;
+                      return (
+                        <div key={ev.data.id} className="flex items-center gap-2.5 px-4 py-3">
+                          <span className="text-gray-500 text-[11px] w-11 shrink-0 font-mono tabular-nums">
+                            {formatElapsed(ev.data.tiempoEnMarcador)}
+                          </span>
+                          <span className="text-base shrink-0">⚖️</span>
+                          <div className="min-w-0">
+                            <span
+                              className="font-semibold text-sm"
+                              style={{ color: getColor(ev.data.ganadorId) }}
+                            >
+                              {eqGana?.equipo.nombre}
+                            </span>
+                            <div className="text-gray-600 text-xs">
+                              {ev.data.metodo === "tabla"
+                                ? "Pasa por posición en la tabla"
+                                : `Pasa en penales ${penales?.golesA ?? 0}–${penales?.golesB ?? 0}`}
+                            </div>
                           </div>
                         </div>
                       );

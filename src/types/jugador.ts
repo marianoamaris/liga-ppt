@@ -207,6 +207,17 @@ export interface ArqueroEdicion {
 export type RondaPlayoff = "cuartos" | "semifinal" | "final";
 
 /**
+ * Cómo se resolvió una llave que acabó empatada: los cuartos por posición en la
+ * tabla general, semifinal y final desde el punto de penal.
+ */
+export interface DefinicionPlayoff {
+  metodo: "tabla" | "penales";
+  /** Penales convertidos, en el mismo orden que los equipos de la llave. */
+  penales1: number | null;
+  penales2: number | null;
+}
+
+/**
  * Una llave del cuadro final. Sale de un partido de playoff; la final puede
  * venir además de `edicion_finales`, y entonces no tiene partido asociado.
  */
@@ -222,6 +233,8 @@ export interface PartidoPlayoff {
   goles1: number | null;
   goles2: number | null;
   ganador_slug: string | null;
+  /** Solo cuando el partido acabó igualado y hubo que desempatar. */
+  definicion: DefinicionPlayoff | null;
   en_juego: boolean;
 }
 

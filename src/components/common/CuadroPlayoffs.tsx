@@ -1,6 +1,6 @@
 import React from "react";
 import type { PartidoPlayoff, RondaPlayoff } from "../../types/jugador";
-import { IconoCuartos, IconoFinal, IconoSemifinal } from "./iconos";
+import { IconoCuartos, IconoDesempate, IconoFinal, IconoSemifinal } from "./iconos";
 
 /**
  * Cuadro final de una edición: cuartos → semifinales → final.
@@ -109,7 +109,19 @@ function Llave({
           </span>
         </div>
       )}
-      {!llave.en_juego && !decidida && llave.goles1 != null && (
+      {/* El empate no queda en empate: pasa alguien, y por qué pasó es parte
+          del resultado tanto como el marcador. */}
+      {!llave.en_juego && llave.definicion && (
+        <div className="flex items-center gap-1.5 border-t border-line px-3 py-1.5">
+          <IconoDesempate className="size-3 shrink-0 text-chalk-3" />
+          <span className="font-cond text-[0.625rem] text-chalk-3">
+            {llave.definicion.metodo === "tabla"
+              ? "Pasa por posición en la tabla"
+              : `Penales ${llave.definicion.penales1 ?? 0}–${llave.definicion.penales2 ?? 0}`}
+          </span>
+        </div>
+      )}
+      {!llave.en_juego && !decidida && !llave.definicion && llave.goles1 != null && (
         <div className="border-t border-line px-3 py-1.5">
           <span className="font-cond text-[0.625rem] text-chalk-3">Definida por fuera</span>
         </div>

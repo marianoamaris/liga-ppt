@@ -1,7 +1,7 @@
 import React from "react";
 import { FaFutbol, FaHandshake, FaTrophy } from "react-icons/fa6";
 import { GiSoccerKick, GiWhistle, GiGoalKeeper } from "react-icons/gi";
-import { LuTimer, LuTarget, LuPencil, LuFlame } from "react-icons/lu";
+import { LuTimer, LuTarget, LuPencil, LuFlame, LuScale } from "react-icons/lu";
 
 /**
  * Iconografía del dominio.
@@ -44,6 +44,11 @@ export const IconoSemifinal: React.FC<Props> = ({ className = "" }) => (
 
 export const IconoFinal: React.FC<Props> = ({ className = "" }) => (
   <FaTrophy aria-hidden className={className} />
+);
+
+/** Desempate: la llave no la resolvió el marcador sino la tabla o los penales. */
+export const IconoDesempate: React.FC<Props> = ({ className = "" }) => (
+  <LuScale aria-hidden className={className} />
 );
 
 export const IconoAnotador: React.FC<Props> = ({ className = "" }) => (

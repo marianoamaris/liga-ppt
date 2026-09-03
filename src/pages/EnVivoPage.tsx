@@ -10,6 +10,7 @@ import { CuadroPlayoffs } from "../components/common/CuadroPlayoffs";
 import {
   ICONO_MODO,
   IconoAnotador,
+  IconoDesempate,
   IconoArquero,
   IconoAutogol,
   IconoEmpate,
@@ -203,6 +204,23 @@ function FeedEventos({ eventos, equipos }: { eventos: Evento[]; equipos: EquipoE
               <span className="w-2 h-2 rounded-full shrink-0 ring-1 ring-chalk-3" style={{ backgroundColor: colorDe(ev.data.equipoId) }} />
               <span className="font-medium text-chalk">{ev.data.jugador}</span>
               <span className="text-vivo text-xs font-semibold">· Expulsión</span>
+            </div>
+          );
+        }
+        if (ev.tipo === "definicion") {
+          const eq = equipos.find((e) => e.equipo.id === ev.data.ganadorId);
+          const { penales } = ev.data;
+          return (
+            <div key={ev.data.id} className="flex items-center gap-2 px-4 py-2 text-sm">
+              {t}<IconoDesempate className="size-3.5 shrink-0 text-chalk-2" />
+              <span className="w-2 h-2 rounded-full shrink-0 ring-1 ring-chalk-3" style={{ backgroundColor: colorDe(ev.data.ganadorId) }} />
+              <span className="font-medium text-chalk">{eq?.equipo.nombre}</span>
+              <span className="text-chalk-3 text-xs">
+                ·{" "}
+                {ev.data.metodo === "tabla"
+                  ? "pasa por tabla"
+                  : `pasa en penales ${penales?.golesA ?? 0}–${penales?.golesB ?? 0}`}
+              </span>
             </div>
           );
         }
