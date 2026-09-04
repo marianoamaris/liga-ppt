@@ -73,6 +73,40 @@ function cuartosDe(
   );
 }
 
+/** Puesto en la tabla general, 1-indexado. 0 si el equipo no aparece. */
+function puestoDe(slug: string, ordenTabla: string[]): number {
+  return ordenTabla.indexOf(slug) + 1;
+}
+
+/**
+ * En qué renglón del cuadro va la llave dentro de su ronda.
+ *
+ * Las llaves llegan ordenadas por hora de arranque, y así el cuadro no se
+ * sostenía: el primer cuarto de la noche podía ser el 3º-6º, que desemboca en
+ * la segunda semifinal, y quedaba dibujado encima del que desemboca en la
+ * primera. Las líneas se cruzaban y el cuadro dejaba de leerse.
+ *
+ * La ranura sale de los puestos de tabla que enfrenta: el cuarto que alimenta
+ * la semifinal 1 va arriba, y esa semifinal es la del 1º. `Infinity` para lo
+ * que no encaje en el cuadro previsto —una llave entre dos equipos que no son
+ * los que tocaban—, que se dibuja al final sin estorbar al resto.
+ */
+function ranuraDe(llave: PartidoPlayoff, ordenTabla: string[]): number {
+  if (llave.ronda === "final") return 0;
+
+  const puestos = [
+    puestoDe(llave.equipo1_slug, ordenTabla),
+    puestoDe(llave.equipo2_slug, ordenTabla),
+  ];
+
+  const i =
+    llave.ronda === "cuartos"
+      ? CRUCES_SEMIFINAL.findIndex(({ cuartos }) => cuartos.every((p) => puestos.includes(p)))
+      : CRUCES_SEMIFINAL.findIndex(({ anfitrion }) => puestos.includes(anfitrion));
+
+  return i === -1 ? Infinity : i;
+}
+
 /**
  * Las rondas que faltan por jugarse, con lo que ya se sabe de ellas.
  *
@@ -514,25 +548,46 @@ export function CuadroPlayoffs({
    */
   ordenTabla?: string[];
 }) {
-  const pendientes = ordenTabla?.length ? proyectar(llaves, ordenTabla) : [];
+  const tabla = ordenTabla?.length ? ordenTabla : null;
+  const pendientes = tabla ? proyectar(llaves, tabla) : [];
 
   // Solo se pintan las rondas que existen: una edición puede no jugar cuartos.
   // Las que faltan aparecen si la proyección las alcanza.
+  //
+  // Jugadas y pendientes van en la misma lista, no una tanda detrás de otra:
+  // si se juega antes la segunda semifinal que la primera, cada una tiene que
+  // seguir en su renglón.
   const rondas = RONDAS.map((r) => ({
     ...r,
-    partidos: llaves
-      .filter((ll) => ll.ronda === r.key)
-      .sort((a, b) => a.orden - b.orden),
-    proyectadas: pendientes
-      .filter((ll) => ll.ronda === r.key)
-      .sort((a, b) => a.orden - b.orden),
-  })).filter((r) => r.partidos.length > 0 || r.proyectadas.length > 0);
+    items: [
+      ...llaves
+        .filter((ll) => ll.ronda === r.key)
+        .map((llave) => ({
+          clave: llave.partido_id ?? `${llave.ronda}-${llave.orden}`,
+          // Sin tabla no hay ranura que calcular: manda la hora de arranque,
+          // que es lo único que se sabe de una edición heredada.
+          ranura: tabla ? ranuraDe(llave, tabla) : llave.orden - 1,
+          orden: llave.orden,
+          jugada: llave,
+          pendiente: null as LlavePendiente | null,
+        })),
+      ...pendientes
+        .filter((ll) => ll.ronda === r.key)
+        .map((llave) => ({
+          clave: `pendiente-${llave.ronda}-${llave.orden}`,
+          ranura: llave.orden - 1,
+          orden: llave.orden,
+          jugada: null as PartidoPlayoff | null,
+          pendiente: llave,
+        })),
+    ].sort((a, b) => (a.ranura !== b.ranura ? a.ranura - b.ranura : a.orden - b.orden)),
+  })).filter((r) => r.items.length > 0);
 
   if (!rondas.length) return null;
 
   return (
     <div className={`grid grid-cols-1 gap-4 md:items-center ${COLUMNAS[rondas.length] ?? ""}`}>
-      {rondas.map(({ key, titulo, Icono, partidos, proyectadas }) => (
+      {rondas.map(({ key, titulo, Icono, items }) => (
         <div key={key} className="flex flex-col gap-2.5">
           <div className="flex items-center gap-1.5">
             <Icono className="size-3.5 text-chalk-3" />
@@ -540,22 +595,18 @@ export function CuadroPlayoffs({
               {titulo}
             </h3>
           </div>
-          {partidos.map((ll) => (
-            <Llave
-              key={ll.partido_id ?? `${ll.ronda}-${ll.orden}`}
-              llave={ll}
-              nombreDe={nombreDe}
-              colorDe={colorDe}
-            />
-          ))}
-          {proyectadas.map((ll) => (
-            <LlaveProyectada
-              key={`pendiente-${ll.ronda}-${ll.orden}`}
-              llave={ll}
-              nombreDe={nombreDe}
-              colorDe={colorDe}
-            />
-          ))}
+          {items.map(({ clave, jugada, pendiente }) =>
+            jugada ? (
+              <Llave key={clave} llave={jugada} nombreDe={nombreDe} colorDe={colorDe} />
+            ) : (
+              <LlaveProyectada
+                key={clave}
+                llave={pendiente!}
+                nombreDe={nombreDe}
+                colorDe={colorDe}
+              />
+            )
+          )}
           {key === "final" && campeonSlug && (
             <div className="flex items-center gap-2 rounded-sm border border-line px-3 py-2">
               <IconoFinal className="size-3.5 shrink-0 text-chalk-2" />
