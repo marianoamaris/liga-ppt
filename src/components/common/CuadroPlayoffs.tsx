@@ -1,5 +1,10 @@
-import React from "react";
-import type { EventoLlave, PartidoPlayoff, RondaPlayoff } from "../../types/jugador";
+import React, { useEffect, useRef, useState } from "react";
+import type {
+  EventoLlave,
+  PartidoPlayoff,
+  RondaPlayoff,
+  TiroPenal,
+} from "../../types/jugador";
 import type { RazonAmarilla } from "../anotador/types";
 import { RAZON_LABEL, SIN_TIEMPO } from "../anotador/utils";
 import {
@@ -21,7 +26,11 @@ import {
  * jugando en vivo: una llave en curso llega con `en_juego` y sin ganador.
  */
 
-const RONDAS: { key: RondaPlayoff; titulo: string; Icono: React.FC<{ className?: string }> }[] = [
+const RONDAS: {
+  key: RondaPlayoff;
+  titulo: string;
+  Icono: React.FC<{ className?: string }>;
+}[] = [
   { key: "cuartos", titulo: "Cuartos", Icono: IconoCuartos },
   { key: "semifinal", titulo: "Semifinales", Icono: IconoSemifinal },
   { key: "final", titulo: "Final", Icono: IconoFinal },
@@ -61,7 +70,7 @@ interface LlavePendiente {
 function cuartosDe(
   llaves: PartidoPlayoff[],
   puestos: [number, number],
-  ordenTabla: string[]
+  ordenTabla: string[],
 ): PartidoPlayoff | undefined {
   const [a, b] = puestos.map((p) => ordenTabla[p - 1]);
   if (!a || !b) return undefined;
@@ -69,7 +78,7 @@ function cuartosDe(
     (ll) =>
       ll.ronda === "cuartos" &&
       ((ll.equipo1_slug === a && ll.equipo2_slug === b) ||
-        (ll.equipo1_slug === b && ll.equipo2_slug === a))
+        (ll.equipo1_slug === b && ll.equipo2_slug === a)),
   );
 }
 
@@ -101,8 +110,12 @@ function ranuraDe(llave: PartidoPlayoff, ordenTabla: string[]): number {
 
   const i =
     llave.ronda === "cuartos"
-      ? CRUCES_SEMIFINAL.findIndex(({ cuartos }) => cuartos.every((p) => puestos.includes(p)))
-      : CRUCES_SEMIFINAL.findIndex(({ anfitrion }) => puestos.includes(anfitrion));
+      ? CRUCES_SEMIFINAL.findIndex(({ cuartos }) =>
+          cuartos.every((p) => puestos.includes(p)),
+        )
+      : CRUCES_SEMIFINAL.findIndex(({ anfitrion }) =>
+          puestos.includes(anfitrion),
+        );
 
   return i === -1 ? Infinity : i;
 }
@@ -119,7 +132,7 @@ function ranuraDe(llave: PartidoPlayoff, ordenTabla: string[]): number {
  */
 function proyectar(
   llaves: PartidoPlayoff[],
-  ordenTabla: string[]
+  ordenTabla: string[],
 ): LlavePendiente[] {
   // Sin cuartos no hay nada que proyectar: o la edición no juega playoff, o
   // todavía no ha empezado y esa proyección la hace otra pantalla.
@@ -135,13 +148,14 @@ function proyectar(
     const jugada = llaves.find(
       (ll) =>
         ll.ronda === "semifinal" &&
-        (ll.equipo1_slug === anfitrionSlug || ll.equipo2_slug === anfitrionSlug)
+        (ll.equipo1_slug === anfitrionSlug ||
+          ll.equipo2_slug === anfitrionSlug),
     );
     if (jugada) {
       ganadoresSemi.push(
         jugada.ganador_slug
           ? { slug: jugada.ganador_slug, etiqueta: "" }
-          : { slug: null, etiqueta: `Ganador semifinal ${i + 1}` }
+          : { slug: null, etiqueta: `Ganador semifinal ${i + 1}` },
       );
       return;
     }
@@ -164,7 +178,10 @@ function proyectar(
 
   // La final solo se proyecta si no está anotada y si las dos semifinales
   // llegaron a plantearse; media final es peor que ninguna.
-  if (!llaves.some((ll) => ll.ronda === "final") && ganadoresSemi.length === 2) {
+  if (
+    !llaves.some((ll) => ll.ronda === "final") &&
+    ganadoresSemi.length === 2
+  ) {
     pendientes.push({
       ronda: "final",
       orden: 1,
@@ -210,7 +227,10 @@ function LadoLlave({
     <div className="flex items-center gap-2 px-3 py-2">
       <span
         className="size-2.5 shrink-0 rounded-full ring-[1.5px] ring-chalk-3"
-        style={{ backgroundColor: colorDe(slug) ?? "#4B5563", opacity: apagado ? 0.45 : 1 }}
+        style={{
+          backgroundColor: colorDe(slug) ?? "#4B5563",
+          opacity: apagado ? 0.45 : 1,
+        }}
       />
       <span
         className={`font-cond min-w-0 flex-1 truncate text-sm ${
@@ -248,12 +268,25 @@ function enOrden(eventos: EventoLlave[]): EventoLlave[] {
 }
 
 function IconoEvento({ tipo }: { tipo: EventoLlave["tipo"] }) {
-  if (tipo === "gol") return <IconoGol className="size-3 shrink-0 text-chalk-2" />;
-  if (tipo === "autogol") return <IconoAutogol className="size-3 shrink-0 text-chalk-3" />;
+  if (tipo === "gol")
+    return <IconoGol className="size-3 shrink-0 text-chalk-2" />;
+  if (tipo === "autogol")
+    return <IconoAutogol className="size-3 shrink-0 text-chalk-3" />;
   return <Tarjeta tipo={tipo} />;
 }
 
-function FilaEvento({ evento, colorDe }: { evento: EventoLlave; colorDe: ColorDe }) {
+/**
+ * Un hecho del partido dentro del panel, ya colocado en la columna de su
+ * equipo. El bando se lee por la columna, así que aquí no hace falta repetirlo
+ * con un punto de color: sobra tinta y el ojo ya lo sabe.
+ */
+function EventoLado({
+  evento,
+  lado,
+}: {
+  evento: EventoLlave;
+  lado: "izq" | "der";
+}) {
   // La razón viaja como texto libre: si es una de las conocidas se traduce, y
   // si no, se muestra tal cual antes que dejar el hueco.
   const razon =
@@ -261,26 +294,85 @@ function FilaEvento({ evento, colorDe }: { evento: EventoLlave; colorDe: ColorDe
       ? (RAZON_LABEL[evento.razon as RazonAmarilla] ?? evento.razon)
       : null;
   return (
-    <li className="flex items-start gap-2 py-1">
-      <span
-        className="mt-1 size-2 shrink-0 rounded-full"
-        style={{ backgroundColor: colorDe(evento.equipo_slug) ?? "#4B5563" }}
-      />
-      <span className="mt-0.5 text-[0.6875rem] leading-none">
+    <div
+      className={`flex min-w-0 items-start gap-1.5 ${
+        lado === "der" ? "flex-row-reverse text-right" : ""
+      }`}
+    >
+      <span className="mt-0.5 shrink-0 text-xs leading-none">
         <IconoEvento tipo={evento.tipo} />
       </span>
-      <div className="min-w-0 flex-1">
-        <span className="font-cond block truncate text-[0.6875rem] text-chalk-2">
+      <div className="min-w-0">
+        <span className="font-cond block truncate text-xs text-chalk">
           {evento.jugador ?? "En contra"}
         </span>
         {razon && (
-          <span className="font-cond block truncate text-[0.625rem] text-chalk-3">{razon}</span>
+          <span className="font-cond block truncate text-[0.625rem] text-chalk-3">
+            {razon}
+          </span>
         )}
       </div>
-      <span className="tnum font-data shrink-0 text-[0.625rem] text-chalk-3">
-        {minutoDe(evento.tiempo)}
+    </div>
+  );
+}
+
+/** Un cobro de la tanda, en la columna de su equipo. */
+function TiroLado({
+  tiro,
+  lado,
+  colorDe,
+}: {
+  tiro: TiroPenal;
+  lado: "izq" | "der";
+  colorDe: ColorDe;
+}) {
+  return (
+    <div
+      className={`flex min-w-0 items-center gap-1.5 ${
+        lado === "der" ? "flex-row-reverse text-right" : ""
+      }`}
+    >
+      <span
+        className="size-2 shrink-0 rounded-full border"
+        style={{
+          borderColor: colorDe(tiro.equipoId) ?? "#4B5563",
+          backgroundColor: tiro.convertido
+            ? (colorDe(tiro.equipoId) ?? "#4B5563")
+            : "transparent",
+        }}
+      />
+      <span className="font-cond min-w-0 truncate text-xs text-chalk-2">
+        {tiro.jugador}
       </span>
-    </li>
+      <span className="font-cond shrink-0 text-[0.625rem] text-chalk-3">
+        {tiro.convertido ? "gol" : "falló"}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Una fila del relato: el hecho en la columna de su equipo y, en medio, el
+ * minuto. Las dos columnas caen bajo el equipo que las encabeza, así que el
+ * partido se lee como se leería en cualquier acta.
+ */
+function FilaPanel({
+  izquierda,
+  centro,
+  derecha,
+}: {
+  izquierda: React.ReactNode;
+  centro: React.ReactNode;
+  derecha: React.ReactNode;
+}) {
+  return (
+    <div className="grid grid-cols-[1fr_2.75rem_1fr] items-start gap-2 px-4 py-1.5">
+      <div className="min-w-0">{izquierda}</div>
+      <span className="tnum font-data pt-0.5 text-center text-[0.625rem] text-chalk-3">
+        {centro}
+      </span>
+      <div className="min-w-0">{derecha}</div>
+    </div>
   );
 }
 
@@ -344,33 +436,47 @@ function Estado({ llave }: { llave: PartidoPlayoff }) {
     );
   }
   if (llave.ganador_slug == null && llave.goles1 != null) {
-    return <span className="font-cond text-[0.625rem] text-chalk-3">Definida por fuera</span>;
+    return (
+      <span className="font-cond text-[0.625rem] text-chalk-3">
+        Definida por fuera
+      </span>
+    );
   }
   return null;
 }
 
+/** La misma clave que identifica la llave en el cuadro y en el panel. */
+function claveDe(llave: PartidoPlayoff): string {
+  return llave.partido_id ?? `${llave.ronda}-${llave.orden}`;
+}
+
+/** Si la llave tiene algo que contar: goles, tarjetas o una tanda. */
+function hayDetalle(llave: PartidoPlayoff): boolean {
+  return (
+    (llave.eventos?.length ?? 0) > 0 ||
+    (llave.definicion?.tiros?.length ?? 0) > 0
+  );
+}
+
 /**
- * Lo que pasó dentro de la llave: cada gol con su autor y su minuto, cada
- * tarjeta con su motivo y, si la hubo, la tanda de penales tiro a tiro.
+ * El pie de la llave: su estado y la puerta al detalle.
  *
- * Va plegado porque el cuadro se lee de un vistazo y son tres columnas de
- * llaves: el marcador sigue siendo lo primero y el detalle está a un clic.
+ * Es un botón, no un desplegable. Antes el detalle crecía dentro de la propia
+ * tarjeta y empujaba media columna hacia abajo cada vez que se abría; ahora
+ * solo enciende el panel de abajo, que es común a todo el cuadro.
  */
-function Detalle({
+function PieLlave({
   llave,
-  nombreDe,
-  colorDe,
+  abierta,
+  onAbrir,
 }: {
   llave: PartidoPlayoff;
-  nombreDe: NombreDe;
-  colorDe: ColorDe;
+  abierta: boolean;
+  onAbrir: () => void;
 }) {
-  const eventos = enOrden(llave.eventos ?? []);
-  const tiros = llave.definicion?.tiros ?? [];
-
   // Sin nada que contar no hay nada que abrir —una edición heredada no tiene
-  // partido anotado—: la llave se queda con su línea de estado, como antes.
-  if (!eventos.length && !tiros.length) {
+  // partido anotado—: la llave se queda con su línea de estado.
+  if (!hayDetalle(llave)) {
     if (!tieneEstado(llave)) return null;
     return (
       <div className="flex items-center gap-1.5 border-t border-line px-3 py-1.5">
@@ -380,63 +486,148 @@ function Detalle({
   }
 
   return (
-    <details className="group border-t border-line">
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 px-3 py-1.5 [&::-webkit-details-marker]:hidden">
-        {tieneEstado(llave) ? (
-          <Estado llave={llave} />
-        ) : (
-          <span className="font-cond text-[0.625rem] text-chalk-3">Detalle del partido</span>
-        )}
-        <span className="ml-auto flex items-center gap-2">
-          <ResumenTarjetas eventos={eventos} />
-          <span aria-hidden className="text-chalk-3 transition-transform group-open:rotate-45">
-            +
-          </span>
+    <button
+      type="button"
+      onClick={onAbrir}
+      aria-expanded={abierta}
+      className={`flex w-full cursor-pointer items-center gap-1.5 border-t border-line px-3 py-1.5 text-left transition-colors hover:bg-raised/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
+        abierta ? "bg-raised/70" : ""
+      }`}
+    >
+      {tieneEstado(llave) ? (
+        <Estado llave={llave} />
+      ) : (
+        <span className="font-cond text-[0.625rem] text-chalk-3">
+          Detalle del partido
         </span>
-      </summary>
+      )}
+      <span className="ml-auto flex items-center gap-2">
+        <ResumenTarjetas eventos={llave.eventos ?? []} />
+        <span
+          aria-hidden
+          className={`text-chalk-3 transition-transform ${abierta ? "rotate-45" : ""}`}
+        >
+          +
+        </span>
+      </span>
+    </button>
+  );
+}
+
+/**
+ * Lo que pasó dentro de una llave: cada gol con su autor y su minuto, cada
+ * tarjeta con su motivo y, si la hubo, la tanda de penales tiro a tiro.
+ *
+ * Vive debajo del cuadro y no dentro de la tarjeta, y solo hay uno abierto a
+ * la vez. Así el cuadro no se deforma al mirar un partido —las columnas se
+ * quedan donde estaban— y el relato tiene el ancho de la pantalla para
+ * ponerse a dos columnas, una por equipo, como un acta.
+ */
+function PanelDetalle({
+  llave,
+  ronda,
+  nombreDe,
+  colorDe,
+  onCerrar,
+}: {
+  llave: PartidoPlayoff;
+  ronda: string;
+  nombreDe: NombreDe;
+  colorDe: ColorDe;
+  onCerrar: () => void;
+}) {
+  const eventos = enOrden(llave.eventos ?? []);
+  const tiros = llave.definicion?.tiros ?? [];
+  const nombre1 = nombreDe(llave.equipo1_slug) || llave.equipo1_nombre;
+  const nombre2 = nombreDe(llave.equipo2_slug) || llave.equipo2_nombre;
+
+  return (
+    <div className="rounded-sm border border-line bg-raised/30">
+      <div className="flex items-center gap-3 border-b border-line px-4 py-2.5">
+        <span className="font-cond shrink-0 text-[0.625rem] tracking-wider text-chalk-3 uppercase">
+          {ronda}
+        </span>
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
+          <span className="font-cond min-w-0 flex-1 truncate text-right text-sm text-chalk">
+            {nombre1}
+          </span>
+          <span
+            className="size-2.5 shrink-0 rounded-full ring-[1.5px] ring-chalk-3"
+            style={{
+              backgroundColor: colorDe(llave.equipo1_slug) ?? "#4B5563",
+            }}
+          />
+          <span className="tnum font-data shrink-0 text-sm font-bold text-chalk">
+            {llave.goles1 ?? "—"}–{llave.goles2 ?? "—"}
+          </span>
+          <span
+            className="size-2.5 shrink-0 rounded-full ring-[1.5px] ring-chalk-3"
+            style={{
+              backgroundColor: colorDe(llave.equipo2_slug) ?? "#4B5563",
+            }}
+          />
+          <span className="font-cond min-w-0 flex-1 truncate text-sm text-chalk">
+            {nombre2}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={onCerrar}
+          aria-label="Cerrar el detalle"
+          className="font-cond shrink-0 cursor-pointer px-1 text-chalk-3 transition-colors hover:text-chalk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+        >
+          ×
+        </button>
+      </div>
 
       {eventos.length > 0 && (
-        <ul className="border-t border-line/60 px-3 py-1.5">
-          {eventos.map((ev) => (
-            <FilaEvento key={ev.id} evento={ev} colorDe={colorDe} />
-          ))}
-        </ul>
+        <div className="py-1.5">
+          {eventos.map((ev) => {
+            const local = ev.equipo_slug === llave.equipo1_slug;
+            return (
+              <FilaPanel
+                key={ev.id}
+                izquierda={local ? <EventoLado evento={ev} lado="der" /> : null}
+                centro={minutoDe(ev.tiempo)}
+                derecha={local ? null : <EventoLado evento={ev} lado="izq" />}
+              />
+            );
+          })}
+        </div>
       )}
 
       {tiros.length > 0 && (
-        <div className="border-t border-line/60 px-3 py-1.5">
-          <p className="font-cond mb-1 text-[0.625rem] tracking-wider text-chalk-3 uppercase">
+        <div className="border-t border-line/60 py-1.5">
+          <p className="font-cond px-4 pb-1 text-[0.625rem] tracking-wider text-chalk-3 uppercase">
             Tanda de penales
           </p>
-          <ul>
-            {tiros.map((t) => (
-              <li key={t.id} className="flex items-center gap-2 py-0.5">
-                <span
-                  className="size-2 shrink-0 rounded-full border"
-                  style={{
-                    borderColor: colorDe(t.equipoId) ?? "#4B5563",
-                    backgroundColor: t.convertido
-                      ? (colorDe(t.equipoId) ?? "#4B5563")
-                      : "transparent",
-                  }}
-                />
-                <span className="font-cond min-w-0 flex-1 truncate text-[0.6875rem] text-chalk-2">
-                  {t.jugador}
-                </span>
-                <span className="font-cond shrink-0 text-[0.625rem] text-chalk-3">
-                  {t.convertido ? "gol" : "falló"}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {tiros.map((t, i) => {
+            const local = t.equipoId === llave.equipo1_slug;
+            return (
+              <FilaPanel
+                key={t.id}
+                izquierda={
+                  local ? (
+                    <TiroLado tiro={t} lado="der" colorDe={colorDe} />
+                  ) : null
+                }
+                centro={i + 1}
+                derecha={
+                  local ? null : (
+                    <TiroLado tiro={t} lado="izq" colorDe={colorDe} />
+                  )
+                }
+              />
+            );
+          })}
           {llave.ganador_slug && (
-            <p className="font-cond mt-1 truncate text-[0.625rem] text-chalk-3">
+            <p className="font-cond px-4 pt-1 text-center text-[0.625rem] text-chalk-3">
               Pasa {nombreDe(llave.ganador_slug)}
             </p>
           )}
         </div>
       )}
-    </details>
+    </div>
   );
 }
 
@@ -444,14 +635,24 @@ function Llave({
   llave,
   nombreDe,
   colorDe,
+  abierta,
+  onAbrir,
 }: {
   llave: PartidoPlayoff;
   nombreDe: NombreDe;
   colorDe: ColorDe;
+  abierta: boolean;
+  onAbrir: () => void;
 }) {
   const decidida = llave.ganador_slug != null;
   return (
-    <div className="rounded-sm border border-line bg-raised/30">
+    // La llave abierta se marca con el borde: el panel está abajo, y sin esto
+    // no se sabría de cuál de las seis tarjetas se está leyendo el detalle.
+    <div
+      className={`rounded-sm border bg-raised/30 transition-colors ${
+        abierta ? "border-chalk-3" : "border-line"
+      }`}
+    >
       <LadoLlave
         slug={llave.equipo1_slug}
         nombre={nombreDe(llave.equipo1_slug) || llave.equipo1_nombre}
@@ -469,7 +670,7 @@ function Llave({
         decidida={decidida}
         colorDe={colorDe}
       />
-      <Detalle llave={llave} nombreDe={nombreDe} colorDe={colorDe} />
+      <PieLlave llave={llave} abierta={abierta} onAbrir={onAbrir} />
     </div>
   );
 }
@@ -498,7 +699,9 @@ function LlaveProyectada({
           <span
             className="size-2.5 shrink-0 rounded-full ring-[1.5px] ring-chalk-3"
             style={{
-              backgroundColor: lado.slug ? (colorDe(lado.slug) ?? "#4B5563") : "transparent",
+              backgroundColor: lado.slug
+                ? (colorDe(lado.slug) ?? "#4B5563")
+                : "transparent",
               opacity: lado.slug ? 0.6 : 1,
             }}
           />
@@ -548,6 +751,11 @@ export function CuadroPlayoffs({
    */
   ordenTabla?: string[];
 }) {
+  // Un solo detalle abierto a la vez, y vive aquí y no en cada tarjeta: es la
+  // forma de garantizar que no haya dos relatos compitiendo por la pantalla.
+  const [abierta, setAbierta] = useState<string | null>(null);
+  const panel = useRef<HTMLDivElement>(null);
+
   const tabla = ordenTabla?.length ? ordenTabla : null;
   const pendientes = tabla ? proyectar(llaves, tabla) : [];
 
@@ -570,6 +778,7 @@ export function CuadroPlayoffs({
           orden: llave.orden,
           jugada: llave,
           pendiente: null as LlavePendiente | null,
+          titulo: r.titulo,
         })),
       ...pendientes
         .filter((ll) => ll.ronda === r.key)
@@ -579,47 +788,89 @@ export function CuadroPlayoffs({
           orden: llave.orden,
           jugada: null as PartidoPlayoff | null,
           pendiente: llave,
+          titulo: r.titulo,
         })),
-    ].sort((a, b) => (a.ranura !== b.ranura ? a.ranura - b.ranura : a.orden - b.orden)),
+    ].sort((a, b) =>
+      a.ranura !== b.ranura ? a.ranura - b.ranura : a.orden - b.orden,
+    ),
   })).filter((r) => r.items.length > 0);
+
+  // La llave abierta se busca en la lista de cada render: en vivo las llaves
+  // se recargan cada ocho segundos, y guardar el objeto dejaría el panel
+  // contando un partido que ya avanzó. Si desaparece, el panel se va con ella.
+  const seleccion = rondas
+    .flatMap((r) => r.items)
+    .find((i) => i.jugada && claveDe(i.jugada) === abierta);
+
+  // Al cambiar de partido el panel se trae a la vista. `nearest` mueve lo
+  // mínimo: si ya se veía, no se mueve nada.
+  useEffect(() => {
+    if (abierta)
+      panel.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [abierta]);
 
   if (!rondas.length) return null;
 
   return (
-    <div className={`grid grid-cols-1 gap-4 md:items-center ${COLUMNAS[rondas.length] ?? ""}`}>
-      {rondas.map(({ key, titulo, Icono, items }) => (
-        <div key={key} className="flex flex-col gap-2.5">
-          <div className="flex items-center gap-1.5">
-            <Icono className="size-3.5 text-chalk-3" />
-            <h3 className="font-cond text-[0.6875rem] tracking-wider text-chalk-2 uppercase">
-              {titulo}
-            </h3>
-          </div>
-          {items.map(({ clave, jugada, pendiente }) =>
-            jugada ? (
-              <Llave key={clave} llave={jugada} nombreDe={nombreDe} colorDe={colorDe} />
-            ) : (
-              <LlaveProyectada
-                key={clave}
-                llave={pendiente!}
-                nombreDe={nombreDe}
-                colorDe={colorDe}
-              />
-            )
-          )}
-          {key === "final" && campeonSlug && (
-            <div className="flex items-center gap-2 rounded-sm border border-line px-3 py-2">
-              <IconoFinal className="size-3.5 shrink-0 text-chalk-2" />
-              <span className="font-cond truncate text-sm text-chalk">
-                {nombreDe(campeonSlug)}
-              </span>
-              <span className="font-cond ml-auto shrink-0 text-[0.625rem] tracking-wider text-chalk-3 uppercase">
-                Campeón
-              </span>
+    <div className="flex flex-col gap-4">
+      <div
+        className={`grid grid-cols-1 gap-4 md:items-center ${COLUMNAS[rondas.length] ?? ""}`}
+      >
+        {rondas.map(({ key, titulo, Icono, items }) => (
+          <div key={key} className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-1.5">
+              <Icono className="size-3.5 text-chalk-3" />
+              <h3 className="font-cond text-[0.6875rem] tracking-wider text-chalk-2 uppercase">
+                {titulo}
+              </h3>
             </div>
-          )}
+            {items.map(({ clave, jugada, pendiente }) =>
+              jugada ? (
+                <Llave
+                  key={clave}
+                  llave={jugada}
+                  nombreDe={nombreDe}
+                  colorDe={colorDe}
+                  abierta={abierta === clave}
+                  onAbrir={() =>
+                    setAbierta((actual) => (actual === clave ? null : clave))
+                  }
+                />
+              ) : (
+                <LlaveProyectada
+                  key={clave}
+                  llave={pendiente!}
+                  nombreDe={nombreDe}
+                  colorDe={colorDe}
+                />
+              ),
+            )}
+            {key === "final" && campeonSlug && (
+              <div className="flex items-center gap-2 rounded-sm border border-line px-3 py-2">
+                <IconoFinal className="size-3.5 shrink-0 text-chalk-2" />
+                <span className="font-cond truncate text-sm text-chalk">
+                  {nombreDe(campeonSlug)}
+                </span>
+                <span className="font-cond ml-auto shrink-0 text-[0.625rem] tracking-wider text-chalk-3 uppercase">
+                  Campeón
+                </span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {seleccion?.jugada && (
+        <div ref={panel}>
+          <PanelDetalle
+            llave={seleccion.jugada}
+            ronda={seleccion.titulo}
+            nombreDe={nombreDe}
+            colorDe={colorDe}
+            onCerrar={() => setAbierta(null)}
+          />
         </div>
-      ))}
+      )}
     </div>
   );
 }
