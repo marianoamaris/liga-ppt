@@ -1276,11 +1276,13 @@ function PlayoffSection({
           <h2 className="text-chalk font-bold text-sm">
             Cuadro final{numeroSede != null ? ` · Liga #${numeroSede}` : ""}
           </h2>
-          <p className="text-chalk-3 text-xs mt-0.5">
-            {hayFinal
-              ? "Cuadro completo. Queda guardado en la edición."
-              : "Se actualiza con cada llave que termina."}
-          </p>
+          {/* Mientras el cuadro está a medias no hace falta decirlo: se ve.
+              La nota queda solo para el final, que sí dice algo nuevo. */}
+          {hayFinal && (
+            <p className="text-chalk-3 text-xs mt-0.5">
+              Cuadro completo. Queda guardado en la edición.
+            </p>
+          )}
         </div>
 
         <div className="bg-surface rounded-lg px-4 py-4 border border-line">
