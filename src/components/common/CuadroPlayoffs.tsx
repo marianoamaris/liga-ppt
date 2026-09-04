@@ -28,6 +28,120 @@ const RONDAS: { key: RondaPlayoff; titulo: string; Icono: React.FC<{ className?:
 ];
 
 /**
+ * Cómo se cruza el cuadro, en puestos de la tabla general.
+ *
+ * El 1º y el 2º entran directos a semifinales y esperan cada uno al ganador de
+ * una llave concreta: el 1º al que salga del 4º-5º, y el 2º al que salga del
+ * 3º-6º. No es el orden en que se juegan los cuartos —eso depende de a qué hora
+ * arranque cada partido—, así que la llave se busca por los puestos que la
+ * componen, no por su posición en la ronda.
+ */
+const CRUCES_SEMIFINAL: { anfitrion: number; cuartos: [number, number] }[] = [
+  { anfitrion: 1, cuartos: [4, 5] },
+  { anfitrion: 2, cuartos: [3, 6] },
+];
+
+/**
+ * Un lado de una llave que todavía no se juega. O ya se sabe qué equipo es
+ * —el 1º de la tabla, el ganador de un cuarto que ya terminó— o solo se sabe
+ * de dónde va a salir.
+ */
+interface LadoPendiente {
+  slug: string | null;
+  etiqueta: string;
+}
+
+interface LlavePendiente {
+  ronda: RondaPlayoff;
+  orden: number;
+  lados: [LadoPendiente, LadoPendiente];
+}
+
+/** Las dos llaves de cuartos, identificadas por los puestos que enfrentan. */
+function cuartosDe(
+  llaves: PartidoPlayoff[],
+  puestos: [number, number],
+  ordenTabla: string[]
+): PartidoPlayoff | undefined {
+  const [a, b] = puestos.map((p) => ordenTabla[p - 1]);
+  if (!a || !b) return undefined;
+  return llaves.find(
+    (ll) =>
+      ll.ronda === "cuartos" &&
+      ((ll.equipo1_slug === a && ll.equipo2_slug === b) ||
+        (ll.equipo1_slug === b && ll.equipo2_slug === a))
+  );
+}
+
+/**
+ * Las rondas que faltan por jugarse, con lo que ya se sabe de ellas.
+ *
+ * Mientras el cuadro no existía entero, la pestaña de playoff pasaba de mostrar
+ * la proyección completa a mostrar solo la ronda jugada: se perdía el «quién
+ * sigue» justo cuando por fin era concreto. Aquí se rellenan los huecos.
+ *
+ * Una semifinal ya anotada manda sobre su proyección; se reconoce por el
+ * anfitrión, que es quien tiene el puesto directo.
+ */
+function proyectar(
+  llaves: PartidoPlayoff[],
+  ordenTabla: string[]
+): LlavePendiente[] {
+  // Sin cuartos no hay nada que proyectar: o la edición no juega playoff, o
+  // todavía no ha empezado y esa proyección la hace otra pantalla.
+  if (!llaves.some((ll) => ll.ronda === "cuartos")) return [];
+
+  const pendientes: LlavePendiente[] = [];
+  const ganadoresSemi: LadoPendiente[] = [];
+
+  CRUCES_SEMIFINAL.forEach(({ anfitrion, cuartos }, i) => {
+    const anfitrionSlug = ordenTabla[anfitrion - 1];
+    if (!anfitrionSlug) return;
+
+    const jugada = llaves.find(
+      (ll) =>
+        ll.ronda === "semifinal" &&
+        (ll.equipo1_slug === anfitrionSlug || ll.equipo2_slug === anfitrionSlug)
+    );
+    if (jugada) {
+      ganadoresSemi.push(
+        jugada.ganador_slug
+          ? { slug: jugada.ganador_slug, etiqueta: "" }
+          : { slug: null, etiqueta: `Ganador semifinal ${i + 1}` }
+      );
+      return;
+    }
+
+    const llaveCuartos = cuartosDe(llaves, cuartos, ordenTabla);
+    const rival: LadoPendiente = llaveCuartos?.ganador_slug
+      ? { slug: llaveCuartos.ganador_slug, etiqueta: "" }
+      : { slug: null, etiqueta: `Ganador ${cuartos[0]}º vs ${cuartos[1]}º` };
+
+    pendientes.push({
+      ronda: "semifinal",
+      orden: i + 1,
+      // «#1» y no «1º de la tabla»: en el cuadro a tres columnas la etiqueta
+      // larga se come el nombre del equipo, y es como se nombran los puestos
+      // en el resto de la pantalla.
+      lados: [{ slug: anfitrionSlug, etiqueta: `#${anfitrion}` }, rival],
+    });
+    ganadoresSemi.push({ slug: null, etiqueta: `Ganador semifinal ${i + 1}` });
+  });
+
+  // La final solo se proyecta si no está anotada y si las dos semifinales
+  // llegaron a plantearse; media final es peor que ninguna.
+  if (!llaves.some((ll) => ll.ronda === "final") && ganadoresSemi.length === 2) {
+    pendientes.push({
+      ronda: "final",
+      orden: 1,
+      lados: [ganadoresSemi[0], ganadoresSemi[1]],
+    });
+  }
+
+  return pendientes;
+}
+
+/**
  * En móvil las rondas van una debajo de otra; el cuadro solo se abre en
  * columnas cuando hay ancho. Escritas enteras porque Tailwind lee las clases
  * del código, no las compone en tiempo de ejecución.
@@ -326,32 +440,99 @@ function Llave({
   );
 }
 
+/**
+ * Una llave que todavía no se juega. Se dibuja apagada y con el borde
+ * punteado: ocupa el sitio que va a ocupar el partido, pero se tiene que
+ * notar que ahí aún no ha pasado nada.
+ */
+function LlaveProyectada({
+  llave,
+  nombreDe,
+  colorDe,
+}: {
+  llave: LlavePendiente;
+  nombreDe: NombreDe;
+  colorDe: ColorDe;
+}) {
+  return (
+    <div className="rounded-sm border border-dashed border-line bg-raised/10">
+      {llave.lados.map((lado, i) => (
+        <div
+          key={i}
+          className={`flex items-center gap-2 px-3 py-2 ${i ? "border-t border-line" : ""}`}
+        >
+          <span
+            className="size-2.5 shrink-0 rounded-full ring-[1.5px] ring-chalk-3"
+            style={{
+              backgroundColor: lado.slug ? (colorDe(lado.slug) ?? "#4B5563") : "transparent",
+              opacity: lado.slug ? 0.6 : 1,
+            }}
+          />
+          {lado.slug ? (
+            <>
+              <span className="font-cond min-w-0 flex-1 truncate text-sm text-chalk-2">
+                {nombreDe(lado.slug)}
+              </span>
+              {lado.etiqueta && (
+                <span className="font-cond shrink-0 text-[0.625rem] text-chalk-3">
+                  {lado.etiqueta}
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="font-cond min-w-0 flex-1 truncate text-sm text-chalk-3 italic">
+              {lado.etiqueta}
+            </span>
+          )}
+        </div>
+      ))}
+      <div className="border-t border-line px-3 py-1.5">
+        <span className="font-cond text-[0.625rem] tracking-wider text-chalk-3 uppercase">
+          Por jugar
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function CuadroPlayoffs({
   llaves,
   nombreDe,
   colorDe,
   campeonSlug,
+  ordenTabla,
 }: {
   llaves: PartidoPlayoff[];
   nombreDe: NombreDe;
   colorDe: ColorDe;
   /** Se resalta bajo la final; normalmente el ganador de esa misma llave. */
   campeonSlug?: string | null;
+  /**
+   * Equipos en orden de tabla general. Con ella el cuadro proyecta las rondas
+   * que faltan; sin ella solo dibuja lo jugado, que es lo que quiere el
+   * histórico de una edición terminada.
+   */
+  ordenTabla?: string[];
 }) {
-  // Solo se pintan las rondas que existen: una edición puede no jugar cuartos,
-  // y mientras la sesión avanza las siguientes todavía no tienen partidos.
+  const pendientes = ordenTabla?.length ? proyectar(llaves, ordenTabla) : [];
+
+  // Solo se pintan las rondas que existen: una edición puede no jugar cuartos.
+  // Las que faltan aparecen si la proyección las alcanza.
   const rondas = RONDAS.map((r) => ({
     ...r,
     partidos: llaves
       .filter((ll) => ll.ronda === r.key)
       .sort((a, b) => a.orden - b.orden),
-  })).filter((r) => r.partidos.length > 0);
+    proyectadas: pendientes
+      .filter((ll) => ll.ronda === r.key)
+      .sort((a, b) => a.orden - b.orden),
+  })).filter((r) => r.partidos.length > 0 || r.proyectadas.length > 0);
 
   if (!rondas.length) return null;
 
   return (
     <div className={`grid grid-cols-1 gap-4 md:items-center ${COLUMNAS[rondas.length] ?? ""}`}>
-      {rondas.map(({ key, titulo, Icono, partidos }) => (
+      {rondas.map(({ key, titulo, Icono, partidos, proyectadas }) => (
         <div key={key} className="flex flex-col gap-2.5">
           <div className="flex items-center gap-1.5">
             <Icono className="size-3.5 text-chalk-3" />
@@ -362,6 +543,14 @@ export function CuadroPlayoffs({
           {partidos.map((ll) => (
             <Llave
               key={ll.partido_id ?? `${ll.ronda}-${ll.orden}`}
+              llave={ll}
+              nombreDe={nombreDe}
+              colorDe={colorDe}
+            />
+          ))}
+          {proyectadas.map((ll) => (
+            <LlaveProyectada
+              key={`pendiente-${ll.ronda}-${ll.orden}`}
               llave={ll}
               nombreDe={nombreDe}
               colorDe={colorDe}

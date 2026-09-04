@@ -1289,6 +1289,7 @@ function PlayoffSection({
             nombreDe={nombreDe}
             colorDe={(slug) => colorDe(slug)}
             campeonSlug={campeon}
+            ordenTabla={standings.map((s) => s.equipoId)}
           />
         </div>
       </div>

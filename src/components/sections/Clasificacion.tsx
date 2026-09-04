@@ -384,6 +384,15 @@ export const Clasificacion: React.FC = () => {
                       nombreDe={nombreDe}
                       colorDe={colorDe}
                       campeonSlug={historico.edicion.campeon_slug}
+                      // Una edición terminada no proyecta nada: su cuadro es
+                      // el que fue, no el que iba a ser.
+                      ordenTabla={
+                        historico.edicion.estado === "activa"
+                          ? [...historico.clasificacion]
+                              .sort((a, b) => a.posicion - b.posicion)
+                              .map((f) => f.equipo_slug)
+                          : undefined
+                      }
                     />
                   </Panel>
                 )}
