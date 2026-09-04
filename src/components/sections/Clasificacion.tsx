@@ -81,7 +81,7 @@ function TablaPosiciones({
     <table className="w-full border-collapse text-sm">
       <thead>
         <tr className="font-cond text-[0.625rem] text-chalk-3">
-          <th className="w-6 pb-2 text-left font-bold" />
+          <th className="w-8 pb-2 text-left font-bold" />
           <th className="pb-2 text-left font-bold">Equipo</th>
           {hayPj && !compacta && <th className="pb-2 text-right font-bold">PJ</th>}
           {hayDetalle && (
@@ -106,8 +106,12 @@ function TablaPosiciones({
                     : ""
               }`}
             >
+              {/* La barra de zona se pinta dentro de la celda, así que el
+                  número necesita sitio para no quedar encima de ella. El
+                  hueco va en todas las filas: si solo lo llevaran las de
+                  zona, la columna bailaría en el séptimo puesto. */}
               <td
-                className={`tnum font-data py-2 text-xs ${
+                className={`tnum font-data py-2 pl-2 text-xs ${
                   zona ? "text-chalk" : "text-chalk-3"
                 }`}
                 style={
