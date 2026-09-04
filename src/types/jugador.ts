@@ -228,6 +228,24 @@ export interface DefinicionPlayoff {
 }
 
 /**
+ * Un hecho del partido de una llave: un gol o una tarjeta, con su autor y el
+ * minuto en que ocurrió. Es lo que el anotador registra durante el playoff y
+ * que el cuadro, hasta ahora, resumía en un marcador.
+ */
+export interface EventoLlave {
+  id: string;
+  tipo: "gol" | "autogol" | "amarilla" | "roja";
+  /** Equipo al que se le apunta: el que anota, o el del sancionado. */
+  equipo_slug: string;
+  /** Null en los autogoles: se registra el equipo, no quién se lo metió. */
+  jugador: string | null;
+  /** Motivo de la amarilla; null en el resto. */
+  razon: string | null;
+  /** Segundos jugados. Null si el evento no llegó a guardarlo. */
+  tiempo: number | null;
+}
+
+/**
  * Una llave del cuadro final. Sale de un partido de playoff; la final puede
  * venir además de `edicion_finales`, y entonces no tiene partido asociado.
  */
@@ -245,6 +263,8 @@ export interface PartidoPlayoff {
   ganador_slug: string | null;
   /** Solo cuando el partido acabó igualado y hubo que desempatar. */
   definicion: DefinicionPlayoff | null;
+  /** Goles y tarjetas en orden de juego. Vacío en las llaves sin partido. */
+  eventos: EventoLlave[];
   en_juego: boolean;
 }
 

@@ -1,4 +1,18 @@
-import type { EquipoEnCancha, Evento, ModoPartido, TeamScore } from "./types";
+import type { EquipoEnCancha, Evento, ModoPartido, RazonAmarilla, TeamScore } from "./types";
+
+/**
+ * Cómo se lee cada motivo de amarilla. Vive aquí porque no lo usa solo el
+ * anotador: el cuadro de playoffs muestra las mismas tarjetas mucho después,
+ * y la etiqueta tiene que decir lo mismo en los dos sitios.
+ */
+export const RAZON_LABEL: Record<RazonAmarilla, string> = {
+  "halar-peto":      "Halar peto",
+  "falta-temeraria": "Falta temeraria",
+  "falta-tactica":   "Falta táctica o normal",
+  "llegada-tarde":   "Llegada tarde",
+  "falta":           "Falta",
+  "falta-respeto":   "Falta de respeto",
+};
 
 export const LIGA20_COLORES: Record<string, string> = {
   brighton:          "#FFD700",

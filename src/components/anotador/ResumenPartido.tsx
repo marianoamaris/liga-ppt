@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { useSede } from "../../context/SedeContext";
-import { getColor, computeScores, formatElapsed } from "./utils";
+import { getColor, computeScores, formatElapsed, RAZON_LABEL } from "./utils";
 import type { ModoPartido, PartidoVivo, RazonAmarilla } from "./types";
-
-const RAZON_LABEL: Record<RazonAmarilla, string> = {
-  "halar-peto":      "Halar peto",
-  "falta-temeraria": "Falta temeraria",
-  "falta-tactica":   "Falta táctica o normal",
-  "llegada-tarde":   "Llegada tarde",
-  "falta":           "Falta",
-  "falta-respeto":   "Falta de respeto al anotador",
-};
 
 const MODO_LABEL: Record<ModoPartido, string> = {
   jornada: "Jornada",

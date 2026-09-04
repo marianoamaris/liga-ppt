@@ -11,6 +11,7 @@ import {
   computeScores,
   amarillasPorJugador,
   DURACION_POR_MODO,
+  RAZON_LABEL,
 } from "./utils";
 import type {
   EquipoEnCancha,
@@ -27,15 +28,6 @@ import type {
 } from "./types";
 
 const PAIRS: [number, number][] = [[0, 1], [0, 2], [1, 2]];
-
-const RAZON_LABEL: Record<RazonAmarilla, string> = {
-  "halar-peto":      "Halar peto",
-  "falta-temeraria": "Falta temeraria",
-  "falta-tactica":   "Falta táctica o normal",
-  "llegada-tarde":   "Llegada tarde",
-  "falta":           "Falta",
-  "falta-respeto":   "Falta de respeto",
-};
 
 interface Props {
   partido: PartidoVivo;
