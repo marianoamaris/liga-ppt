@@ -28,6 +28,9 @@ export const LIGA20_COLORES: Record<string, string> = {
 
 export const DURACION_PARTIDO = 8 * 60; // 480 segundos
 
+/** Lo que se muestra cuando un evento no guardó en qué minuto ocurrió. */
+export const SIN_TIEMPO = "—";
+
 /**
  * Duración reglamentaria de cada modo, en segundos.
  *
@@ -61,7 +64,15 @@ export function formatCountdown(secs: number): string {
 }
 
 /** Format elapsed seconds as "M'SS"" (e.g. 1'23" = 83 seconds) */
-export function formatElapsed(secs: number): string {
+/**
+ * Minuto y segundo del marcador.
+ *
+ * Acepta que no haya tiempo: hay eventos guardados antes de que el reloj
+ * viajara con ellos —las expulsiones, sobre todo— y formatearlos a ciegas
+ * pintaba un `NaN'NaN"` en el feed y en el resumen.
+ */
+export function formatElapsed(secs: number | null | undefined): string {
+  if (typeof secs !== "number" || !Number.isFinite(secs)) return SIN_TIEMPO;
   const m = Math.floor(secs / 60);
   const s = secs % 60;
   return `${m}'${String(s).padStart(2, "0")}"`;

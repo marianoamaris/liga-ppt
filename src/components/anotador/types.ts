@@ -47,7 +47,9 @@ export interface EventoRoja {
   id: string;
   jugador: string;
   equipoId: string;
-  tiempoEnMarcador: number;
+  /** Opcional: las expulsiones anotadas antes de que el reloj viajara con el
+   *  evento se guardaron sin él, y siguen en la base. */
+  tiempoEnMarcador?: number;
 }
 
 export interface EventoAutogol {

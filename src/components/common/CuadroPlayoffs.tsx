@@ -1,7 +1,7 @@
 import React from "react";
 import type { EventoLlave, PartidoPlayoff, RondaPlayoff } from "../../types/jugador";
 import type { RazonAmarilla } from "../anotador/types";
-import { RAZON_LABEL } from "../anotador/utils";
+import { RAZON_LABEL, SIN_TIEMPO } from "../anotador/utils";
 import {
   IconoAutogol,
   IconoCuartos,
@@ -84,7 +84,7 @@ function LadoLlave({
 
 /** Minuto de partido: los segundos sobran en una llave de casi una hora. */
 function minutoDe(tiempo: number | null): string {
-  return tiempo == null ? "" : `${Math.floor(tiempo / 60)}'`;
+  return tiempo == null ? SIN_TIEMPO : `${Math.floor(tiempo / 60)}'`;
 }
 
 /**
