@@ -1,10 +1,10 @@
-import logoRey from "../assets/El rey del estampado.png";
-import logoFrens from "../assets/Frens Burgers.jpg";
-import logoVV from "../assets/V&V Accesorios.jpg";
+import logoRey from "../assets/LOGOS_MIN/El rey del estampado.webp";
+import logoFrens from "../assets/LOGOS_MIN/Frens Burgers.webp";
+import logoVV from "../assets/LOGOS_MIN/V&V Accesorios.webp";
 // Nombre ASCII: evita fallos de build en Linux (NFC/NFD del “ó” en Git/Netlify)
-import logoSalon from "../assets/salon-eventos-mariano-amaris.jpg";
-import logoAndariego from "../assets/Andariego.jpg";
-import logoDondeVaro from "../assets/Donde Varo.jpg";
+import logoSalon from "../assets/LOGOS_MIN/salon-eventos-mariano-amaris.webp";
+import logoAndariego from "../assets/LOGOS_MIN/Andariego.webp";
+import logoDondeVaro from "../assets/LOGOS_MIN/Donde Varo.webp";
 
 export type Patrocinador = {
   id: string;

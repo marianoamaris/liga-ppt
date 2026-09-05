@@ -113,15 +113,24 @@ export const CarruselEquipos: React.FC<Props> = ({
     [total]
   );
 
-  // Precarga para que al pasar de equipo la camiseta ya esté
+  /**
+   * Precarga solo las vecinas, para que al pasar de equipo la camiseta ya esté.
+   *
+   * Antes se precargaban las nueve de golpe nada más abrir la pantalla, se
+   * fueran a mirar o no. Ahora pesan poco, pero pedir la edición entera para
+   * enseñar una tarjeta sigue sin tener sentido: se traen la anterior y la
+   * siguiente, que es hasta donde puede llegar el próximo gesto.
+   */
   useEffect(() => {
-    for (const eq of equipos) {
-      const url = camisetaEquipo(sede_id, numero_sede, eq.color_slug, eq.color_hex);
+    if (!total) return;
+    for (const salto of [1, -1]) {
+      const eq = equipos[(slide + salto + total) % total];
+      const url = eq && camisetaEquipo(sede_id, numero_sede, eq.color_slug, eq.color_hex);
       if (!url) continue;
       const img = new Image();
       img.src = url;
     }
-  }, [equipos, sede_id, numero_sede]);
+  }, [equipos, slide, total, sede_id, numero_sede]);
 
   if (error) {
     return (
@@ -172,7 +181,7 @@ export const CarruselEquipos: React.FC<Props> = ({
             src={imagenActual}
             alt={`Plantilla de ${actual.nombre}`}
             width={800}
-            height={600}
+            height={800}
             decoding="async"
             className="absolute inset-0 mx-auto size-full object-contain"
           />

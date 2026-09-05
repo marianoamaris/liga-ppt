@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { edicionesApi, partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
-import { supabase } from "../lib/supabase";
+import { clienteSupabase } from "../lib/supabase";
 import { getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
 import { useSede } from "../context/SedeContext";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
@@ -1513,17 +1513,35 @@ export function EnVivoPage() {
     // Polling fallback cada 8s — garantiza actualizaciones aunque Realtime se caiga
     const intervalo = setInterval(refrescar, 8_000);
 
-    // Realtime: notifica cambios al instante cuando el canal está estable
-    if (supabase) {
-      channelRef.current = supabase
+    // Realtime: notifica cambios al instante cuando el canal está estable.
+    // El cliente llega por importación diferida, así que puede resolverse
+    // después de que la pantalla ya se haya ido; `vivo` evita dejar un canal
+    // abierto contra un componente desmontado.
+    let vivo = true;
+    clienteSupabase().then((cliente) => {
+      if (!vivo || !cliente) return;
+      channelRef.current = cliente
         .channel("en-vivo")
-        .on("postgres_changes", { event: "*", schema: "public", table: "partidos" }, refrescar)
+        .on(
+          "postgres_changes",
+          // Solo esta edición: sin el filtro, un partido de Bogotá hacía
+          // refrescar cinco endpoints a quien estuviera viendo Valledupar.
+          {
+            event: "*",
+            schema: "public",
+            table: "partidos",
+            filter: `temporada=eq.${edicion}`,
+          },
+          refrescar
+        )
         .subscribe();
-    }
+    });
 
     return () => {
+      vivo = false;
       clearInterval(intervalo);
       channelRef.current?.unsubscribe();
+      channelRef.current = null;
     };
   }, [edicionActual, edicionArrancada]);
 

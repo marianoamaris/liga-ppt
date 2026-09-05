@@ -15,7 +15,7 @@ import type {
   TipoRecord,
   Posicion,
 } from "../types/jugador";
-import { supabase } from "./supabase";
+import { clienteSupabase } from "./supabase";
 
 const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 const TOKEN_KEY = "ligappt_token";
@@ -43,8 +43,9 @@ export function clearRefreshToken(): void {
 
 /** Intenta renovar el JWT via Supabase. Devuelve el nuevo token o null. */
 async function tryRefreshToken(): Promise<string | null> {
-  if (!supabase) return null;
-  const { data, error } = await supabase.auth.refreshSession();
+  const cliente = await clienteSupabase();
+  if (!cliente) return null;
+  const { data, error } = await cliente.auth.refreshSession();
   if (error || !data.session) return null;
   storeToken(data.session.access_token);
   if (data.session.refresh_token) storeRefreshToken(data.session.refresh_token);

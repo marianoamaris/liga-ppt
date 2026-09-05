@@ -9,6 +9,7 @@ npm run dev        # Start dev server at http://localhost:5173
 npm run build      # Type-check + Vite production build (output: dist/)
 npm run lint       # ESLint
 npm run preview    # Preview the production build locally
+npm run imagenes   # Regenerate the optimised jerseys and sponsor logos
 ```
 
 There is no test suite.
@@ -56,7 +57,8 @@ Player names appear across sources with inconsistent spellings, so the padrón i
 ### Images
 
 - **Player photos** — `src/utils/fotosJugadores.ts` globs `src/assets/FOTOS_JUGADORES/`. Prefer `fotoJugadorPorArchivo(jugador.foto_archivo)`, which uses the filename the database records, over name-based lookup.
-- **Jerseys** — `src/utils/imagenesEquipos.ts` globs `src/assets/CAMISETAS/<sede>/<numero_sede>/<Color>.png`, e.g. `CAMISETAS/vup/20/Amarillo.png`. Note the folder uses the *visible* edition number, not the internal key. When `color_slug` is missing, the colour is inferred from the team's hex.
+- **Jerseys** — drop the designs in `src/assets/CAMISETAS/<sede>/<numero_sede>/<Color>.png`, e.g. `CAMISETAS/vup/20/Amarillo.png`. Note the folder uses the *visible* edition number, not the internal key. When `color_slug` is missing, the colour is inferred from the team's hex.
+- **Optimised images** — nothing under `CAMISETAS/` or `LOGOS/` is bundled directly: the originals are 1620px PNGs of up to 2.4 MB for a 400px box. `npm run imagenes` writes 800px (jerseys) and 480px (logos) WebP into `CAMISETAS_MIN/` and `LOGOS_MIN/`, which is what the globs and the imports read. Run it after adding or replacing any design, and commit both folders. Same idea as `scripts/generar-miniaturas.sh` for player photos.
 
 ### Navigation
 

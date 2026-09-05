@@ -1,22 +1,26 @@
 /**
  * Resuelve la camiseta de un equipo a partir de su color.
  *
- * Los archivos viven en `src/assets/CAMISETAS/<sede>/<n>/<Color>.png`, donde
- * `n` es el número de la edición **dentro de su sede** —el que ve el usuario—
- * y no la clave interna: así la primera edición de Bogotá es `bog/1` y no
- * `101`, que no le diría nada a quien deje caer ahí los diseños nuevos.
+ * Los diseños se dejan caer en `src/assets/CAMISETAS/<sede>/<n>/<Color>.png`,
+ * donde `n` es el número de la edición **dentro de su sede** —el que ve el
+ * usuario— y no la clave interna: así la primera edición de Bogotá es `bog/1`
+ * y no `101`, que no le diría nada a quien suba los diseños nuevos.
+ *
+ * Lo que se lee aquí, en cambio, es la carpeta derivada: los originales son
+ * PNG de 1620 px y hasta 2,3 MB para un recuadro de 400, y el carrusel los
+ * precargaba todos. Las genera `scripts/optimizar-camisetas.mjs`.
  *
  * El nombre del color es lo que la base guarda en `edicion_equipos.color_slug`.
  */
 
 const modules = import.meta.glob<string>(
-  "../assets/CAMISETAS/*/*/*.{png,jpg,jpeg,webp}",
+  "../assets/CAMISETAS_MIN/*/*/*.{png,jpg,jpeg,webp}",
   { eager: true, query: "?url", import: "default" }
 );
 
-/** "../assets/CAMISETAS/vup/20/Amarillo.png" → clave "vup/20/amarillo" */
+/** "../assets/CAMISETAS_MIN/vup/20/Amarillo.webp" → clave "vup/20/amarillo" */
 function claveDeRuta(ruta: string): string | null {
-  const m = ruta.match(/CAMISETAS\/([^/]+)\/(\d+)\/([^/]+)\.[^.]+$/i);
+  const m = ruta.match(/CAMISETAS_MIN\/([^/]+)\/(\d+)\/([^/]+)\.[^.]+$/i);
   if (!m) return null;
   return `${m[1].toLowerCase()}/${m[2]}/${m[3].toLowerCase()}`;
 }
