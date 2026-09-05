@@ -1410,6 +1410,45 @@ export function EnVivoPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const channelRef = useRef<any>(null);
 
+  /**
+   * Mete en el marcador la fila que acaba de llegar por Realtime.
+   *
+   * El aviso ya trae el partido entero —la tabla está en `REPLICA IDENTITY
+   * FULL`, así que viaja la fila completa con sus eventos— y hasta ahora se
+   * tiraba para volver a pedir lo mismo por HTTP. Aplicarla directamente hace
+   * que el gol aparezca sin un solo viaje de red: en cuanto el anotador toca el
+   * botón, está en pantalla.
+   *
+   * Los rankings sí siguen viniendo del servidor, porque son agregados de toda
+   * la edición y no se pueden recalcular desde una fila suelta. Pero ahí un
+   * segundo de retraso no lo ve nadie; el marcador sí.
+   */
+  function aplicarCambioEnVivo(
+    edicion: number,
+    payload: { eventType?: string; new?: unknown; old?: unknown }
+  ) {
+    const fila = payload.new as Partido | undefined;
+    const anterior = payload.old as { id?: string } | undefined;
+
+    if (payload.eventType === "DELETE") {
+      if (anterior?.id) setPartidos((ps) => ps.filter((p) => p.id !== anterior.id));
+      return;
+    }
+    if (!fila?.id || fila.temporada !== edicion) return;
+
+    setPartidos((ps) => {
+      const resto = ps.filter((p) => p.id !== fila.id);
+      // Un partido finalizado sale del directo; es el mismo criterio que usa
+      // la consulta de /en-vivo.
+      if (fila.finalizado_en) return resto;
+      return [...resto, fila].sort(
+        (a, b) => new Date(a.iniciado_en).getTime() - new Date(b.iniciado_en).getTime()
+      );
+    });
+    setLastUpdate(new Date());
+    setLoadingMatch(false);
+  }
+
   async function fetchActivos(edicion: number) {
     try {
       const { enVivo } = await partidosApi.getEnVivo(edicion);
@@ -1510,18 +1549,41 @@ export function EnVivoPage() {
 
     refrescar();
 
-    // Polling fallback cada 8s — garantiza actualizaciones aunque Realtime se caiga
-    const intervalo = setInterval(refrescar, 8_000);
+    /**
+     * El sondeo es la red de seguridad, no el mecanismo.
+     *
+     * Cada vuelta son cinco peticiones, así que a ocho segundos eran unas 37
+     * por minuto y pestaña: batería y datos del móvil de quien está viendo el
+     * partido. Ahora que Realtime pinta el marcador al instante y refresca los
+     * rankings detrás, esto solo tiene que cubrir el caso de que el canal se
+     * caiga —y para eso medio minuto sobra.
+     */
+    const intervalo = setInterval(refrescar, 30_000);
 
-    // Realtime: notifica cambios al instante cuando el canal está estable.
-    // El cliente llega por importación diferida, así que puede resolverse
-    // después de que la pantalla ya se haya ido; `vivo` evita dejar un canal
-    // abierto contra un componente desmontado.
+    /**
+     * Los rankings, agrupados.
+     *
+     * Una tanda de penales son seis escrituras seguidas, y una jornada movida
+     * varios goles en un minuto. Pedir cuatro agregados por cada una es tirar
+     * peticiones: se espera un momento a que amaine y se pide una vez.
+     */
+    let pendiente: ReturnType<typeof setTimeout> | null = null;
+    const refrescarDerivados = () => {
+      if (pendiente) clearTimeout(pendiente);
+      pendiente = setTimeout(() => {
+        fetchStandings(edicion);
+        fetchRankings(edicion);
+      }, 1_200);
+    };
+
+    // Realtime: el cliente llega por importación diferida, así que puede
+    // resolverse después de que la pantalla ya se haya ido; `vivo` evita dejar
+    // un canal abierto contra un componente desmontado.
     let vivo = true;
     clienteSupabase().then((cliente) => {
       if (!vivo || !cliente) return;
       channelRef.current = cliente
-        .channel("en-vivo")
+        .channel(`en-vivo-${edicion}`)
         .on(
           "postgres_changes",
           // Solo esta edición: sin el filtro, un partido de Bogotá hacía
@@ -1532,7 +1594,12 @@ export function EnVivoPage() {
             table: "partidos",
             filter: `temporada=eq.${edicion}`,
           },
-          refrescar
+          (payload) => {
+            // El marcador, de la fila que ya viene en el aviso. Cero red.
+            aplicarCambioEnVivo(edicion, payload);
+            // Los agregados, del servidor, y sin prisa.
+            refrescarDerivados();
+          }
         )
         .subscribe();
     });
@@ -1540,6 +1607,7 @@ export function EnVivoPage() {
     return () => {
       vivo = false;
       clearInterval(intervalo);
+      if (pendiente) clearTimeout(pendiente);
       channelRef.current?.unsubscribe();
       channelRef.current = null;
     };
