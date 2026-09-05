@@ -70,7 +70,41 @@ function syncRenewedTokens(headers: Headers): void {
   if (newRefresh) storeRefreshToken(newRefresh);
 }
 
+/**
+ * Lecturas idénticas que están en vuelo a la vez.
+ *
+ * Varias pantallas montan a la vez hooks que piden lo mismo —el padrón de
+ * jugadores lo quieren Inicio, Historia y Logros; la clasificación la piden la
+ * tabla y el marcador— y cada uno abría su propia petición. Dos componentes
+ * hermanos que se montan en el mismo render son dos viajes a la red para la
+ * misma respuesta.
+ *
+ * Aquí se comparte la promesa mientras dura: el segundo que llegue se engancha
+ * a la del primero. Nada se guarda después de resolverse; para eso está la
+ * caché HTTP, que es de quien sabe cuándo caduca cada cosa. Esto solo evita el
+ * duplicado simultáneo, que es el que ninguna cabecera puede evitar.
+ *
+ * Solo GET: dos escrituras iguales a la vez son dos escrituras, no una.
+ */
+const lecturasEnVuelo = new Map<string, Promise<unknown>>();
+
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const metodo = init.method ?? "GET";
+  if (metodo !== "GET") return pedir<T>(path, init);
+
+  // El token entra en la clave: dos sesiones distintas no comparten respuesta.
+  const clave = `${path}\u0000${getToken() ?? ""}`;
+  const yaEnVuelo = lecturasEnVuelo.get(clave);
+  if (yaEnVuelo) return yaEnVuelo as Promise<T>;
+
+  const promesa = pedir<T>(path, init).finally(() => {
+    lecturasEnVuelo.delete(clave);
+  });
+  lecturasEnVuelo.set(clave, promesa);
+  return promesa;
+}
+
+async function pedir<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken();
   const res = await fetch(`${BASE}${path}`, {
     ...init,
