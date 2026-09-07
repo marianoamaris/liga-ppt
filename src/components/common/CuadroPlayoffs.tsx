@@ -40,14 +40,20 @@ const RONDAS: {
  * Cómo se cruza el cuadro, en puestos de la tabla general.
  *
  * El 1º y el 2º entran directos a semifinales y esperan cada uno al ganador de
- * una llave concreta: el 1º al que salga del 4º-5º, y el 2º al que salga del
- * 3º-6º. No es el orden en que se juegan los cuartos —eso depende de a qué hora
+ * una llave concreta: el 1º al que salga del 3º-6º, y el 2º al que salga del
+ * 4º-5º. No es el orden en que se juegan los cuartos —eso depende de a qué hora
  * arranque cada partido—, así que la llave se busca por los puestos que la
  * componen, no por su posición en la ronda.
+ *
+ * OJO: es el cruce de la liga, no el estándar de un bracket de seis, que manda
+ * al 1º contra el ganador del 4º-5º. Estaba escrito así y la proyección pintaba
+ * la semifinal del 2º contra un equipo que ya estaba jugando la del 1º. Solo
+ * afecta a la edición en curso: el cuadro de una edición terminada se dibuja
+ * sin `ordenTabla` y no proyecta nada.
  */
 const CRUCES_SEMIFINAL: { anfitrion: number; cuartos: [number, number] }[] = [
-  { anfitrion: 1, cuartos: [4, 5] },
-  { anfitrion: 2, cuartos: [3, 6] },
+  { anfitrion: 1, cuartos: [3, 6] },
+  { anfitrion: 2, cuartos: [4, 5] },
 ];
 
 /**
@@ -80,6 +86,39 @@ function cuartosDe(
       ((ll.equipo1_slug === a && ll.equipo2_slug === b) ||
         (ll.equipo1_slug === b && ll.equipo2_slug === a)),
   );
+}
+
+/**
+ * Con quién se cruza el anfitrión de una semifinal que todavía no está anotada.
+ *
+ * El primer candidato es el que dice el cuadro: el ganador del cuartos que
+ * alimenta esa semifinal. Pero manda lo anotado sobre lo previsto — el anotador
+ * no obliga a respetar el cruce, así que una semifinal puede plantearse con
+ * otra pareja. Si ese ganador ya está jugando la otra semifinal, el rival es el
+ * que queda libre, y solo cuando queda uno: con dos libres no hay forma de
+ * saber cuál, y prometer el equipo equivocado es peor que no prometer ninguno.
+ *
+ * Sin esta comprobación el mismo equipo se dibujaba en las dos llaves.
+ */
+function rivalPendiente(
+  llaves: PartidoPlayoff[],
+  cuartos: [number, number],
+  ordenTabla: string[],
+  ocupados: Set<string>,
+): LadoPendiente {
+  const previsto = cuartosDe(llaves, cuartos, ordenTabla)?.ganador_slug ?? null;
+  if (previsto && !ocupados.has(previsto))
+    return { slug: previsto, etiqueta: "" };
+
+  if (previsto) {
+    const libres = llaves
+      .filter((ll) => ll.ronda === "cuartos" && ll.ganador_slug)
+      .map((ll) => ll.ganador_slug as string)
+      .filter((slug) => !ocupados.has(slug));
+    if (libres.length === 1) return { slug: libres[0], etiqueta: "" };
+  }
+
+  return { slug: null, etiqueta: `Ganador ${cuartos[0]}º vs ${cuartos[1]}º` };
 }
 
 /** Puesto en la tabla general, 1-indexado. 0 si el equipo no aparece. */
@@ -141,6 +180,16 @@ function proyectar(
   const pendientes: LlavePendiente[] = [];
   const ganadoresSemi: LadoPendiente[] = [];
 
+  // Quién está ya colocado en una semifinal anotada. La llave que falta se
+  // proyecta contra lo que queda, no contra lo que decía el cuadro.
+  const ocupados = new Set<string>();
+  llaves
+    .filter((ll) => ll.ronda === "semifinal")
+    .forEach((ll) => {
+      ocupados.add(ll.equipo1_slug);
+      ocupados.add(ll.equipo2_slug);
+    });
+
   CRUCES_SEMIFINAL.forEach(({ anfitrion, cuartos }, i) => {
     const anfitrionSlug = ordenTabla[anfitrion - 1];
     if (!anfitrionSlug) return;
@@ -160,18 +209,16 @@ function proyectar(
       return;
     }
 
-    const llaveCuartos = cuartosDe(llaves, cuartos, ordenTabla);
-    const rival: LadoPendiente = llaveCuartos?.ganador_slug
-      ? { slug: llaveCuartos.ganador_slug, etiqueta: "" }
-      : { slug: null, etiqueta: `Ganador ${cuartos[0]}º vs ${cuartos[1]}º` };
-
     pendientes.push({
       ronda: "semifinal",
       orden: i + 1,
       // «#1» y no «1º de la tabla»: en el cuadro a tres columnas la etiqueta
       // larga se come el nombre del equipo, y es como se nombran los puestos
       // en el resto de la pantalla.
-      lados: [{ slug: anfitrionSlug, etiqueta: `#${anfitrion}` }, rival],
+      lados: [
+        { slug: anfitrionSlug, etiqueta: `#${anfitrion}` },
+        rivalPendiente(llaves, cuartos, ordenTabla, ocupados),
+      ],
     });
     ganadoresSemi.push({ slug: null, etiqueta: `Ganador semifinal ${i + 1}` });
   });
