@@ -326,7 +326,7 @@ function TablaGoleadores({ goleadores, loading }: { goleadores: Goleador[]; load
             <AnimatePresence initial={false}>
               {goleadores.map((g, i) => {
                 const color = colorDe(g.equipoId);
-                const textColor = getTextColor(g.equipoId);
+                const textColor = getTextColor(color);
                 const hasVs = g.golesVs && Object.keys(g.golesVs).length > 0;
                 const isOpen = expandedIdx === i;
                 const vsEntries = hasVs
@@ -428,7 +428,7 @@ function TablaArqueros({ arqueros, loading }: { arqueros: Arquero[]; loading: bo
             <AnimatePresence initial={false}>
               {arqueros.map((a, i) => {
                 const color = colorDe(a.equipoId);
-                const textColor = getTextColor(a.equipoId);
+                const textColor = getTextColor(color);
                 const hasVs = a.golesDe && Object.keys(a.golesDe).length > 0;
                 const isOpen = expandedIdx === i;
                 const vsEntries = hasVs
@@ -550,7 +550,7 @@ function TopGolesRapidos({ goleadores, loading }: { goleadores: Goleador[]; load
         ) : (
           top3.map((g, i) => {
             const color = colorDe(g.equipoId);
-            const textColor = getTextColor(g.equipoId);
+            const textColor = getTextColor(color);
             return (
               <div key={i} className="flex items-center gap-3 px-4 py-2.5">
                 <Puesto n={i + 1} />
@@ -616,7 +616,7 @@ function TopGolesSalvadores({ goleadores, loading }: { goleadores: Goleador[]; l
         ) : (
           salvadores.map((g, i) => {
             const color = colorDe(g.equipoId);
-            const textColor = getTextColor(g.equipoId);
+            const textColor = getTextColor(color);
             return (
               <div key={i} className="flex items-center gap-3 px-4 py-2.5">
                 <Puesto n={i + 1} />
@@ -1224,7 +1224,7 @@ function PlayoffMatchup({
           <span className="text-chalk-3 text-[10px]">Favorito por tabla:</span>
           <span
             className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full"
-            style={{ backgroundColor: colorDe(favoritoEquipo.equipoId), color: getTextColor(favoritoEquipo.equipoId) }}
+            style={{ backgroundColor: colorDe(favoritoEquipo.equipoId), color: getTextColor(colorDe(favoritoEquipo.equipoId)) }}
           >
             {favoritoEquipo.nombre}
           </span>

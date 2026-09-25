@@ -49,8 +49,17 @@ export function getColor(id: string): string {
   return LIGA20_COLORES[id] ?? "#4B5563";
 }
 
-export function getTextColor(id: string): string {
-  return ["tottenham", "brighton"].includes(id) ? "#111827" : "#ffffff";
+/**
+ * Tinta legible sobre el color de un equipo. Se decide por la luminancia del
+ * hex y no por el id: una lista de equipos claros se queda vieja en cuanto
+ * cambia la edición, y el Real Madrid acababa con letras blancas sobre blanco.
+ */
+export function getTextColor(hex: string): string {
+  const c = hex.replace("#", "");
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 140 ? "#111827" : "#ffffff";
 }
 
 export function makeId(): string {
