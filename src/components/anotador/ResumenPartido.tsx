@@ -34,8 +34,13 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
   // Aggregate stats
   const golesPorJugador: Record<string, number> = {};
   const golesRecibidosPorArquero: Record<string, number> = {};
-  const amarillasData: { jugador: string; equipo: string; razon: RazonAmarilla }[] = [];
-  const rojasData: { jugador: string; equipo: string }[] = [];
+  const amarillasData: {
+    tiempoEnMarcador: number;
+    jugador: string;
+    equipo: string;
+    razon: RazonAmarilla;
+  }[] = [];
+  const rojasData: { tiempoEnMarcador: number | null; jugador: string; equipo: string }[] = [];
 
   for (const ev of eventos) {
     if (ev.tipo === "gol") {
@@ -58,6 +63,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
     } else if (ev.tipo === "amarilla") {
       const eqAm = equipos.find((e) => e.equipo.id === ev.data.equipoId);
       amarillasData.push({
+        tiempoEnMarcador: ev.data.tiempoEnMarcador,
         jugador: ev.data.jugador,
         equipo: eqAm?.equipo.nombre ?? "",
         razon: ev.data.razon,
@@ -65,6 +71,8 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
     } else if (ev.tipo === "roja") {
       const eqRoja = equipos.find((e) => e.equipo.id === ev.data.equipoId);
       rojasData.push({
+        // Las expulsiones antiguas se guardaron sin reloj
+        tiempoEnMarcador: ev.data.tiempoEnMarcador ?? null,
         jugador: ev.data.jugador,
         equipo: eqRoja?.equipo.nombre ?? "",
       });
@@ -230,6 +238,8 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
   // ── Jornada full summary ───────────────────────────────────────────────────
   const resumenJSON = JSON.stringify(
     {
+      sede: sede?.nombre ?? null,
+      edicion: numeroSede ?? null,
       jornada: config.jornada,
       equipos: equipos.map((eq) => {
         const s = scores.get(eq.equipo.id) ?? {
@@ -253,6 +263,22 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
             equipoGoleador: eqGol?.equipo.nombre,
             arquero: eqArq?.arqueroDesignado ?? "—",
             equipoArquero: eqArq?.equipo.nombre,
+          };
+        })
+        .filter(Boolean),
+      // Un autogol decide el duelo igual que un gol: sin ellos, las victorias
+      // de `equipos` no cuadran con la lista de goles.
+      autogoles: eventos
+        .filter((e) => e.tipo === "autogol")
+        .map((ev) => {
+          if (ev.tipo !== "autogol") return null;
+          const eqAuto = equipos.find((e) => e.equipo.id === ev.data.equipoAutogolId);
+          const eqGana = equipos.find((e) => e.equipo.id === ev.data.equipoGanadorId);
+          return {
+            tiempoEnMarcador: ev.data.tiempoEnMarcador,
+            equipoAutogol: eqAuto?.equipo.nombre,
+            arquero: eqAuto?.arqueroDesignado ?? "—",
+            equipoGanador: eqGana?.equipo.nombre,
           };
         })
         .filter(Boolean),
