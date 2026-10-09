@@ -4,7 +4,7 @@ import { edicionesApi, partidosApi, statsApi, type Partido, type Standing, type 
 import { clienteSupabase } from "../lib/supabase";
 import { getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
 import { useSede } from "../context/SedeContext";
-import { useEquiposEdicion } from "../hooks/useCatalogo";
+import { useEdicion, useEquiposEdicion } from "../hooks/useCatalogo";
 import type { EquipoLocal, PartidoPlayoff } from "../types/jugador";
 import { CuadroPlayoffs } from "../components/common/CuadroPlayoffs";
 import {
@@ -970,6 +970,10 @@ function TorneoRegularSection({
   loading: boolean;
 }) {
   const { colorDe } = useCatalogo();
+  const { edicionActual, numeroSede } = useSede();
+  // El banner se lee de la edición en curso: escrito a mano se quedó en la 20
+  // y en la Premier cuando ya se jugaba la 21 de LaLiga.
+  const { edicion, equipos: equiposEdicion } = useEdicion(edicionActual);
   const [jornadaAbierta, setJornadaAbierta] = useState<string | null>(null);
 
   const jornadasDisponibles = useMemo(() => {
@@ -1005,12 +1009,26 @@ function TorneoRegularSection({
       {/* Banner */}
       <div className="bg-surface rounded-lg px-4 py-3 border border-line flex items-center justify-between">
         <div>
-          <h2 className="text-chalk font-bold text-sm">Torneo Regular · Liga #20</h2>
-          <p className="text-chalk-3 text-xs mt-0.5">Premier League · 6 Jornadas · 9 Equipos</p>
+          <h2 className="text-chalk font-bold text-sm">
+            Torneo Regular{numeroSede != null ? ` · Liga #${numeroSede}` : ""}
+          </h2>
+          {edicion && (
+            <p className="text-chalk-3 text-xs mt-0.5">
+              {[
+                edicion.tematica,
+                `${edicion.total_jornadas} Jornadas`,
+                equiposEdicion.length ? `${equiposEdicion.length} Equipos` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )}
         </div>
-        <span className="bg-green-900/40 text-green-400 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border border-green-800/50">
-          En curso
-        </span>
+        {edicion?.estado === "activa" && (
+          <span className="bg-green-900/40 text-green-400 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border border-green-800/50">
+            En curso
+          </span>
+        )}
       </div>
 
       {/* Jornada a Jornada */}
