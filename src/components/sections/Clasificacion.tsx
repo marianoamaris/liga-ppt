@@ -1,8 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSede } from "../../context/SedeContext";
-import { useEdiciones, useHistoricoEdicion } from "../../hooks/useCatalogo";
+import { useAnalisis, useEdiciones, useHistoricoEdicion } from "../../hooks/useCatalogo";
 import { CarruselEquipos } from "../common/CarruselEquipos";
 import { CuadroPlayoffs } from "../common/CuadroPlayoffs";
+import {
+  Evolucion,
+  Forma,
+  JugadoresEdicion,
+  RachasYRitmo,
+  ResumenDeJornada,
+} from "./Analisis";
+import { hayAnalisis, type AnalisisEquipo } from "../../types/analisis";
 import type {
   EdicionEquipo,
   FilaClasificacion,
@@ -63,11 +71,14 @@ function TablaPosiciones({
   nombreDe,
   colorDe,
   compacta,
+  formaDe,
 }: {
   filas: FilaClasificacion[];
   nombreDe: (slug: string) => string;
   colorDe: (slug: string) => string | null;
   compacta: boolean;
+  /** Últimos cruces de cada equipo; sin él la columna no aparece. */
+  formaDe?: (slug: string) => AnalisisEquipo["forma"] | null;
 }) {
   // Las ediciones antiguas solo anotaban puntos; no se muestran columnas vacías.
   const hayDetalle = filas.some((f) => f.victorias != null);
@@ -89,6 +100,12 @@ function TablaPosiciones({
           )}
           {hayDetalle && !compacta && <th className="pb-2 text-right font-bold">E</th>}
           {hayDetalle && !compacta && <th className="pb-2 text-right font-bold">D</th>}
+          {formaDe && (
+            <th className="pb-2 pl-3 text-right font-bold">
+              <span className="sr-only">Últimos cruces</span>
+              <span aria-hidden>Forma</span>
+            </th>
+          )}
           <th className="pb-2 text-right font-bold">Pts</th>
         </tr>
       </thead>
@@ -153,6 +170,14 @@ function TablaPosiciones({
                     </td>
                   </>
                 ))}
+              {formaDe && (
+                <td className="py-2 pl-3 text-right whitespace-nowrap">
+                  {(() => {
+                    const forma = formaDe(f.equipo_slug);
+                    return forma?.length ? <Forma forma={forma} nombreDe={nombreDe} /> : null;
+                  })()}
+                </td>
+              )}
               <td className="tnum font-data py-2 text-right font-bold text-chalk">
                 {f.puntos}
               </td>
@@ -297,6 +322,10 @@ export const Clasificacion: React.FC = () => {
   }, [sedeId, edicionActual]);
 
   const { historico, loading, error } = useHistoricoEdicion(edicionElegida);
+  const { analisis: analisisCrudo } = useAnalisis(edicionElegida);
+  // Mientras llega el de la edición nueva, no se mezcla con la tabla de otra.
+  const analisis =
+    hayAnalisis(analisisCrudo) && analisisCrudo.edicion === edicionElegida ? analisisCrudo : null;
 
   const porSlug = useMemo(() => {
     const mapa = new Map<string, EdicionEquipo>();
@@ -308,6 +337,24 @@ export const Clasificacion: React.FC = () => {
   const colorDe = (slug: string) => porSlug.get(slug)?.color_hex ?? null;
 
   const maxGoles = historico?.goleadores[0]?.goles ?? 0;
+
+  const analisisPorEquipo = useMemo(
+    () => new Map((analisis?.equipos ?? []).map((e) => [e.equipoId, e])),
+    [analisis]
+  );
+  const formaDe = analisis
+    ? (slug: string) => analisisPorEquipo.get(slug)?.forma ?? null
+    : undefined;
+  const ordenTabla = useMemo(
+    () =>
+      [...(historico?.clasificacion ?? [])]
+        .sort((a, b) => a.posicion - b.posicion)
+        .map((f) => f.equipo_slug),
+    [historico]
+  );
+  const etiqueta = historico
+    ? `Liga PPT · Edición ${historico.edicion.numero_sede}${historico.edicion.tematica ? ` · ${historico.edicion.tematica}` : ""}`
+    : "";
 
   return (
     <div className="min-h-full bg-ink text-chalk">
@@ -351,6 +398,7 @@ export const Clasificacion: React.FC = () => {
                       nombreDe={nombreDe}
                       colorDe={colorDe}
                       compacta
+                      formaDe={formaDe}
                     />
                   </div>
                   <div className="hidden lg:block">
@@ -359,6 +407,7 @@ export const Clasificacion: React.FC = () => {
                       nombreDe={nombreDe}
                       colorDe={colorDe}
                       compacta={false}
+                      formaDe={formaDe}
                     />
                   </div>
 
@@ -375,6 +424,20 @@ export const Clasificacion: React.FC = () => {
                     </ul>
                   )}
                 </Panel>
+
+                {analisis && analisis.jornadas.length >= 2 && (
+                  <Panel titulo="Evolución" nota="Puesto al cerrar cada jornada">
+                    <Evolucion
+                      // Se remonta al cambiar de edición: el equipo elegido
+                      // de otra edición no existe en esta.
+                      key={analisis.edicion}
+                      equipos={analisis.equipos}
+                      nombreDe={nombreDe}
+                      colorDe={colorDe}
+                      inicial={ordenTabla[0] ?? null}
+                    />
+                  </Panel>
+                )}
 
                 {/* El cuadro va justo después de la tabla: es su continuación
                     natural, la tabla reparte los puestos que aquí se juegan. */}
@@ -403,9 +466,11 @@ export const Clasificacion: React.FC = () => {
 
                 {historico.jornadas.length > 0 && (
                   <Panel titulo="Jornadas" nota={`${historico.jornadas.length}`}>
-                    {historico.jornadas.map(({ jornada, resultados }) => (
+                    {historico.jornadas.map(({ jornada, resultados }, i, todas) => (
                       <details
-                        key={jornada}
+                        key={`${historico.edicion.numero}-${jornada}`}
+                        // La última jornada jugada abierta: es la que se viene a ver.
+                        open={i === todas.length - 1 && !!analisis}
                         className="border-t border-line first:border-t-0"
                       >
                         <summary className="font-cond flex cursor-pointer list-none items-center justify-between gap-3 py-2.5 text-sm text-chalk [&::-webkit-details-marker]:hidden">
@@ -423,6 +488,16 @@ export const Clasificacion: React.FC = () => {
                           </span>
                         </summary>
                         <div className="pb-3">
+                          {(() => {
+                            const resumen = analisis?.jornadas.find((r) => r.jornada === jornada);
+                            return resumen ? (
+                              <ResumenDeJornada
+                                resumen={resumen}
+                                nombreDe={nombreDe}
+                                etiquetaEdicion={etiqueta}
+                              />
+                            ) : null;
+                          })()}
                           <TablaPosiciones
                             filas={resultados}
                             nombreDe={nombreDe}
@@ -434,6 +509,18 @@ export const Clasificacion: React.FC = () => {
                     ))}
                   </Panel>
                 )}
+
+                {analisis && (
+                  <Panel titulo="Rachas y ritmo" nota="Por cruce">
+                    <RachasYRitmo
+                      equipos={analisis.equipos}
+                      orden={ordenTabla}
+                      nombreDe={nombreDe}
+                      colorDe={colorDe}
+                    />
+                  </Panel>
+                )}
+
               </div>
 
               <div className="flex flex-col gap-4">
@@ -474,7 +561,13 @@ export const Clasificacion: React.FC = () => {
                   </Panel>
                 )}
 
-                {historico.goleadores.length > 0 && (
+                {analisis && (
+                  <Panel titulo="Jugadores" nota="Fase regular">
+                    <JugadoresEdicion jugadores={analisis.jugadores} colorDe={colorDe} />
+                  </Panel>
+                )}
+
+                {!analisis && historico.goleadores.length > 0 && (
                   <Panel titulo="Goleadores" nota={`${historico.goleadores.length}`}>
                     <ul>
                       {historico.goleadores.slice(0, 10).map((g) => (

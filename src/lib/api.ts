@@ -1,4 +1,5 @@
 import type { Evento } from "../components/anotador/types";
+import type { AnalisisEdicion, PerfilJugador } from "../types/analisis";
 import type {
   Edicion,
   EdicionEquipo,
@@ -163,7 +164,7 @@ export interface Partido {
 
 export interface ApiEquipo {
   equipo: { id: string; nombre: string };
-  jugadores: { nombre: string }[];
+  jugadores: { nombre: string; slug?: string }[];
   arqueroDesignado?: string;
 }
 
@@ -307,6 +308,18 @@ export const jugadoresApi = {
   /** Acepta el slug canónico o cualquier grafía alternativa registrada. */
   get: (slug: string) =>
     req<{ jugador: Jugador; resueltoPorAlias?: string }>(`/jugadores/${slug}`),
+  /** Ficha, palmarés y trayectoria edición por edición, de todas las sedes. */
+  perfil: (slug: string) =>
+    req<PerfilJugador>(`/jugadores/${encodeURIComponent(slug)}/perfil`),
+};
+
+/**
+ * Lo que se lee de los partidos más allá de la tabla: resumen de cada jornada,
+ * evolución, forma, rachas y estadísticas por jugador. Solo hay
+ * datos en ediciones con partidos anotados.
+ */
+export const analisisApi = {
+  edicion: (numero: number) => req<AnalisisEdicion>(`/analisis/${numero}`),
 };
 
 /**

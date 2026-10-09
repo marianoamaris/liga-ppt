@@ -17,7 +17,11 @@ function buildEquipo(
       nombre: equipo.nombre,
       imagen: camisetaEquipo(sede, numeroSede, equipo.color_slug, equipo.color_hex) ?? "",
     },
-    jugadores: equipo.jugadores.map(({ nombre }) => ({ nombre })),
+    // El slug viaja con el nombre: es lo que permite cruzar al jugador con su
+    // perfil sin depender de cómo esté escrito su nombre ese día.
+    jugadores: equipo.jugadores.map(({ nombre, jugador }) =>
+      jugador?.slug ? { nombre, slug: jugador.slug } : { nombre }
+    ),
     ...(equipo.arqueroDesignado
       ? { arqueroDesignado: equipo.arqueroDesignado }
       : {}),

@@ -42,6 +42,9 @@ const AnotadorPage = lazy(() =>
 const CrearLigaPage = lazy(() =>
   import("./pages/CrearLigaPage").then((m) => ({ default: m.CrearLigaPage }))
 );
+const PerfilJugadorPage = lazy(() =>
+  import("./pages/PerfilJugadorPage").then((m) => ({ default: m.PerfilJugadorPage }))
+);
 const EnVivoPage = lazy(() =>
   import("./pages/EnVivoPage").then((m) => ({ default: m.EnVivoPage }))
 );
@@ -63,6 +66,7 @@ export const AppRouter = () => (
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/clasificacion" element={<Clasificacion />} />
           <Route path="/historia" element={<Historia />} />
+          <Route path="/jugador/:slug" element={<PerfilJugadorPage />} />
           <Route path="/logros" element={<LogrosPage />} />
           <Route path="/anuncios" element={<AnunciosPage />} />
           <Route path="/patrocinadores" element={<PatrocinadoresPage />} />

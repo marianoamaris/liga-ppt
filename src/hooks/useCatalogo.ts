@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { edicionesApi, jugadoresApi, palmaresApi, recordsApi } from "../lib/api";
+import { analisisApi, edicionesApi, jugadoresApi, palmaresApi, recordsApi } from "../lib/api";
+import type { AnalisisEdicion, PerfilJugador } from "../types/analisis";
 import {
   finalAHistorica,
   jugadorAUsuarioLiga,
@@ -308,4 +309,27 @@ export function usePlantillasEdicion(numero: number | null) {
   );
 
   return { ...datos, loading, error };
+}
+
+/**
+ * Resumen de jornadas, evolución, forma, rachas y estadísticas
+ * por jugador de una edición. Las ediciones heredadas llegan vacías.
+ */
+export function useAnalisis(numero: number | null) {
+  const { datos, loading, error } = useAsync<AnalisisEdicion | null>(
+    () => (numero == null ? Promise.resolve(null) : analisisApi.edicion(numero)),
+    null,
+    [numero]
+  );
+  return { analisis: datos, loading, error };
+}
+
+/** Perfil completo de un jugador. Acepta el slug canónico o un alias. */
+export function usePerfilJugador(slug: string | undefined) {
+  const { datos, loading, error } = useAsync<PerfilJugador | null>(
+    () => (slug ? jugadoresApi.perfil(slug) : Promise.resolve(null)),
+    null,
+    [slug]
+  );
+  return { perfil: datos, loading, error };
 }

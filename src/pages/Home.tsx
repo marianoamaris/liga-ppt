@@ -2,7 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSede } from "../context/SedeContext";
 import { useInicio } from "../hooks/useInicio";
-import { useEquiposEdicion } from "../hooks/useCatalogo";
+import { useAnalisis, useEquiposEdicion } from "../hooks/useCatalogo";
+import { ResumenDeJornada } from "../components/sections/Analisis";
 import { Marcador } from "../components/Home/Marcador";
 import { PATROCINADORES } from "../constants/PATROCINADORES";
 import type { Arquero, Goleador, Standing } from "../lib/api";
@@ -149,6 +150,12 @@ export const Home: React.FC = () => {
   } = useInicio();
   const { sede, edicionActual, numeroSede } = useSede();
   const { locales: catalogo, colorDe } = useEquiposEdicion(edicionActual);
+  const { analisis } = useAnalisis(edicionActual);
+  // La última jornada jugada de la edición en curso, si es de esta ciudad.
+  const ultimaJornada =
+    analisis?.edicion === edicionActual ? analisis.jornadas[analisis.jornadas.length - 1] : undefined;
+  const nombreEquipo = (slug: string) =>
+    catalogo.find((e) => e.id === slug)?.nombre ?? slug.replace(/-/g, " ");
 
   const topGoleadores = goleadores.slice(0, 3).map((g: Goleador) => ({
     id: `${g.jugador}-${g.equipoId}`,
@@ -214,6 +221,20 @@ export const Home: React.FC = () => {
                 <Tabla standings={standings} colorDe={colorDe} />
               </div>
             </Panel>
+
+            {ultimaJornada && (
+              <Panel
+                titulo={`Jornada ${ultimaJornada.jornada} · lo que dejó`}
+                accion="Todas"
+                onAccion={() => navigate("/clasificacion")}
+              >
+                <ResumenDeJornada
+                  resumen={ultimaJornada}
+                  nombreDe={nombreEquipo}
+                  etiquetaEdicion={`Liga PPT · Edición ${numeroSede ?? ""}`}
+                />
+              </Panel>
+            )}
 
             <Panel titulo="La liga" accion="Historia" onAccion={() => navigate("/historia")}>
               <div className="mb-4 grid grid-cols-3 gap-3">

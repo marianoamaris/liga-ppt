@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaStar } from "react-icons/fa6";
 import type { Jugador } from "../../types/jugador";
 import { fotoJugadorPorArchivo } from "../../utils/fotosJugadores";
@@ -33,7 +34,11 @@ export const UserCard: React.FC<{ jugador: Jugador }> = ({ jugador }) => {
   const foto = fotoJugadorPorArchivo(jugador.foto_archivo);
 
   return (
-    <article className="flex flex-col gap-3 rounded-md border border-line bg-surface p-4">
+    <Link
+      to={`/jugador/${jugador.slug}`}
+      aria-label={`Perfil de ${jugador.nombre}`}
+      className="flex flex-col gap-3 rounded-md border border-line bg-surface p-4 transition-colors hover:border-chalk-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+    >
       <div className="flex items-start gap-3">
         <div className="size-16 shrink-0 overflow-hidden rounded-sm bg-raised">
           {foto ? (
@@ -97,6 +102,6 @@ export const UserCard: React.FC<{ jugador: Jugador }> = ({ jugador }) => {
           )}
         </div>
       )}
-    </article>
+    </Link>
   );
 };

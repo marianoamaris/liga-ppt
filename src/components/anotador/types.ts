@@ -4,6 +4,8 @@ export type ModoPartido = "jornada" | "cuartos" | "semifinal" | "final";
 
 export interface JugadorEnCancha {
   nombre: string;
+  /** Slug canónico del padrón; los partidos antiguos no lo traen. */
+  slug?: string;
 }
 
 export interface EquipoEnCancha {
