@@ -88,25 +88,32 @@ function TablaPosiciones({
     return <p className="text-sm text-chalk-3">Esta edición no tiene tabla registrada.</p>;
   }
 
+  // Cada columna de cifras lleva su propio aire a la izquierda: con el nombre
+  // ocupando el ancho sobrante, sin esto las cifras quedaban una pegada a la
+  // otra («65 36 13 16»). En el celular el espacio es menor, pero existe.
+  // Un ancho fijo no serviría: la celda del nombre, con `w-full`, se queda
+  // todo lo que sobra. El relleno sí se respeta siempre.
+  const aire = compacta ? "pl-2" : "pl-6";
+  const cabecera = `pb-2 text-right font-bold ${aire}`;
+  const cifra = `tnum font-data py-2.5 text-right text-xs ${aire}`;
+
   return (
     <table className="w-full border-collapse text-sm">
       <thead>
         <tr className="font-cond text-[0.625rem] text-chalk-3">
           <th className="w-8 pb-2 text-left font-bold" />
           <th className="pb-2 text-left font-bold">Equipo</th>
-          {hayPj && !compacta && <th className="pb-2 text-right font-bold">PJ</th>}
-          {hayDetalle && (
-            <th className="pb-2 text-right font-bold">{compacta ? "V·E·D" : "V"}</th>
-          )}
-          {hayDetalle && !compacta && <th className="pb-2 text-right font-bold">E</th>}
-          {hayDetalle && !compacta && <th className="pb-2 text-right font-bold">D</th>}
+          {hayPj && !compacta && <th className={cabecera}>PJ</th>}
+          {hayDetalle && <th className={cabecera}>{compacta ? "V·E·D" : "V"}</th>}
+          {hayDetalle && !compacta && <th className={cabecera}>E</th>}
+          {hayDetalle && !compacta && <th className={cabecera}>D</th>}
           {formaDe && (
-            <th className={`pb-2 text-right font-bold ${compacta ? "pl-2" : "pl-3"}`}>
+            <th className={cabecera}>
               <span className="sr-only">Últimos cruces</span>
               <span aria-hidden>Forma</span>
             </th>
           )}
-          <th className="pb-2 pl-2 text-right font-bold">Pts</th>
+          <th className={`${cabecera} pr-2`}>Pts</th>
         </tr>
       </thead>
       <tbody>
@@ -128,7 +135,7 @@ function TablaPosiciones({
                   hueco va en todas las filas: si solo lo llevaran las de
                   zona, la columna bailaría en el séptimo puesto. */}
               <td
-                className={`tnum font-data py-2 pr-2 pl-2 text-xs ${
+                className={`tnum font-data py-2.5 pr-2 pl-2 text-xs ${
                   zona ? "text-chalk" : "text-chalk-3"
                 }`}
                 style={
@@ -143,44 +150,40 @@ function TablaPosiciones({
               >
                 {f.posicion}
               </td>
-              {/* `max-w-0` + `w-full`: el nombre se recorta y no empuja a las
-                  cifras contra el borde en el celular. */}
-              <td className="w-full max-w-0 py-2">
+              {/* `max-w-0` + `w-full`: el nombre toma el ancho que sobra y se
+                  recorta si no cabe, en vez de empujar las cifras. */}
+              <td className="w-full max-w-0 py-2.5">
                 <span className="font-cond flex items-center gap-2 text-chalk">
                   <PuntoEquipo color={colorDe(f.equipo_slug)} />
                   <span className="truncate">{nombreDe(f.equipo_slug)}</span>
                 </span>
               </td>
-              {hayPj && !compacta && (
-                <td className="tnum font-data py-2 text-right text-xs text-chalk-3">{f.pj}</td>
-              )}
+              {hayPj && !compacta && <td className={`${cifra} text-chalk-3`}>{f.pj}</td>}
               {hayDetalle &&
                 (compacta ? (
-                  <td className="tnum font-data py-2 text-right text-[0.6875rem] whitespace-nowrap text-chalk-3">
+                  <td className={`${cifra} text-[0.6875rem] whitespace-nowrap text-chalk-3`}>
                     {f.victorias}·{f.empates}·{f.derrotas ?? "—"}
                   </td>
                 ) : (
                   <>
-                    <td className="tnum font-data py-2 text-right text-xs text-chalk-2">
-                      {f.victorias}
-                    </td>
-                    <td className="tnum font-data py-2 text-right text-xs text-chalk-2">
-                      {f.empates}
-                    </td>
-                    <td className="tnum font-data py-2 text-right text-xs text-chalk-2">
-                      {f.derrotas ?? "—"}
-                    </td>
+                    <td className={`${cifra} text-chalk-2`}>{f.victorias}</td>
+                    <td className={`${cifra} text-chalk-2`}>{f.empates}</td>
+                    <td className={`${cifra} text-chalk-2`}>{f.derrotas ?? "—"}</td>
                   </>
                 ))}
               {formaDe && (
-                <td className={`py-2 text-right whitespace-nowrap ${compacta ? "pl-2" : "pl-3"}`}>
+                <td className={`py-2.5 text-right whitespace-nowrap ${aire}`}>
                   {(() => {
                     const forma = formaDe(f.equipo_slug);
-                    return forma?.length ? <Forma forma={forma} nombreDe={nombreDe} compacta={compacta} /> : null;
+                    return forma?.length ? (
+                      <Forma forma={forma} nombreDe={nombreDe} compacta={compacta} />
+                    ) : null;
                   })()}
                 </td>
               )}
-              <td className="tnum font-data py-2 pl-2 text-right font-bold text-chalk">
+              <td
+                className={`tnum font-data py-2.5 pr-2 text-right font-bold text-chalk ${aire}`}
+              >
                 {f.puntos}
               </td>
             </tr>
@@ -394,7 +397,9 @@ export const Clasificacion: React.FC = () => {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.5fr_1fr] lg:items-start">
               <div className="flex flex-col gap-4">
                 <Panel titulo="Tabla general">
-                  <div className="lg:hidden">
+                  {/* Compacta solo en el celular: desde tablet hay sitio para
+                      PJ, V, E y D por separado. */}
+                  <div className="sm:hidden">
                     <TablaPosiciones
                       filas={historico.clasificacion}
                       nombreDe={nombreDe}
@@ -403,7 +408,7 @@ export const Clasificacion: React.FC = () => {
                       formaDe={formaDe}
                     />
                   </div>
-                  <div className="hidden lg:block">
+                  <div className="hidden sm:block">
                     <TablaPosiciones
                       filas={historico.clasificacion}
                       nombreDe={nombreDe}
