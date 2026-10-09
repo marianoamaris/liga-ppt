@@ -101,12 +101,12 @@ function TablaPosiciones({
           {hayDetalle && !compacta && <th className="pb-2 text-right font-bold">E</th>}
           {hayDetalle && !compacta && <th className="pb-2 text-right font-bold">D</th>}
           {formaDe && (
-            <th className="pb-2 pl-3 text-right font-bold">
+            <th className={`pb-2 text-right font-bold ${compacta ? "pl-2" : "pl-3"}`}>
               <span className="sr-only">Últimos cruces</span>
               <span aria-hidden>Forma</span>
             </th>
           )}
-          <th className="pb-2 text-right font-bold">Pts</th>
+          <th className="pb-2 pl-2 text-right font-bold">Pts</th>
         </tr>
       </thead>
       <tbody>
@@ -128,7 +128,7 @@ function TablaPosiciones({
                   hueco va en todas las filas: si solo lo llevaran las de
                   zona, la columna bailaría en el séptimo puesto. */}
               <td
-                className={`tnum font-data py-2 pl-2 text-xs ${
+                className={`tnum font-data py-2 pr-2 pl-2 text-xs ${
                   zona ? "text-chalk" : "text-chalk-3"
                 }`}
                 style={
@@ -143,7 +143,9 @@ function TablaPosiciones({
               >
                 {f.posicion}
               </td>
-              <td className="py-2">
+              {/* `max-w-0` + `w-full`: el nombre se recorta y no empuja a las
+                  cifras contra el borde en el celular. */}
+              <td className="w-full max-w-0 py-2">
                 <span className="font-cond flex items-center gap-2 text-chalk">
                   <PuntoEquipo color={colorDe(f.equipo_slug)} />
                   <span className="truncate">{nombreDe(f.equipo_slug)}</span>
@@ -171,14 +173,14 @@ function TablaPosiciones({
                   </>
                 ))}
               {formaDe && (
-                <td className="py-2 pl-3 text-right whitespace-nowrap">
+                <td className={`py-2 text-right whitespace-nowrap ${compacta ? "pl-2" : "pl-3"}`}>
                   {(() => {
                     const forma = formaDe(f.equipo_slug);
-                    return forma?.length ? <Forma forma={forma} nombreDe={nombreDe} /> : null;
+                    return forma?.length ? <Forma forma={forma} nombreDe={nombreDe} compacta={compacta} /> : null;
                   })()}
                 </td>
               )}
-              <td className="tnum font-data py-2 text-right font-bold text-chalk">
+              <td className="tnum font-data py-2 pl-2 text-right font-bold text-chalk">
                 {f.puntos}
               </td>
             </tr>

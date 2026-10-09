@@ -41,20 +41,25 @@ const NOMBRE_RESULTADO: Record<Resultado, string> = {
 export function Forma({
   forma,
   nombreDe,
+  compacta = false,
 }: {
   forma: AnalisisEquipo["forma"];
   nombreDe: NombreDe;
+  /** En la tabla del celular: cuadros más chicos para que la fila respire. */
+  compacta?: boolean;
 }) {
   return (
     <span
-      className="inline-flex gap-0.5"
+      className={`inline-flex ${compacta ? "gap-px" : "gap-0.5"}`}
       aria-label={`Últimos cruces: ${forma.map((f) => NOMBRE_RESULTADO[f.resultado]).join(", ")}`}
     >
       {forma.map((f, i) => (
         <span
           key={i}
           title={`${NOMBRE_RESULTADO[f.resultado]} contra ${nombreDe(f.rivalId)} · J${f.jornada}`}
-          className={`font-data grid size-3.5 place-items-center rounded-[2px] text-[0.5625rem] leading-none font-bold ${ESTILO_RESULTADO[f.resultado]}`}
+          className={`font-data grid place-items-center rounded-[2px] leading-none font-bold ${
+            compacta ? "size-2.5 text-[0.4375rem]" : "size-3.5 text-[0.5625rem]"
+          } ${ESTILO_RESULTADO[f.resultado]}`}
         >
           {f.resultado}
         </span>
