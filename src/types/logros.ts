@@ -7,7 +7,6 @@ export type IdRecord =
   | "racha_marcando"
   | "gol_rapido"
   | "goles_playoffs"
-  | "penales"
   | "amarillas"
   | "puntos_liga"
   | "menos_puntos_liga"

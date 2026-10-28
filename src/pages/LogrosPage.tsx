@@ -48,7 +48,6 @@ const CATALOGO: Record<IdRecord, Catalogo> = {
     formato: (s) => mmss(s),
   },
   goles_playoffs: { titulo: "Más goles en playoffs", unidad: "goles", nota: "Cuartos, semis y finales · desde la edición 19" },
-  penales: { titulo: "Más penales convertidos en tandas", unidad: "penales", nota: "Desde la edición 19" },
   amarillas: { titulo: "Más amarillas", unidad: "amarillas", nota: "Desde la edición 19" },
 
   puntos_liga: { titulo: "Más puntos en una liga", unidad: "puntos" },
@@ -80,7 +79,6 @@ const SECCIONES: { id: string; filtro: Filtro; titulo: string; records: IdRecord
       "racha_marcando",
       "gol_rapido",
       "goles_playoffs",
-      "penales",
       "menos_recibidos",
       "amarillas",
     ],
@@ -224,8 +222,7 @@ export const LogrosPage: React.FC = () => {
   const { datos, loading, error } = useConsulta<LogrosSede>(consultas.logros(sedeId));
 
   const porId = new Map((datos?.records ?? []).map((r) => [r.id, r]));
-  // Un récord sin marcas (una ciudad recién abierta, o algo que nunca pasó,
-  // como una tanda de penales) no ocupa sitio.
+  // Un récord sin marcas (una ciudad recién abierta) no ocupa sitio.
   const secciones = SECCIONES.filter((s) => filtro === "todos" || s.filtro === filtro)
     .map((s) => ({ ...s, lista: s.records.map((id) => porId.get(id)).filter((r): r is RecordVivo => !!r?.marcas.length) }))
     .filter((s) => s.lista.length > 0);
