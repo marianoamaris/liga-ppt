@@ -376,13 +376,13 @@ function DetalleDePartidos({
       {!esArquero && (mejorSesion || racha.mejor > 1) && (
         <Panel titulo="Récords personales" nota="Desde la edición 19">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {mejorSesion && <Cifra valor={mejorSesion.goles} etiqueta="Mejor sesión" />}
+            {mejorSesion && <Cifra valor={mejorSesion.goles} etiqueta="Mejor jornada" />}
             {racha.mejor > 1 && <Cifra valor={racha.mejor} etiqueta="Mejor racha" />}
             {racha.actual > 1 && <Cifra valor={racha.actual} etiqueta="Racha actual" />}
           </div>
           <p className="mt-3 text-[0.6875rem] text-chalk-3">
-            {mejorSesion && <>Su mejor sesión, {mejorSesion.goles} {mejorSesion.goles === 1 ? "gol" : "goles"}: {textoSesion(mejorSesion, trayectoria, sedes, conSede)}. </>}
-            {racha.mejor > 1 && "La racha cuenta sesiones seguidas marcando."}
+            {mejorSesion && <>Su mejor jornada, {mejorSesion.goles} {mejorSesion.goles === 1 ? "gol" : "goles"}: {textoSesion(mejorSesion, trayectoria, sedes, conSede)}. </>}
+            {racha.mejor > 1 && "La racha cuenta jornadas seguidas marcando."}
           </p>
         </Panel>
       )}

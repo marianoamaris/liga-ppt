@@ -38,9 +38,9 @@ interface Catalogo {
  */
 const CATALOGO: Record<IdRecord, Catalogo> = {
   goles_liga: { titulo: "Más goles en una liga", unidad: "goles" },
-  goles_sesion: { titulo: "Más goles en una sesión", unidad: "goles" },
+  goles_sesion: { titulo: "Más goles en una jornada", unidad: "goles" },
   menos_recibidos: { titulo: "Arquero menos batido en una liga", unidad: "recibidos", nota: "Ligas terminadas" },
-  racha_marcando: { titulo: "Más sesiones seguidas marcando", unidad: "sesiones", nota: "Desde la edición 19" },
+  racha_marcando: { titulo: "Más jornadas seguidas marcando", unidad: "jornadas", nota: "Desde la edición 19" },
   gol_rapido: {
     titulo: "Gol más rápido",
     unidad: "min:seg",
