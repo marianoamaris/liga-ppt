@@ -2,6 +2,7 @@ import {
   analisisApi,
   edicionesApi,
   jugadoresApi,
+  logrosApi,
   palmaresApi,
   partidosApi,
   recordsApi,
@@ -77,6 +78,7 @@ export const consultas = {
     q(`palmares:${sede ?? "*"}`, () => palmaresApi.todo(sede).then((r) => r.palmares), CATALOGO),
   titulos: (sede?: string) =>
     q(`titulos:${sede ?? "*"}`, () => palmaresApi.titulos(sede).then((r) => r.titulos), CATALOGO),
+  logros: (sede: string) => q(`logros:${sede}`, () => logrosApi.todo(sede), DERIVADO),
   records: (sede?: string) =>
     q(`records:${sede ?? "*"}`, () => recordsApi.todo(sede).then((r) => r.records), CATALOGO),
 

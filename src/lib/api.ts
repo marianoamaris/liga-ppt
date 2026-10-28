@@ -1,5 +1,6 @@
 import type { Evento } from "../components/anotador/types";
 import type { AnalisisEdicion, DorsalesEdicion, DorsalesHistorico, PerfilJugador } from "../types/analisis";
+import type { LogrosSede } from "../types/logros";
 import type {
   Edicion,
   EdicionEquipo,
@@ -359,6 +360,11 @@ export const recordsApi = {
     req<{ total: number; records: Record<TipoRecord, FilaRecord[]> }>(
       `/records${sede ? `?sede=${sede}` : ""}`
     ),
+};
+
+export const logrosApi = {
+  /** Todos los récords vivos de una sede, de jugadores y de equipos. */
+  todo: (sede: string) => req<LogrosSede>(`/logros?sede=${sede}`),
 };
 
 export const sedesApi = {

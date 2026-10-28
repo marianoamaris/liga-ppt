@@ -1,314 +1,288 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import type { FilaRecord, TipoRecord } from "../types/jugador";
-import { useRecords } from "../hooks/useCatalogo";
+import { Link } from "react-router-dom";
 import { useSede } from "../context/SedeContext";
+import { useConsulta } from "../lib/cache";
+import { consultas } from "../lib/consultas";
 import { SelectorSede } from "../components/common/SelectorSede";
 import { Puesto } from "../components/common/iconos";
 import { fotoJugadorPorArchivo } from "../utils/fotosJugadores";
+import { etiquetaEdicion } from "../utils/ediciones";
+import { mmss } from "../types/analisis";
+import type { IdRecord, LogrosSede, Marca, RecordVivo } from "../types/logros";
 
 /**
- * Catálogo de récords: qué se muestra y cómo se llama.
+ * Récords de la liga, por sede.
  *
- * Los podios ya no viven aquí —están en `sede_records`, separados por ciudad—
- * pero las etiquetas sí: son copy de la interfaz, no datos, y añadir un tipo
- * de récord implica tocar esta pantalla de todos modos.
+ * Antes era un podio con una pestaña por récord: siete pestañas, y cada récord
+ * nuevo era otra más. Ahora es una página que se recorre: secciones de
+ * jugadores y equipos, una tarjeta por récord con el primero en grande y el
+ * segundo y el tercero debajo, y el top 10 al desplegarla. Un récord nuevo es
+ * una tarjeta más.
+ *
+ * Los récords están vivos: el backend junta lo congelado de la hoja de cálculo
+ * con lo que se calcula de cada edición y de los partidos anotados. Lo que solo
+ * existe desde la edición 19 lo dice en la propia tarjeta.
  */
-const TABS: { id: TipoRecord; label: string; titulo: string; unidad: string }[] = [
-  {
-    id: "mas_goles_liga",
-    label: "Goles en una liga",
-    titulo: "Más goles anotados en una sola liga",
-    unidad: "goles",
-  },
-  {
-    id: "mas_goles_jornada",
-    label: "Goles en una jornada",
-    titulo: "Más goles anotados en una sola jornada",
-    unidad: "goles",
-  },
-  {
-    id: "menos_goles_recibidos",
-    label: "Menos goles recibidos",
-    titulo: "Menos goles recibidos en una liga (arquero)",
-    unidad: "recibidos",
-  },
-  {
-    id: "mas_puntos_equipo",
-    label: "Más puntos de un equipo",
-    titulo: "Más puntos hechos por un equipo en una liga",
-    unidad: "puntos",
-  },
-  {
-    id: "mas_puntos_jornada",
-    label: "Más puntos en una jornada",
-    titulo: "Más puntos hechos por un equipo en una sola jornada",
-    unidad: "puntos",
-  },
-  {
-    id: "menos_puntos_jornada",
-    label: "Menos puntos en una jornada",
-    titulo: "Menos puntos hechos por un equipo en una sola jornada",
-    unidad: "puntos",
-  },
-  {
-    id: "menos_puntos_equipo",
-    label: "Menos puntos de un equipo",
-    titulo: "Menos puntos hechos por un equipo en una liga",
-    unidad: "puntos",
-  },
-];
 
-// ── Podium slot config (display order: 2nd left, 1st center, 3rd right) ──
-
-const SLOTS = [
-  {
-    dataIdx: 1,
-    rank: 2,
-    barH: 104,
-    tono: "var(--color-chalk-2)",
-    label: "Segundo",
-  },
-  {
-    dataIdx: 0,
-    rank: 1,
-    barH: 160,
-    tono: "var(--color-chalk)",
-    label: "Primero",
-  },
-  {
-    dataIdx: 2,
-    rank: 3,
-    barH: 72,
-    tono: "var(--color-chalk-3)",
-    label: "Tercero",
-  },
-];
-
-// ── Sub-components ─────────────────────────────────────────────────────────
-
-/** Nombre a mostrar: el del padrón si el récord resuelve, si no la grafía original. */
-function nombreDe(fila: FilaRecord): string {
-  return (
-    fila.jugadores?.nombre ?? fila.jugador_nombre ?? fila.equipo_nombre ?? "—"
-  );
+interface Catalogo {
+  titulo: string;
+  unidad: string;
+  /** De dónde sale o qué cuenta, cuando no es obvio. */
+  nota?: string;
+  formato?: (valor: number) => string;
 }
 
-function PlayerAvatar({ fila, size }: { fila: FilaRecord; size: number }) {
-  const src = fotoJugadorPorArchivo(fila.jugadores?.foto_archivo ?? null);
-  const nombre = nombreDe(fila);
+/**
+ * Cómo se llama cada récord. Las filas son datos y llegan de la API; las
+ * etiquetas son copy y viven aquí, junto al componente que las pinta.
+ */
+const CATALOGO: Record<IdRecord, Catalogo> = {
+  goles_liga: { titulo: "Más goles en una liga", unidad: "goles" },
+  goles_sesion: { titulo: "Más goles en una sesión", unidad: "goles" },
+  menos_recibidos: { titulo: "Arquero menos batido en una liga", unidad: "recibidos", nota: "Ligas terminadas" },
+  racha_marcando: { titulo: "Más sesiones seguidas marcando", unidad: "sesiones", nota: "Desde la edición 19" },
+  gol_rapido: {
+    titulo: "Gol más rápido",
+    unidad: "min:seg",
+    nota: "Desde que arranca el cruce · desde la edición 19",
+    formato: (s) => mmss(s),
+  },
+  goles_playoffs: { titulo: "Más goles en playoffs", unidad: "goles", nota: "Cuartos, semis y finales · desde la edición 19" },
+  penales: { titulo: "Más penales convertidos en tandas", unidad: "penales", nota: "Desde la edición 19" },
+  amarillas: { titulo: "Más amarillas", unidad: "amarillas", nota: "Desde la edición 19" },
 
+  puntos_liga: { titulo: "Más puntos en una liga", unidad: "puntos" },
+  puntos_jornada: { titulo: "Más puntos en una jornada", unidad: "puntos" },
+  racha_victorias: { titulo: "Más cruces seguidos ganados", unidad: "cruces", nota: "Desde la edición 19" },
+  racha_invicto: { titulo: "Más cruces seguidos sin perder", unidad: "cruces", nota: "Desde la edición 19" },
+  goles_favor: { titulo: "Más goles a favor en una liga", unidad: "goles", nota: "Desde la edición 19" },
+  menos_goles_contra: {
+    titulo: "Menos goles en contra en una liga",
+    unidad: "goles",
+    nota: "Ligas terminadas · desde la edición 19",
+  },
+
+  menos_puntos_liga: { titulo: "Menos puntos en una liga", unidad: "puntos", nota: "Ligas terminadas" },
+  menos_puntos_jornada: { titulo: "Menos puntos en una jornada", unidad: "puntos", nota: "Ligas terminadas" },
+  racha_derrotas: { titulo: "Más cruces seguidos perdidos", unidad: "cruces", nota: "Desde la edición 19" },
+  racha_sin_ganar: { titulo: "Más cruces seguidos sin ganar", unidad: "cruces", nota: "Desde la edición 19" },
+};
+
+/** Las secciones, en el orden en que se leen. */
+const SECCIONES: { id: string; filtro: Filtro; titulo: string; records: IdRecord[] }[] = [
+  {
+    id: "jugadores",
+    filtro: "jugadores",
+    titulo: "Jugadores",
+    records: [
+      "goles_liga",
+      "goles_sesion",
+      "racha_marcando",
+      "gol_rapido",
+      "goles_playoffs",
+      "penales",
+      "menos_recibidos",
+      "amarillas",
+    ],
+  },
+  {
+    id: "equipos",
+    filtro: "equipos",
+    titulo: "Equipos",
+    records: ["puntos_liga", "puntos_jornada", "racha_victorias", "racha_invicto", "goles_favor", "menos_goles_contra"],
+  },
+  {
+    id: "olvidar",
+    filtro: "equipos",
+    titulo: "Equipos · para olvidar",
+    records: ["menos_puntos_liga", "menos_puntos_jornada", "racha_derrotas", "racha_sin_ganar"],
+  },
+];
+
+type Filtro = "todos" | "jugadores" | "equipos";
+
+const FILTROS: { id: Filtro; label: string }[] = [
+  { id: "todos", label: "Todos" },
+  { id: "jugadores", label: "Jugadores" },
+  { id: "equipos", label: "Equipos" },
+];
+
+const RONDA: Record<string, string> = { cuartos: "cuartos", semifinal: "semifinal", final: "final" };
+
+/** Quién: el jugador del padrón o el equipo de esa edición. */
+function nombreDe(m: Marca): string {
+  return m.jugador?.nombre ?? m.equipo?.nombre ?? "—";
+}
+
+function Avatar({ m, grande }: { m: Marca; grande?: boolean }) {
+  const tam = grande ? "size-14" : "size-8";
+  if (m.equipo) {
+    return (
+      <span
+        className={`${tam} shrink-0 rounded-full ring-2 ring-line`}
+        style={{ background: m.equipo.color_hex ?? "#4B5563" }}
+      />
+    );
+  }
+  const foto = fotoJugadorPorArchivo(m.jugador?.foto_archivo ?? null);
   return (
-    <div
-      className="shrink-0 overflow-hidden rounded-full bg-raised ring-2 ring-line"
-      style={{ width: size, height: size }}
-    >
-      {src ? (
-        <img src={src} alt="" className="size-full object-cover object-top" />
+    <span className={`${tam} shrink-0 overflow-hidden rounded-full bg-raised ring-2 ring-line`}>
+      {foto ? (
+        <img src={foto} alt="" className="size-full object-cover object-top" />
       ) : (
-        <span className="font-cond grid size-full place-items-center text-chalk-3">
-          {nombre.charAt(0)}
-        </span>
+        <span className="font-cond grid size-full place-items-center text-xs text-chalk-3">{nombreDe(m).charAt(0)}</span>
       )}
-    </div>
+    </span>
   );
 }
 
-/** Los récords de equipo se identifican por su color de camiseta. */
-function TeamDot({ color, size }: { color: string | null; size: number }) {
-  return (
-    <div
-      className="shrink-0 rounded-full ring-2 ring-chalk-3"
-      style={{ width: size, height: size, background: color ?? "#4B5563" }}
-    />
+function Nombre({ m, className }: { m: Marca; className: string }) {
+  return m.jugador?.slug ? (
+    <Link to={`/jugador/${m.jugador.slug}`} className={`${className} hover:underline`}>
+      {nombreDe(m)}
+    </Link>
+  ) : (
+    <span className={className}>{nombreDe(m)}</span>
   );
 }
 
-function Aviso({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mx-auto max-w-md rounded-md border border-line bg-surface px-4 py-5 text-center text-sm text-chalk-3">
-      {children}
-    </p>
-  );
-}
+function Tarjeta({ record }: { record: RecordVivo }) {
+  const { sedes, sedeId } = useSede();
+  const [abierta, setAbierta] = useState(false);
+  const cat = CATALOGO[record.id];
+  const valor = (v: number) => (cat.formato ? cat.formato(v) : String(v));
 
-// ── Main page ──────────────────────────────────────────────────────────────
+  /** «Edición 19 · jornada 6», o nada si el récord no dice cuándo. */
+  const cuando = (m: Marca) => {
+    if (m.numero_sede == null) return null;
+    const ed = etiquetaEdicion({ numero_sede: m.numero_sede, sede_id: sedeId }, sedes);
+    if (m.jornada != null) return `${ed} · jornada ${m.jornada}`;
+    if (m.ronda) return `${ed} · ${RONDA[m.ronda] ?? m.ronda}`;
+    return ed;
+  };
 
-export const LogrosPage: React.FC = () => {
-  const [selected, setSelected] = useState<TipoRecord>("mas_goles_liga");
-  const { sede, sedeId } = useSede();
-  const { de, loading, error } = useRecords(sedeId);
-
-  const tab = TABS.find((t) => t.id === selected)!;
-  // El orden lo fija la base con `posicion`; el podio solo lo reordena para
-  // pintar el 2.º a la izquierda y el 3.º a la derecha.
-  const podio = [...de(selected)].sort((a, b) => a.posicion - b.posicion);
+  const [primero, ...resto] = record.marcas;
+  const visibles = abierta ? resto : resto.slice(0, 2);
 
   return (
-    <div className="min-h-full bg-ink">
-      {/* Header */}
-      <div className="relative pt-10 pb-2 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="font-cond mb-2 text-[0.625rem] text-chalk-3">
-            {sede ? `${sede.nombre} · Todos los tiempos` : "Liga PPT"}
-          </p>
-          <h1 className="font-cond text-4xl text-chalk">Récords</h1>
-        </motion.div>
+    <article className="flex flex-col rounded-md border border-line bg-surface">
+      <header className="flex items-baseline justify-between gap-3 px-4 pt-4">
+        <h3 className="font-cond text-xs text-chalk-2">{cat.titulo}</h3>
+      </header>
 
-        {/* Los récords no se mezclan entre ciudades: cada una tiene los suyos. */}
-        <SelectorSede
-          className="mx-auto mt-5 w-full max-w-[16rem] px-4"
-          mostrarEdicion={false}
-        />
-      </div>
-
-      {/* Tabs */}
-      <div className="relative px-4 pt-6 pb-2">
-        <div className="flex flex-wrap gap-2 justify-center">
-          {TABS.map((t, i) => {
-            const active = selected === t.id;
-            return (
-              <motion.button
-                key={t.id}
-                onClick={() => setSelected(t.id)}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06, duration: 0.3 }}
-                whileTap={{ scale: 0.95 }}
-                aria-pressed={active}
-                className={`font-cond rounded-sm border px-3 py-1.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
-                  active
-                    ? "border-chalk-3 bg-raised text-chalk"
-                    : "border-line text-chalk-3 hover:text-chalk-2"
-                }`}
-              >
-                {t.label}
-              </motion.button>
-            );
-          })}
+      <div className="flex items-center gap-3 px-4 pt-3 pb-3">
+        <Avatar m={primero} grande />
+        <div className="min-w-0 flex-1">
+          <Nombre m={primero} className="block truncate text-base text-chalk" />
+          <p className="truncate text-[0.6875rem] text-chalk-3">{cuando(primero) ?? " "}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <span className="tnum font-data block text-3xl leading-none font-bold text-chalk">{valor(primero.valor)}</span>
+          <span className="font-cond text-[0.625rem] text-chalk-3">{cat.unidad}</span>
         </div>
       </div>
 
-      {/* Podium */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`${sedeId}-${selected}`}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="relative px-4 pt-6 pb-10"
-        >
-          <p className="font-cond mb-10 text-center text-[0.6875rem] text-chalk-3">
-            {tab.titulo}
+      {visibles.length > 0 && (
+        <ol className="border-t border-line px-4">
+          {visibles.map((m, i) => (
+            <li
+              key={`${nombreDe(m)}-${m.edicion}-${m.jornada}-${i}`}
+              className="flex items-center gap-2.5 border-t border-line py-2 first:border-t-0"
+            >
+              <Puesto n={m.posicion} />
+              <Avatar m={m} />
+              <span className="min-w-0 flex-1">
+                <Nombre m={m} className="block truncate text-sm text-chalk" />
+                {cuando(m) && <span className="block truncate text-[0.625rem] text-chalk-3">{cuando(m)}</span>}
+              </span>
+              <span className="tnum font-data shrink-0 text-sm font-bold text-chalk">{valor(m.valor)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      <footer className="mt-auto flex items-center justify-between gap-3 border-t border-line px-4 py-2.5">
+        <span className="text-[0.625rem] text-chalk-3">{cat.nota ?? ""}</span>
+        {resto.length > 2 && (
+          <button
+            type="button"
+            onClick={() => setAbierta((v) => !v)}
+            aria-expanded={abierta}
+            className="font-cond shrink-0 text-[0.6875rem] text-chalk-2 hover:text-chalk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk"
+          >
+            {abierta ? "Ver menos" : `Ver los ${record.marcas.length}`}
+          </button>
+        )}
+      </footer>
+    </article>
+  );
+}
+
+export const LogrosPage: React.FC = () => {
+  const [filtro, setFiltro] = useState<Filtro>("todos");
+  const { sede, sedeId } = useSede();
+  const { datos, loading, error } = useConsulta<LogrosSede>(consultas.logros(sedeId));
+
+  const porId = new Map((datos?.records ?? []).map((r) => [r.id, r]));
+  // Un récord sin marcas (una ciudad recién abierta, o algo que nunca pasó,
+  // como una tanda de penales) no ocupa sitio.
+  const secciones = SECCIONES.filter((s) => filtro === "todos" || s.filtro === filtro)
+    .map((s) => ({ ...s, lista: s.records.map((id) => porId.get(id)).filter((r): r is RecordVivo => !!r?.marcas.length) }))
+    .filter((s) => s.lista.length > 0);
+
+  return (
+    <div className="min-h-full bg-ink text-chalk">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 p-4">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="font-cond text-[0.625rem] text-chalk-3">
+              {sede ? `${sede.nombre} · Todos los tiempos` : "Liga PPT"}
+            </p>
+            <h1 className="font-cond text-3xl text-chalk">Récords</h1>
+          </div>
+          {/* Los récords no se mezclan entre ciudades: cada una tiene los suyos. */}
+          <SelectorSede className="w-full max-w-[16rem]" mostrarEdicion={false} />
+        </header>
+
+        <div role="group" aria-label="Filtrar récords" className="flex flex-wrap gap-2">
+          {FILTROS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFiltro(f.id)}
+              aria-pressed={filtro === f.id}
+              className={`font-cond rounded-sm border px-3 py-1.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
+                filtro === f.id ? "border-chalk-3 bg-raised text-chalk" : "border-line text-chalk-3 hover:text-chalk-2"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <p className="font-cond text-sm text-chalk-3">Cargando récords…</p>
+        ) : error ? (
+          <p className="rounded-md bg-vivo/15 px-4 py-3 text-sm text-chalk-2">No se pudieron cargar los récords: {error}</p>
+        ) : !secciones.length ? (
+          <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+            {sede?.nombre ?? "Esta ciudad"} todavía no tiene récords: se escriben a medida que se juega.
           </p>
-
-          {loading ? (
-            <Aviso>Cargando récords…</Aviso>
-          ) : error ? (
-            <Aviso>No se pudieron cargar los récords: {error}</Aviso>
-          ) : !podio.length ? (
-            // Una ciudad recién abierta no tiene récords que batir todavía.
-            <Aviso>
-              {sede?.nombre ?? "Esta ciudad"} todavía no tiene este récord registrado.
-            </Aviso>
-          ) : (
-            <div className="flex items-end justify-center gap-2 sm:gap-4 max-w-2xl mx-auto">
-              {SLOTS.map((slot, i) => {
-                const item = podio[slot.dataIdx];
-                // El podio puede venir incompleto: no todos los récords tienen
-                // tres puestos registrados.
-                if (!item) return null;
-
-                const isGold = slot.rank === 1;
-                const esEquipo = item.equipo_nombre != null;
-
-                return (
-                  <motion.div
-                    key={slot.rank}
-                    initial={{ opacity: 0, y: 48 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: i * 0.09,
-                      duration: 0.5,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    className="flex flex-col items-center"
-                    style={{ flex: isGold ? "0 0 42%" : "0 0 27%", maxWidth: isGold ? 200 : 152 }}
-                  >
-                    {/* Card */}
-                    <div
-                      className={`mb-2 flex w-full flex-col items-center gap-2 rounded-md border bg-surface p-3 ${
-                        isGold ? "border-chalk-3" : "border-line"
-                      }`}
-                    >
-                      <Puesto n={slot.rank} className={isGold ? "size-6 text-xs" : ""} />
-
-                      {esEquipo ? (
-                        <TeamDot color={item.equipo_color} size={isGold ? 68 : 52} />
-                      ) : (
-                        <PlayerAvatar fila={item} size={isGold ? 76 : 56} />
-                      )}
-
-                      {/* Name */}
-                      <div className="text-center px-1">
-                        <div
-                          className="font-cond leading-tight text-chalk"
-                          style={{ fontSize: isGold ? "0.9rem" : "0.78rem" }}
-                        >
-                          {nombreDe(item)}
-                        </div>
-                        {/* La edición solo consta en los récords de equipo; en los
-                            de jugador la fuente heredada no la registraba. */}
-                        {item.numero_sede != null ? (
-                          <div className="font-cond text-[0.625rem] text-chalk-3">
-                            Edición {item.numero_sede}
-                          </div>
-                        ) : item.jugadores ? (
-                          <div className="text-[0.625rem] text-chalk-3">
-                            @{item.jugadores.username ?? item.jugadores.slug}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      {/* Stat */}
-                      <div
-                        className="tnum font-data leading-none font-bold tracking-tight"
-                        style={{ fontSize: isGold ? "2rem" : "1.5rem", color: slot.tono }}
-                      >
-                        {item.valor}
-                      </div>
-                      <div className="font-cond -mt-1 text-[0.625rem] text-chalk-3">
-                        {tab.unidad}
-                      </div>
-                    </div>
-
-                    {/* Podium block */}
-                    <div
-                      className="relative flex w-full items-center justify-center overflow-hidden rounded-t-md bg-surface"
-                      style={{ height: slot.barH, borderTop: `2px solid ${slot.tono}` }}
-                    >
-                      <span
-                        className="tnum font-data leading-none font-bold select-none opacity-[0.12]"
-                        style={{ fontSize: isGold ? "5rem" : "3.5rem", color: slot.tono }}
-                      >
-                        {slot.rank}
-                      </span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Suelo del podio */}
-          <div className="mx-auto mt-0 h-px max-w-2xl bg-line" />
-        </motion.div>
-      </AnimatePresence>
+        ) : (
+          secciones.map((s) => (
+            <section key={s.id} aria-labelledby={`sec-${s.id}`} className="flex flex-col gap-3">
+              <h2 id={`sec-${s.id}`} className="font-cond text-sm text-chalk-2">
+                {s.titulo}
+              </h2>
+              <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {s.lista.map((r) => (
+                  <Tarjeta key={r.id} record={r} />
+                ))}
+              </div>
+            </section>
+          ))
+        )}
+      </div>
     </div>
   );
 };
