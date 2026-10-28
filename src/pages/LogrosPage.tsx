@@ -40,6 +40,11 @@ const CATALOGO: Record<IdRecord, Catalogo> = {
   goles_liga: { titulo: "Más goles en una liga", unidad: "goles" },
   goles_sesion: { titulo: "Más goles en una jornada", unidad: "goles" },
   menos_recibidos: { titulo: "Arquero menos batido en una liga", unidad: "recibidos", nota: "Ligas terminadas" },
+  menos_recibidos_jornada: {
+    titulo: "Arquero menos batido en una jornada",
+    unidad: "recibidos",
+    nota: "A igualdad, más partidos jugados · desde la edición 19",
+  },
   racha_marcando: { titulo: "Más jornadas seguidas marcando", unidad: "jornadas", nota: "Desde la edición 19" },
   gol_rapido: {
     titulo: "Gol más rápido",
@@ -81,6 +86,7 @@ const SECCIONES: { id: string; filtro: Filtro; titulo: string; records: IdRecord
       "gol_rapido",
       "goles_playoffs",
       "menos_recibidos",
+      "menos_recibidos_jornada",
       "amarillas",
       "rojas",
     ],
@@ -156,9 +162,10 @@ function Tarjeta({ record }: { record: RecordVivo }) {
   const cuando = (m: Marca) => {
     if (m.numero_sede == null) return null;
     const ed = etiquetaEdicion({ numero_sede: m.numero_sede, sede_id: sedeId }, sedes);
-    if (m.jornada != null) return `${ed} · jornada ${m.jornada}`;
-    if (m.ronda) return `${ed} · ${RONDA[m.ronda] ?? m.ronda}`;
-    return ed;
+    const pj = m.partidos != null ? ` · ${m.partidos} partidos` : "";
+    if (m.jornada != null) return `${ed} · jornada ${m.jornada}${pj}`;
+    if (m.ronda) return `${ed} · ${RONDA[m.ronda] ?? m.ronda}${pj}`;
+    return `${ed}${pj}`;
   };
 
   const [primero, ...resto] = record.marcas;

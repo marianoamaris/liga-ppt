@@ -4,6 +4,7 @@ export type IdRecord =
   | "goles_liga"
   | "goles_sesion"
   | "menos_recibidos"
+  | "menos_recibidos_jornada"
   | "racha_marcando"
   | "gol_rapido"
   | "goles_playoffs"
@@ -30,6 +31,8 @@ export interface Marca {
   numero_sede: number | null;
   jornada: number | null;
   ronda: string | null;
+  /** Partidos jugados en esa marca, cuando sirve para desempatar. */
+  partidos: number | null;
 }
 
 export interface RecordVivo {
