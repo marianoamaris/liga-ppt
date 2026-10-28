@@ -72,6 +72,8 @@ export const AppRouter = () => (
           <Route path="/jugador/:slug" element={<PerfilJugadorPage />} />
           <Route path="/dorsales" element={<DorsalesPage />} />
           <Route path="/dorsales/:edicion/:numero" element={<DorsalesPage />} />
+          <Route path="/dorsales/historico" element={<DorsalesPage />} />
+          <Route path="/dorsales/historico/:numero" element={<DorsalesPage />} />
           <Route path="/logros" element={<LogrosPage />} />
           <Route path="/anuncios" element={<AnunciosPage />} />
           <Route path="/patrocinadores" element={<PatrocinadoresPage />} />

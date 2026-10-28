@@ -1,5 +1,5 @@
 import type { Evento } from "../components/anotador/types";
-import type { AnalisisEdicion, DorsalesEdicion, PerfilJugador } from "../types/analisis";
+import type { AnalisisEdicion, DorsalesEdicion, DorsalesHistorico, PerfilJugador } from "../types/analisis";
 import type {
   Edicion,
   EdicionEquipo,
@@ -391,6 +391,9 @@ export const edicionesApi = {
   historico: (numero: number) => req<HistoricoEdicion>(`/historico/${numero}`),
   /** Quién lleva cada número del peto, con sus estadísticas de la edición. */
   dorsales: (numero: number) => req<DorsalesEdicion>(`/ediciones/${numero}/dorsales`),
+  /** Todos los que han llevado cada número en una sede. */
+  dorsalesHistorico: (sede: string) =>
+    req<DorsalesHistorico>(`/ediciones/dorsales/historico?sede=${sede}`),
   plantillas: (numero: number) =>
     req<{
       edicion: number;

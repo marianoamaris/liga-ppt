@@ -153,6 +153,33 @@ export interface DetallePartidos {
   rojas: number;
 }
 
+/** Todos los que han llevado cada número en una sede, sumando sus ediciones. */
+export interface DorsalesHistorico {
+  sede_id: string;
+  ediciones: { edicion: number; numero_sede: number | null }[];
+  dorsales: {
+    dorsal: number;
+    jugadores: {
+      dorsal: number;
+      slug: string | null;
+      nombre: string;
+      posicion: string | null;
+      foto_archivo: string | null;
+      goles: number;
+      partidos: number;
+      amarillas: number;
+      ediciones: {
+        edicion: number;
+        numero_sede: number | null;
+        equipo: { slug: string; nombre: string; color_hex: string | null };
+        goles: number;
+        partidos: number;
+        puesto_equipo: number | null;
+      }[];
+    }[];
+  }[];
+}
+
 /** Quién lleva cada número del peto en una edición. */
 export interface DorsalesEdicion {
   edicion: number;

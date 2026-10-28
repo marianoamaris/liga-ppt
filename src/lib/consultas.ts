@@ -70,6 +70,8 @@ export const consultas = {
     q(`historico:${numero}`, () => edicionesApi.historico(numero), DERIVADO),
   analisis: (numero: number) => q(`analisis:${numero}`, () => analisisApi.edicion(numero), DERIVADO),
   dorsales: (numero: number) => q(`dorsales:${numero}`, () => edicionesApi.dorsales(numero), DERIVADO),
+  dorsalesHistorico: (sede: string) =>
+    q(`dorsales-historico:${sede}`, () => edicionesApi.dorsalesHistorico(sede), DERIVADO),
 
   palmares: (sede?: string) =>
     q(`palmares:${sede ?? "*"}`, () => palmaresApi.todo(sede).then((r) => r.palmares), CATALOGO),
