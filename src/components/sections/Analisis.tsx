@@ -51,7 +51,7 @@ export function Forma({
   return (
     <span
       className={`inline-flex ${compacta ? "gap-px" : "gap-0.5"}`}
-      aria-label={`Últimos cruces: ${forma.map((f) => NOMBRE_RESULTADO[f.resultado]).join(", ")}`}
+      aria-label={`Últimos partidos: ${forma.map((f) => NOMBRE_RESULTADO[f.resultado]).join(", ")}`}
     >
       {forma.map((f, i) => (
         <span
@@ -303,7 +303,7 @@ function textoResumen(r: ResumenJornada, nombreDe: NombreDe, etiquetaEdicion: st
   }
   if (r.vallaMenosVencida) {
     lineas.push(
-      `Valla menos vencida: ${nombreDe(r.vallaMenosVencida.equipoId)}, ${r.vallaMenosVencida.recibidos} en ${r.vallaMenosVencida.cruces} cruces`
+      `Valla menos vencida: ${nombreDe(r.vallaMenosVencida.equipoId)}, ${r.vallaMenosVencida.recibidos} en ${r.vallaMenosVencida.cruces} partidos`
     );
   }
   lineas.push("", `${r.goles} goles · ${r.empates} empates · ${r.amarillas} amarillas${r.rojas ? ` · ${r.rojas} rojas` : ""}`);
@@ -397,7 +397,7 @@ export function ResumenDeJornada({
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-data tnum text-[0.6875rem] text-chalk-3">
-          {r.goles} goles · {r.empates} empates · {r.cruces} cruces · {r.amarillas} amarillas
+          {r.goles} goles · {r.empates} empates · {r.cruces} partidos · {r.amarillas} amarillas
           {r.rojas ? ` · ${r.rojas} rojas` : ""}
         </p>
         <button
@@ -434,19 +434,19 @@ export function RachasYRitmo({
         <thead>
           <tr className="font-cond text-[0.625rem] text-chalk-3">
             <th className="pb-2 text-left font-bold">Equipo</th>
-            <th className="pb-2 text-right font-bold" title="Resultado que se repite en los últimos cruces">
+            <th className="pb-2 text-right font-bold" title="Resultado que se repite en los últimos partidos">
               Racha
             </th>
             <th className="pb-2 text-right font-bold" title="Victorias seguidas, su mejor marca">
               Mejor
             </th>
-            <th className="hidden pb-2 text-right font-bold sm:table-cell" title="Cruces seguidos sin perder, su mejor marca">
+            <th className="hidden pb-2 text-right font-bold sm:table-cell" title="Partidos seguidos sin perder, su mejor marca">
               Invicto
             </th>
-            <th className="pb-2 text-right font-bold" title="Tiempo medio que tarda en ganar un cruce">
+            <th className="pb-2 text-right font-bold" title="Tiempo medio que tarda en ganar un partido">
               Marca en
             </th>
-            <th className="hidden pb-2 text-right font-bold sm:table-cell" title="Tiempo medio que tarda en perder un cruce">
+            <th className="hidden pb-2 text-right font-bold sm:table-cell" title="Tiempo medio que tarda en perder un partido">
               Recibe en
             </th>
           </tr>

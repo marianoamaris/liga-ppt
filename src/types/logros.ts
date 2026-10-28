@@ -8,6 +8,7 @@ export type IdRecord =
   | "gol_rapido"
   | "goles_playoffs"
   | "amarillas"
+  | "rojas"
   | "puntos_liga"
   | "menos_puntos_liga"
   | "puntos_jornada"

@@ -44,16 +44,17 @@ const CATALOGO: Record<IdRecord, Catalogo> = {
   gol_rapido: {
     titulo: "Gol más rápido",
     unidad: "min:seg",
-    nota: "Desde que arranca el cruce · desde la edición 19",
+    nota: "Desde que arranca el partido · desde la edición 19",
     formato: (s) => mmss(s),
   },
   goles_playoffs: { titulo: "Más goles en playoffs", unidad: "goles", nota: "Cuartos, semis y finales · desde la edición 19" },
   amarillas: { titulo: "Más amarillas", unidad: "amarillas", nota: "Desde la edición 19" },
+  rojas: { titulo: "Más rojas", unidad: "rojas", nota: "Desde la edición 19" },
 
   puntos_liga: { titulo: "Más puntos en una liga", unidad: "puntos" },
   puntos_jornada: { titulo: "Más puntos en una jornada", unidad: "puntos" },
-  racha_victorias: { titulo: "Más cruces seguidos ganados", unidad: "cruces", nota: "Desde la edición 19" },
-  racha_invicto: { titulo: "Más cruces seguidos sin perder", unidad: "cruces", nota: "Desde la edición 19" },
+  racha_victorias: { titulo: "Más partidos seguidos ganados", unidad: "partidos", nota: "Desde la edición 19" },
+  racha_invicto: { titulo: "Más partidos seguidos sin perder", unidad: "partidos", nota: "Desde la edición 19" },
   goles_favor: { titulo: "Más goles a favor en una liga", unidad: "goles", nota: "Desde la edición 19" },
   menos_goles_contra: {
     titulo: "Menos goles en contra en una liga",
@@ -63,8 +64,8 @@ const CATALOGO: Record<IdRecord, Catalogo> = {
 
   menos_puntos_liga: { titulo: "Menos puntos en una liga", unidad: "puntos", nota: "Ligas terminadas" },
   menos_puntos_jornada: { titulo: "Menos puntos en una jornada", unidad: "puntos", nota: "Ligas terminadas" },
-  racha_derrotas: { titulo: "Más cruces seguidos perdidos", unidad: "cruces", nota: "Desde la edición 19" },
-  racha_sin_ganar: { titulo: "Más cruces seguidos sin ganar", unidad: "cruces", nota: "Desde la edición 19" },
+  racha_derrotas: { titulo: "Más partidos seguidos perdidos", unidad: "partidos", nota: "Desde la edición 19" },
+  racha_sin_ganar: { titulo: "Más partidos seguidos sin ganar", unidad: "partidos", nota: "Desde la edición 19" },
 };
 
 /** Las secciones, en el orden en que se leen. */
@@ -81,6 +82,7 @@ const SECCIONES: { id: string; filtro: Filtro; titulo: string; records: IdRecord
       "goles_playoffs",
       "menos_recibidos",
       "amarillas",
+      "rojas",
     ],
   },
   {

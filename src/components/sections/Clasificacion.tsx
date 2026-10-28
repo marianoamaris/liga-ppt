@@ -109,7 +109,7 @@ function TablaPosiciones({
           {hayDetalle && !compacta && <th className={cabecera}>D</th>}
           {formaDe && (
             <th className={cabecera}>
-              <span className="sr-only">Últimos cruces</span>
+              <span className="sr-only">Últimos partidos</span>
               <span aria-hidden>Forma</span>
             </th>
           )}
@@ -518,7 +518,7 @@ export const Clasificacion: React.FC = () => {
                 )}
 
                 {analisis && (
-                  <Panel titulo="Rachas y ritmo" nota="Por cruce">
+                  <Panel titulo="Rachas y ritmo" nota="Por partido">
                     <RachasYRitmo
                       equipos={analisis.equipos}
                       orden={ordenTabla}
