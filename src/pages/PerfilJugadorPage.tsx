@@ -5,7 +5,16 @@ import { useSede } from "../context/SedeContext";
 import { usePerfilJugador } from "../hooks/useCatalogo";
 import { fotoJugadorPorArchivo } from "../utils/fotosJugadores";
 import { etiquetaEdicion, mezclaSedes, nombreSede } from "../utils/ediciones";
-import { mmss, type EstadisticaJugador, type TramoTrayectoria } from "../types/analisis";
+import {
+  mmss,
+  type DetallePartidos,
+  type EstadisticaJugador,
+  type PerfilJugador,
+  type RivalPerfil,
+  type TramoTrayectoria,
+} from "../types/analisis";
+import { RAZON_LABEL } from "../components/anotador/utils";
+import type { RazonAmarilla } from "../components/anotador/types";
 import type { Jugador } from "../types/jugador";
 
 /**
@@ -204,7 +213,266 @@ function MinutoDeGol({ tiempos }: { tiempos: number[] }) {
   );
 }
 
-function FilaTrayectoria({ t, conSede }: { t: TramoTrayectoria; conSede: boolean }) {
+const RONDA: Record<string, string> = {
+  cuartos: "Cuartos",
+  semifinal: "Semifinal",
+  final: "Final",
+};
+
+/** Dónde fue una sesión: «Edición 19 · jornada 6» o «Edición 20 · final». */
+function textoSesion(
+  s: { edicion: number; modo: string; jornada: number | null },
+  trayectoria: TramoTrayectoria[],
+  sedes: Parameters<typeof etiquetaEdicion>[1],
+  conSede: boolean
+) {
+  const t = trayectoria.find((x) => x.edicion === s.edicion);
+  const edicion = t ? etiquetaEdicion(t, sedes, { conSede }) : "";
+  const cuando = s.modo === "jornada" ? `jornada ${s.jornada}` : (RONDA[s.modo] ?? s.modo).toLowerCase();
+  return `${edicion} · ${cuando}`;
+}
+
+/**
+ * Su lugar en los rankings históricos de la ciudad, y las finales que jugó.
+ *
+ * Las finales perdidas solo constan desde la edición 19: antes no se guardaba
+ * quién jugaba en el subcampeón. Las ganadas sí, son sus títulos.
+ */
+function EnLaHistoria({ perfil }: { perfil: PerfilJugador }) {
+  const { sedes } = useSede();
+  const variasSedes = perfil.enSede.length > 1;
+  const finalesPerdidas = perfil.trayectoria.filter((t) => t.subcampeon).length;
+  const finalesGanadas = perfil.jugador.ligas_ganadas;
+  const esArquero = perfil.jugador.posicion === "arquero";
+
+  const chips: string[] = [];
+  for (const s of perfil.enSede) {
+    const donde = variasSedes || sedes.length > 1 ? ` de ${nombreSede(s.sede_id, sedes)}` : "";
+    // A un arquero no se le mide por goles, y más allá del top 20 el puesto de
+    // goleador no dice nada.
+    if (!esArquero && s.puestoGoles && s.puestoGoles <= 20) chips.push(`${s.puestoGoles}º goleador histórico${donde}`);
+    // Fuera del top 10 hay decenas de empatados con uno o dos títulos: el
+    // puesto no dice nada.
+    if (s.puestoTitulos && s.puestoTitulos <= 10) chips.push(`${s.puestoTitulos}º en títulos${donde}`);
+  }
+  if (finalesGanadas + finalesPerdidas > 0) {
+    chips.push(
+      `${finalesGanadas + finalesPerdidas} ${finalesGanadas + finalesPerdidas === 1 ? "final" : "finales"}: ${finalesGanadas} ${finalesGanadas === 1 ? "ganada" : "ganadas"}` +
+        (finalesPerdidas ? ` · ${finalesPerdidas} ${finalesPerdidas === 1 ? "perdida" : "perdidas"}` : "")
+    );
+  }
+  if (!chips.length) return null;
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <ul className="flex flex-wrap gap-1.5">
+        {chips.map((c) => (
+          <li key={c} className="font-cond rounded-sm bg-raised px-2 py-1 text-[0.6875rem] text-chalk-2">
+            {c}
+          </li>
+        ))}
+      </ul>
+      {finalesGanadas + finalesPerdidas > 0 && (
+        <p className="text-[0.6875rem] text-chalk-3">Las finales perdidas constan desde la edición 19.</p>
+      )}
+    </div>
+  );
+}
+
+/** Goles en cada jornada de una edición. Una serie: barras en tiza. */
+function GolesPorJornada({ filas }: { filas: { jornada: number; goles: number }[] }) {
+  const max = Math.max(1, ...filas.map((f) => f.goles));
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex h-20 items-end gap-1.5">
+        {filas.map((f) => (
+          <div key={f.jornada} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
+            <span className="tnum font-data text-[0.6875rem] text-chalk-2">{f.goles}</span>
+            <span
+              className="block w-full rounded-t-[4px] bg-chalk"
+              style={{ height: f.goles ? `${(f.goles / max) * 100}%` : "2px", opacity: f.goles ? 1 : 0.3 }}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-1.5" aria-hidden>
+        {filas.map((f) => (
+          <span key={f.jornada} className="font-data flex-1 text-center text-[0.625rem] text-chalk-3">
+            J{f.jornada}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ListaRivales({ rivales, unidad }: { rivales: RivalPerfil[]; unidad: string }) {
+  return (
+    <ol className="flex flex-col">
+      {rivales.map((r, i) => (
+        <li key={`${r.slug ?? r.nombre}-${i}`} className="flex items-baseline justify-between gap-3 border-t border-line py-2 first:border-t-0">
+          {r.slug ? (
+            <Link to={`/jugador/${r.slug}`} className="truncate text-sm text-chalk hover:underline">
+              {r.nombre}
+            </Link>
+          ) : (
+            <span className="truncate text-sm text-chalk">{r.nombre}</span>
+          )}
+          <span className="tnum font-data shrink-0 text-sm font-bold text-chalk">
+            {r.goles}
+            <span className="ml-1 text-[0.625rem] font-normal text-chalk-3">{unidad}</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/**
+ * Lo que dicen los partidos anotados: cuándo marca, a quién, cómo cobra.
+ * Cada recuadro aparece solo si tiene algo que contar.
+ */
+function DetalleDePartidos({
+  detalle,
+  trayectoria,
+  conSede,
+  esArquero,
+}: {
+  detalle: DetallePartidos;
+  trayectoria: TramoTrayectoria[];
+  conSede: boolean;
+  esArquero: boolean;
+}) {
+  const { sedes } = useSede();
+  const { goles, penales, racha, mejorSesion } = detalle;
+  const enPlayoffs = goles.cuartos + goles.semifinal + goles.final;
+  const tirados = penales.convertidos + penales.fallados;
+  const amarillas = Object.entries(detalle.amarillas).sort(([, a], [, b]) => b - a);
+
+  return (
+    <>
+      {((!esArquero && (goles.regular > 0 || enPlayoffs > 0)) || tirados > 0) && (
+        <Panel titulo="Cuando más importa" nota="Desde la edición 19">
+          {!esArquero && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <Cifra valor={goles.regular} etiqueta="Fase regular" />
+              <Cifra valor={goles.cuartos} etiqueta="Cuartos" />
+              <Cifra valor={goles.semifinal} etiqueta="Semifinales" />
+              <Cifra valor={goles.final} etiqueta="Finales" />
+            </div>
+          )}
+          {tirados > 0 && (
+            <p className={`text-sm text-chalk-2 ${esArquero ? "" : "mt-3"}`}>
+              Penales en tandas:{" "}
+              <span className="tnum font-data text-chalk">
+                {penales.convertidos} de {tirados}
+              </span>{" "}
+              convertidos
+            </p>
+          )}
+        </Panel>
+      )}
+
+      {!esArquero && (mejorSesion || racha.mejor > 1) && (
+        <Panel titulo="Récords personales" nota="Desde la edición 19">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {mejorSesion && <Cifra valor={mejorSesion.goles} etiqueta="Mejor sesión" />}
+            {racha.mejor > 1 && <Cifra valor={racha.mejor} etiqueta="Mejor racha" />}
+            {racha.actual > 1 && <Cifra valor={racha.actual} etiqueta="Racha actual" />}
+          </div>
+          <p className="mt-3 text-[0.6875rem] text-chalk-3">
+            {mejorSesion && <>Su mejor sesión, {mejorSesion.goles} {mejorSesion.goles === 1 ? "gol" : "goles"}: {textoSesion(mejorSesion, trayectoria, sedes, conSede)}. </>}
+            {racha.mejor > 1 && "La racha cuenta sesiones seguidas marcando."}
+          </p>
+        </Panel>
+      )}
+
+      {!esArquero && detalle.victimas.length > 0 && (
+        <Panel titulo="Los arqueros a los que más les marca">
+          <ListaRivales rivales={detalle.victimas} unidad="goles" />
+        </Panel>
+      )}
+
+      {detalle.verdugos.length > 0 && (
+        <Panel titulo="Quién le marca más" nota="Como arquero">
+          <ListaRivales rivales={detalle.verdugos} unidad="goles" />
+        </Panel>
+      )}
+
+      {(amarillas.length > 0 || detalle.rojas > 0) && (
+        <Panel titulo="Disciplina" nota="Desde la edición 19">
+          <ul className="flex flex-col">
+            {amarillas.map(([razon, n]) => (
+              <li key={razon} className="flex items-baseline justify-between gap-3 border-t border-line py-2 first:border-t-0">
+                <span className="flex items-center gap-2 text-sm text-chalk-2">
+                  <span aria-hidden className="h-3 w-2 rounded-[2px] bg-amarilla" />
+                  {RAZON_LABEL[razon as RazonAmarilla] ?? razon}
+                </span>
+                <span className="tnum font-data text-sm font-bold text-chalk">{n}</span>
+              </li>
+            ))}
+            {detalle.rojas > 0 && (
+              <li className="flex items-baseline justify-between gap-3 border-t border-line py-2 first:border-t-0">
+                <span className="flex items-center gap-2 text-sm text-chalk-2">
+                  <span aria-hidden className="h-3 w-2 rounded-[2px] bg-roja" />
+                  Rojas
+                </span>
+                <span className="tnum font-data text-sm font-bold text-chalk">{detalle.rojas}</span>
+              </li>
+            )}
+          </ul>
+        </Panel>
+      )}
+    </>
+  );
+}
+
+function Companeros({ companeros }: { companeros: PerfilJugador["companeros"] }) {
+  return (
+    <Panel titulo="Compañeros de equipo" nota="Más de una edición juntos">
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {companeros.map((c) => {
+          const foto = fotoJugadorPorArchivo(c.foto_archivo);
+          return (
+            <li key={c.slug}>
+              <Link
+                to={`/jugador/${c.slug}`}
+                className="flex items-center gap-2.5 rounded-sm bg-raised p-2 transition-colors hover:bg-line"
+              >
+                <span className="size-9 shrink-0 overflow-hidden rounded-sm bg-surface">
+                  {foto ? (
+                    <img src={foto} alt="" className="size-full object-cover object-top" />
+                  ) : (
+                    <span className="font-cond grid size-full place-items-center text-sm text-chalk-3">
+                      {c.nombre.charAt(0)}
+                    </span>
+                  )}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm text-chalk">{c.nombre}</span>
+                  <span className="font-cond block text-[0.625rem] text-chalk-3">
+                    {c.ediciones.length} ediciones juntos
+                  </span>
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </Panel>
+  );
+}
+
+function FilaTrayectoria({
+  t,
+  conSede,
+  mejor,
+}: {
+  t: TramoTrayectoria;
+  conSede: boolean;
+  /** Su edición con más goles: se marca para que salte a la vista. */
+  mejor: boolean;
+}) {
   const { sedes } = useSede();
   const s = t.stats.length ? sumar(t.stats) : null;
   return (
@@ -215,6 +483,11 @@ function FilaTrayectoria({ t, conSede }: { t: TramoTrayectoria; conSede: boolean
           {t.tematica && <span className="truncate text-chalk-3">· {t.tematica}</span>}
           {t.campeon && (
             <FaStar aria-label="Campeón" className="size-3 shrink-0 text-chalk-2" />
+          )}
+          {mejor && (
+            <span className="font-cond shrink-0 rounded-sm bg-chalk px-1.5 py-0.5 text-[0.5625rem] text-ink">
+              Mejor edición
+            </span>
           )}
         </span>
         <span className="tnum font-data shrink-0 text-sm font-bold text-chalk">
@@ -235,6 +508,18 @@ function FilaTrayectoria({ t, conSede }: { t: TramoTrayectoria; conSede: boolean
             {t.equipo.nombre}
           </span>
         )}
+        {t.dorsal != null && (
+          <Link to={`/dorsales/${t.edicion}/${t.dorsal}`} className="font-data hover:text-chalk">
+            · #{t.dorsal}
+          </Link>
+        )}
+        {t.puesto_equipo && (
+          <span>
+            · {t.puesto_equipo.posicion}º de {t.puesto_equipo.de}
+          </span>
+        )}
+        {t.campeon && <span>· Campeón</span>}
+        {t.subcampeon && <span>· Subcampeón</span>}
         {t.es_capitan && <span>· Capitán</span>}
         {t.es_arquero && <span>· Arquero</span>}
         {t.posicion_goleo != null && <span>· {t.posicion_goleo}º goleador</span>}
@@ -279,13 +564,25 @@ export function PerfilJugadorPage() {
     );
   }
 
-  const { jugador, palmares, trayectoria } = perfil;
+  const { jugador, palmares, trayectoria, detalle, companeros } = perfil;
   const foto = fotoJugadorPorArchivo(jugador.foto_archivo);
   const esArquero = jugador.posicion === "arquero";
   const recibidosCarrera = trayectoria.reduce((n, t) => n + (t.recibidos ?? 0), 0);
   const premios = palmares.filter((p) => p.tipo !== "goles_historicos" && p.cantidad > 0);
   const conSede = mezclaSedes(trayectoria);
   const premiosEnVariasSedes = mezclaSedes(premios);
+
+  const dorsalActual = enJuego ? perfil.dorsales.find((d) => d.edicion === enJuego.edicion) : undefined;
+  const jornadasActuales = enJuego
+    ? (detalle?.porJornada ?? []).filter((f) => f.edicion === enJuego.edicion)
+    : [];
+  // Su edición con más goles, si se destaca de alguna manera: con una sola
+  // edición, o con todas en cero, marcarla no dice nada.
+  const conGoles = trayectoria.filter((t) => t.goles > 0 && t.recibidos == null);
+  const mejorEdicion =
+    !esArquero && conGoles.length > 1
+      ? conGoles.reduce((a, b) => (b.goles > a.goles ? b : a)).edicion
+      : null;
 
   const edicionesDe = (p: (typeof premios)[number]): string[] => {
     if (p.detalle) return p.detalle.split(",").map((x) => x.trim()).filter(Boolean);
@@ -323,6 +620,17 @@ export function PerfilJugadorPage() {
             <p className="font-cond mt-1 text-[0.6875rem] text-chalk-3">
               {ETIQUETA_POSICION[jugador.posicion]}
               {jugador.es_fundador ? " · Fundador" : ""}
+              {enJuego?.dorsal != null && (
+                <>
+                  {" · "}
+                  <Link
+                    to={`/dorsales/${enJuego.edicion}/${enJuego.dorsal}`}
+                    className="font-data text-chalk-2 hover:text-chalk"
+                  >
+                    #{enJuego.dorsal}
+                  </Link>
+                </>
+              )}
             </p>
             {jugador.ligas_ganadas > 0 && (
               <div className="mt-2 flex flex-wrap gap-0.5" aria-label={`${jugador.ligas_ganadas} títulos`}>
@@ -357,6 +665,8 @@ export function PerfilJugadorPage() {
             ))}
           </div>
         )}
+
+        <EnLaHistoria perfil={perfil} />
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
           <div className="flex flex-col gap-4">
@@ -398,6 +708,32 @@ export function PerfilJugadorPage() {
                     />
                   </div>
                 )}
+
+                {dorsalActual && (
+                  <p className="mt-3 text-sm text-chalk-2">
+                    Con el{" "}
+                    <Link
+                      to={`/dorsales/${dorsalActual.edicion}/${dorsalActual.dorsal}`}
+                      className="font-data text-chalk hover:underline"
+                    >
+                      #{dorsalActual.dorsal}
+                    </Link>
+                    : <span className="tnum font-data text-chalk">{dorsalActual.puesto}º</span> en goles de{" "}
+                    {dorsalActual.de} que lo llevan
+                    {dorsalActual.lider && dorsalActual.puesto > 1 && (
+                      <span className="text-chalk-3">
+                        {" "}· lidera {dorsalActual.lider.nombre} ({dorsalActual.lider.goles})
+                      </span>
+                    )}
+                  </p>
+                )}
+
+                {jornadasActuales.length > 1 && !actual.arquero && (
+                  <div className="mt-4">
+                    <p className="font-cond mb-2 text-[0.6875rem] text-chalk-3">Goles por jornada</p>
+                    <GolesPorJornada filas={jornadasActuales} />
+                  </div>
+                )}
               </Panel>
             )}
 
@@ -407,13 +743,24 @@ export function PerfilJugadorPage() {
               </Panel>
             )}
 
+            {detalle && (
+              <DetalleDePartidos
+                detalle={detalle}
+                trayectoria={trayectoria}
+                conSede={conSede}
+                esArquero={esArquero}
+              />
+            )}
+
+            {companeros.length > 0 && <Companeros companeros={companeros} />}
+
           </div>
 
           <Panel titulo="Trayectoria">
             {trayectoria.length ? (
               <ul>
                 {trayectoria.map((t) => (
-                  <FilaTrayectoria key={t.edicion} t={t} conSede={conSede} />
+                  <FilaTrayectoria key={t.edicion} t={t} conSede={conSede} mejor={t.edicion === mejorEdicion} />
                 ))}
               </ul>
             ) : (

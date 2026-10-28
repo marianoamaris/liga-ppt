@@ -2,12 +2,12 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-import { sedesApi } from "../lib/api";
+import { useConsulta } from "../lib/cache";
+import { consultas } from "../lib/consultas";
 import { CLAVE_SEDE, SEDE_POR_DEFECTO } from "../config";
 import type { Sede } from "../types/jugador";
 
@@ -53,38 +53,21 @@ function sedeGuardada(): string {
   }
 }
 
+const SIN_SEDES: Sede[] = [];
+
 export function SedeProvider({ children }: { children: ReactNode }) {
-  const [sedes, setSedes] = useState<Sede[]>([]);
-  const [sedeId, setSedeId] = useState<string>(sedeGuardada);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Por la caché, como todo: el provider se monta una sola vez, pero así las
+  // sedes se revalidan al volver a la pestaña pasado un rato, y una edición
+  // recién abierta aparece sin tener que recargar la página.
+  const { datos, loading, error } = useConsulta(consultas.sedes());
+  const sedes = datos?.sedes ?? SIN_SEDES;
+  const [elegida, setSedeId] = useState<string>(sedeGuardada);
 
-  useEffect(() => {
-    let cancelado = false;
-
-    sedesApi
-      .list()
-      .then((r) => {
-        if (cancelado) return;
-        setSedes(r.sedes);
-        // La sede guardada puede haberse desactivado o no existir ya.
-        setSedeId((actual) =>
-          r.sedes.some((s) => s.id === actual)
-            ? actual
-            : r.sedes[0]?.id ?? SEDE_POR_DEFECTO
-        );
-        setLoading(false);
-      })
-      .catch((e: unknown) => {
-        if (cancelado) return;
-        setError(e instanceof Error ? e.message : "No se pudieron cargar las sedes");
-        setLoading(false);
-      });
-
-    return () => {
-      cancelado = true;
-    };
-  }, []);
+  // La sede guardada puede haberse desactivado o no existir ya.
+  const sedeId =
+    !sedes.length || sedes.some((s) => s.id === elegida)
+      ? elegida
+      : sedes[0]?.id ?? SEDE_POR_DEFECTO;
 
   const cambiarSede = useCallback((id: string) => {
     setSedeId(id);

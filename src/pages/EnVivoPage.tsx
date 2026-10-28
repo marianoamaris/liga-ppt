@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useMemo, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { edicionesApi, partidosApi, statsApi, type Partido, type Standing, type Goleador, type Arquero, type JugadorDisciplina } from "../lib/api";
+import type { Partido, Standing, Goleador, Arquero, JugadorDisciplina } from "../lib/api";
 import { clienteSupabase } from "../lib/supabase";
+import { guardado, mutar, useConsulta } from "../lib/cache";
+import { consultas, invalidarDerivados } from "../lib/consultas";
 import { getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
 import { useSede } from "../context/SedeContext";
 import { useEdicion, useEquiposEdicion } from "../hooks/useCatalogo";
@@ -1395,19 +1397,11 @@ type FiltroCancha = "todas" | 1 | 2 | 3;
 
 type Tab = "en-vivo" | "torneo-regular" | "playoff";
 
+const SIN_FILAS: never[] = [];
+
 export function EnVivoPage() {
   const [tab, setTab]                   = useState<Tab>("en-vivo");
-  const [partidos, setPartidos]         = useState<Partido[]>([]);
-  const [baseStandings, setBase]        = useState<Standing[]>([]);
-  const [goleadores, setGoleadores]     = useState<Goleador[]>([]);
-  const [arqueros, setArqueros]         = useState<Arquero[]>([]);
-  const [disciplina, setDisciplina]     = useState<JugadorDisciplina[]>([]);
-  const [playoffs, setPlayoffs]         = useState<PartidoPlayoff[]>([]);
-  const [loadingPlayoffs, setLoadingPlayoffs] = useState(true);
   const [filtro, setFiltro]             = useState<FiltroCancha>("todas");
-  const [loadingMatch, setLoadingMatch] = useState(true);
-  const [loadingStats, setLoadingStats] = useState(true);
-  const [loadingRankings, setLoadingRankings] = useState(true);
   const [lastUpdate, setLastUpdate]     = useState<Date | null>(null);
   const { sede, sedeId, edicionActual, numeroSede }  = useSede();
   const { equipos, sede_id: sedeDeLosEquipos, locales: catalogo, colorDe, loading: loadingEquipos } =
@@ -1425,158 +1419,88 @@ export function EnVivoPage() {
    */
   const edicionArrancada =
     edicionActual != null && sedeDeLosEquipos === sedeId && equipos.length > 0;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const channelRef = useRef<any>(null);
+  const edicion = edicionArrancada ? edicionActual : null;
 
   /**
-   * Mete en el marcador la fila que acaba de llegar por Realtime.
+   * Los datos salen de la caché compartida (`lib/cache.ts`), no de estado
+   * propio. Antes esta pantalla los tiraba al salir y los volvía a pedir todos
+   * al entrar, y pedía por su lado la misma tabla y los mismos goleadores que
+   * acababa de pedir el Inicio. Ahora volver aquí pinta al instante lo que ya
+   * se tenía y solo refresca lo que esté viejo.
    *
-   * El aviso ya trae el partido entero —la tabla está en `REPLICA IDENTITY
-   * FULL`, así que viaja la fila completa con sus eventos— y hasta ahora se
-   * tiraba para volver a pedir lo mismo por HTTP. Aplicarla directamente hace
-   * que el gol aparezca sin un solo viaje de red: en cuanto el anotador toca el
-   * botón, está en pantalla.
-   *
-   * Los rankings sí siguen viniendo del servidor, porque son agregados de toda
-   * la edición y no se pueden recalcular desde una fila suelta. Pero ahí un
-   * segundo de retraso no lo ve nadie; el marcador sí.
+   * Sin edición arrancada las consultas son `null`: no se pide nada.
    */
-  function aplicarCambioEnVivo(
-    edicion: number,
-    payload: { eventType?: string; new?: unknown; old?: unknown }
-  ) {
-    const fila = payload.new as Partido | undefined;
-    const anterior = payload.old as { id?: string } | undefined;
+  const consultaDirecto = edicion == null ? null : consultas.enVivo(edicion);
+  // Hay partido según lo que ya está en la caché: decide si se abre Realtime y
+  // con qué frescura se piden la tabla y los rankings.
+  const vivo = !!consultaDirecto && (guardado<Partido[]>(consultaDirecto.clave)?.length ?? 0) > 0;
 
-    if (payload.eventType === "DELETE") {
-      if (anterior?.id) setPartidos((ps) => ps.filter((p) => p.id !== anterior.id));
-      return;
-    }
-    if (!fila?.id || fila.temporada !== edicion) return;
+  /**
+   * Sin partido en curso se mira cada minuto si empezó uno: es una consulta
+   * barata. Con partido, Realtime pinta cada gol y este sondeo es solo la red
+   * de seguridad por si el canal se cae.
+   */
+  const directo = useConsulta(consultaDirecto, { refrescoMs: vivo ? 30_000 : 60_000 });
+  const seguro = { refrescoMs: vivo ? 30_000 : undefined };
+  const tabla = useConsulta(edicion == null ? null : consultas.clasificacion(edicion, vivo), seguro);
+  const gol = useConsulta(edicion == null ? null : consultas.goleadores(edicion, vivo), seguro);
+  const arq = useConsulta(edicion == null ? null : consultas.arqueros(edicion, vivo), seguro);
+  const disc = useConsulta(edicion == null ? null : consultas.disciplina(edicion, vivo), seguro);
+  // El cuadro final sale de `/historico`, bastante más pesado que el resto: solo
+  // con la pestaña abierta. Antes se repetía cada diez segundos aunque no se
+  // jugara nada; ahora lo refrescan los avisos de Realtime al invalidar.
+  const historico = useConsulta(
+    edicion != null && tab === "playoff" ? consultas.historico(edicion) : null,
+    seguro
+  );
 
-    setPartidos((ps) => {
-      const resto = ps.filter((p) => p.id !== fila.id);
-      // Un partido finalizado sale del directo; es el mismo criterio que usa
-      // la consulta de /en-vivo.
-      if (fila.finalizado_en) return resto;
-      return [...resto, fila].sort(
-        (a, b) => new Date(a.iniciado_en).getTime() - new Date(b.iniciado_en).getTime()
-      );
-    });
-    setLastUpdate(new Date());
-    setLoadingMatch(false);
-  }
-
-  async function fetchActivos(edicion: number) {
-    try {
-      const { enVivo } = await partidosApi.getEnVivo(edicion);
-      const activos = enVivo
+  const partidos = useMemo(
+    () =>
+      (directo.datos ?? [])
         .filter((p) => !p.finalizado_en)
-        .sort((a, b) => new Date(a.iniciado_en).getTime() - new Date(b.iniciado_en).getTime());
-      setPartidos(activos);
-      setLastUpdate(new Date());
-    } catch (err) {
-      console.error("En Vivo fetch:", err);
-    } finally {
-      setLoadingMatch(false);
-    }
-  }
+        .sort((a, b) => new Date(a.iniciado_en).getTime() - new Date(b.iniciado_en).getTime()),
+    [directo.datos]
+  );
+  const baseStandings = tabla.datos ?? SIN_FILAS;
+  const goleadores = gol.datos ?? SIN_FILAS;
+  const arqueros = arq.datos ?? SIN_FILAS;
+  const disciplina = disc.datos ?? SIN_FILAS;
+  const playoffs = historico.datos?.playoffs ?? SIN_FILAS;
 
-  async function fetchStandings(edicion: number) {
-    try {
-      const { standings } = await statsApi.clasificacion(edicion);
-      setBase(standings);
-    } catch {
-      // silent
-    } finally {
-      setLoadingStats(false);
-    }
-  }
+  // Mientras cargan los equipos todavía no se sabe si hay edición: se enseña
+  // el esqueleto, no «no hay partidos».
+  const cargandoEdicion = loadingEquipos && edicionActual != null;
+  const loadingMatch = cargandoEdicion || directo.loading;
+  const loadingStats = cargandoEdicion || tabla.loading;
+  const loadingRankings = cargandoEdicion || gol.loading || arq.loading || disc.loading;
+  const loadingPlayoffs = cargandoEdicion || historico.loading;
 
-  async function fetchRankings(edicion: number) {
-    try {
-      const [{ goleadores: g }, { arqueros: a }, { disciplina: d }] = await Promise.all([
-        statsApi.goleadores(edicion),
-        statsApi.arqueros(edicion),
-        statsApi.disciplina(edicion),
-      ]);
-      setGoleadores(g);
-      setArqueros(a);
-      setDisciplina(d);
-    } catch {
-      // silent
-    } finally {
-      setLoadingRankings(false);
-    }
-  }
+  useEffect(() => {
+    if (directo.datos) setLastUpdate(new Date());
+  }, [directo.datos]);
+
+  // Cuando un partido empieza o termina, lo calculado ya no vale: la tabla del
+  // cierre de jornada tiene que verse sin esperar a que caduque.
+  const ids = partidos.map((p) => p.id).join(",");
+  const idsPrevios = useRef<string | null>(null);
+  useEffect(() => {
+    if (edicion == null || directo.datos === undefined) return;
+    if (idsPrevios.current != null && idsPrevios.current !== ids) invalidarDerivados(edicion);
+    idsPrevios.current = ids;
+  }, [edicion, ids, directo.datos]);
 
   /**
-   * El cuadro final se pide aparte y solo con la pestaña abierta: sale de
-   * `/historico`, que es una consulta bastante más pesada que las del directo
-   * y no tendría sentido repetirla cada 8s para una pantalla que nadie mira.
+   * Realtime, solo con partido en curso.
+   *
+   * Mientras haya alguien suscrito, Supabase lee el registro de cambios de la
+   * base en bucle. Abrir el canal toda la semana para avisar de goles que solo
+   * pasan el jueves por la tarde y en las finales del domingo es gastar en
+   * nada: el sondeo de un minuto detecta que empezó un partido y entonces se
+   * abre. No depende del calendario, así que una fecha movida no lo rompe.
    */
   useEffect(() => {
-    if (!edicionArrancada || tab !== "playoff") return;
-
-    const edicion = edicionActual;
-    let vigente = true;
-
-    const traer = async () => {
-      try {
-        const historico = await edicionesApi.historico(edicion);
-        if (vigente) setPlayoffs(historico.playoffs ?? []);
-      } catch {
-        // silent
-      } finally {
-        if (vigente) setLoadingPlayoffs(false);
-      }
-    };
-
-    traer();
-    const intervalo = setInterval(traer, 10_000);
-    return () => {
-      vigente = false;
-      clearInterval(intervalo);
-    };
-  }, [edicionActual, edicionArrancada, tab]);
-
-  useEffect(() => {
-    // Si la ciudad no está jugando no se pide nada, no se hace polling cada 8s
-    // y no se abre el canal de Realtime. Antes esta pantalla sondeaba la API
-    // indefinidamente aunque no hubiera absolutamente nada que mostrar.
-    if (!edicionArrancada) {
-      setPartidos([]);
-      setBase([]);
-      setGoleadores([]);
-      setArqueros([]);
-      setDisciplina([]);
-      setPlayoffs([]);
-      setLoadingMatch(false);
-      setLoadingStats(false);
-      setLoadingRankings(false);
-      setLoadingPlayoffs(false);
-      return;
-    }
-
-    const edicion = edicionActual;
-    const refrescar = () => {
-      fetchActivos(edicion);
-      fetchStandings(edicion);
-      fetchRankings(edicion);
-    };
-
-    refrescar();
-
-    /**
-     * El sondeo es la red de seguridad, no el mecanismo.
-     *
-     * Cada vuelta son cinco peticiones, así que a ocho segundos eran unas 37
-     * por minuto y pestaña: batería y datos del móvil de quien está viendo el
-     * partido. Ahora que Realtime pinta el marcador al instante y refresca los
-     * rankings detrás, esto solo tiene que cubrir el caso de que el canal se
-     * caiga —y para eso medio minuto sobra.
-     */
-    const intervalo = setInterval(refrescar, 30_000);
+    if (edicion == null || !vivo) return;
+    const clave = consultas.enVivo(edicion).clave;
 
     /**
      * Los rankings, agrupados.
@@ -1588,34 +1512,48 @@ export function EnVivoPage() {
     let pendiente: ReturnType<typeof setTimeout> | null = null;
     const refrescarDerivados = () => {
       if (pendiente) clearTimeout(pendiente);
-      pendiente = setTimeout(() => {
-        fetchStandings(edicion);
-        fetchRankings(edicion);
-      }, 1_200);
+      pendiente = setTimeout(() => invalidarDerivados(edicion), 1_200);
     };
 
-    // Realtime: el cliente llega por importación diferida, así que puede
-    // resolverse después de que la pantalla ya se haya ido; `vivo` evita dejar
-    // un canal abierto contra un componente desmontado.
-    let vivo = true;
+    /**
+     * Mete en el marcador la fila que acaba de llegar por Realtime.
+     *
+     * El aviso ya trae el partido entero —la tabla está en `REPLICA IDENTITY
+     * FULL`, así que viaja la fila completa con sus eventos—. Se escribe en la
+     * caché y no en estado propio, para que el Inicio lo vea igual. Un partido
+     * finalizado sale del directo: es el mismo criterio que usa `/en-vivo`.
+     */
+    const aplicar = (payload: { eventType?: string; new?: unknown; old?: unknown }) => {
+      const fila = payload.new as Partido | undefined;
+      const anterior = payload.old as { id?: string } | undefined;
+      if (payload.eventType === "DELETE") {
+        if (anterior?.id) mutar<Partido[]>(clave, (ps = []) => ps.filter((p) => p.id !== anterior.id));
+        return;
+      }
+      if (!fila?.id || fila.temporada !== edicion) return;
+      mutar<Partido[]>(clave, (ps = []) => {
+        const resto = ps.filter((p) => p.id !== fila.id);
+        return fila.finalizado_en ? resto : [...resto, fila];
+      });
+    };
+
+    let vigente = true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let canal: any = null;
+    // El cliente llega por importación diferida, así que puede resolverse
+    // después de que la pantalla ya se haya ido; `vigente` evita dejar un canal
+    // abierto contra un componente desmontado.
     clienteSupabase().then((cliente) => {
-      if (!vivo || !cliente) return;
-      channelRef.current = cliente
+      if (!vigente || !cliente) return;
+      canal = cliente
         .channel(`en-vivo-${edicion}`)
         .on(
           "postgres_changes",
           // Solo esta edición: sin el filtro, un partido de Bogotá hacía
           // refrescar cinco endpoints a quien estuviera viendo Valledupar.
-          {
-            event: "*",
-            schema: "public",
-            table: "partidos",
-            filter: `temporada=eq.${edicion}`,
-          },
+          { event: "*", schema: "public", table: "partidos", filter: `temporada=eq.${edicion}` },
           (payload) => {
-            // El marcador, de la fila que ya viene en el aviso. Cero red.
-            aplicarCambioEnVivo(edicion, payload);
-            // Los agregados, del servidor, y sin prisa.
+            aplicar(payload);
             refrescarDerivados();
           }
         )
@@ -1623,13 +1561,11 @@ export function EnVivoPage() {
     });
 
     return () => {
-      vivo = false;
-      clearInterval(intervalo);
+      vigente = false;
       if (pendiente) clearTimeout(pendiente);
-      channelRef.current?.unsubscribe();
-      channelRef.current = null;
+      canal?.unsubscribe();
     };
-  }, [edicionActual, edicionArrancada]);
+  }, [edicion, vivo]);
 
   // Canchas numeradas por orden de inicio
   const canchas = partidos.slice(0, 3);

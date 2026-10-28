@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  partidosApi,
-  statsApi,
-  type Arquero,
-  type Goleador,
-  type Partido,
-  type Standing,
-} from "../lib/api";
+import { useEffect, useMemo, useRef } from "react";
+import type { Arquero, Goleador, Partido, Standing } from "../lib/api";
+import { guardado, useConsulta } from "../lib/cache";
+import { consultas, invalidarDerivados } from "../lib/consultas";
 import { useSede } from "../context/SedeContext";
 import { useEdiciones, useFinales, useJugadores } from "./useCatalogo";
 
-/** Cada cuánto se refresca el marcador del Inicio. */
-const REFRESCO_MS = 15_000;
+/**
+ * Cada cuánto se mira si hay partido. Preguntar por el directo es barato —una
+ * consulta a partidos sin terminar—, así que esto sigue corriendo siempre; lo
+ * caro, la tabla y los rankings, solo se sondea mientras se juega.
+ */
+const REFRESCO_CON_PARTIDO_MS = 15_000;
+const REFRESCO_SIN_PARTIDO_MS = 60_000;
 
 interface EstadoInicio {
   enVivo: Partido[];
@@ -22,74 +22,51 @@ interface EstadoInicio {
   error: string | null;
 }
 
+const SIN_PARTIDOS: Partido[] = [];
+const SIN_FILAS: never[] = [];
+
 /**
- * Datos de la edición en curso para el Inicio. Refresca en segundo plano
- * mientras hay partidos abiertos, para que el marcador no se quede viejo.
+ * Datos de la edición en curso para el Inicio.
+ *
+ * Antes pedía el directo, la tabla, los goleadores y los arqueros cada quince
+ * segundos a cualquier hora, aunque fuera martes y no se jugara nada. Ahora la
+ * tabla y los rankings salen de la caché —los mismos que usa En Vivo— y solo
+ * se sondean con partido en curso.
  */
 function useEdicionEnCurso(edicion: number | null): EstadoInicio {
-  const [estado, setEstado] = useState<EstadoInicio>({
-    enVivo: [],
-    standings: [],
-    goleadores: [],
-    arqueros: [],
-    loading: true,
-    error: null,
+  // El intervalo depende de lo que devuelve la propia consulta: en cuanto
+  // aparece un partido, se pasa a mirar cada quince segundos. Se lee de la
+  // caché en el render, que es lo mismo que va a devolver `useConsulta`.
+  const consultaDirecto = edicion == null ? null : consultas.enVivo(edicion);
+  const vivo = !!consultaDirecto && (guardado<Partido[]>(consultaDirecto.clave)?.length ?? 0) > 0;
+  const directo = useConsulta(consultaDirecto, {
+    refrescoMs: vivo ? REFRESCO_CON_PARTIDO_MS : REFRESCO_SIN_PARTIDO_MS,
   });
+  const enVivo = directo.datos ?? SIN_PARTIDOS;
 
+  const refresco = { refrescoMs: vivo ? REFRESCO_CON_PARTIDO_MS : undefined };
+  const tabla = useConsulta(edicion == null ? null : consultas.clasificacion(edicion, vivo), refresco);
+  const gol = useConsulta(edicion == null ? null : consultas.goleadores(edicion, vivo), refresco);
+  const arq = useConsulta(edicion == null ? null : consultas.arqueros(edicion, vivo), refresco);
+
+  // Cuando un partido empieza o termina, lo calculado ya no vale: la tabla del
+  // cierre de jornada tiene que verse sin esperar a que caduque.
+  const ids = enVivo.map((p) => p.id).join(",");
+  const idsPrevios = useRef<string | null>(null);
   useEffect(() => {
-    let cancelado = false;
+    if (edicion == null || directo.datos === undefined) return;
+    if (idsPrevios.current != null && idsPrevios.current !== ids) invalidarDerivados(edicion);
+    idsPrevios.current = ids;
+  }, [edicion, ids, directo.datos]);
 
-    // Sin edición en curso no hay nada que pedir. `loading` se apaga igual: si
-    // esta ciudad no tiene liga abierta, quedarse cargando para siempre haría
-    // parecer que la petición nunca vuelve.
-    if (edicion == null) {
-      setEstado({
-        enVivo: [],
-        standings: [],
-        goleadores: [],
-        arqueros: [],
-        loading: false,
-        error: null,
-      });
-      return;
-    }
-
-    async function cargar(numero: number) {
-      try {
-        const [vivo, clasif, gol, arq] = await Promise.all([
-          partidosApi.getEnVivo(numero),
-          statsApi.clasificacion(numero),
-          statsApi.goleadores(numero),
-          statsApi.arqueros(numero),
-        ]);
-        if (cancelado) return;
-        setEstado({
-          enVivo: vivo.enVivo,
-          standings: clasif.standings,
-          goleadores: gol.goleadores,
-          arqueros: arq.arqueros,
-          loading: false,
-          error: null,
-        });
-      } catch (e) {
-        if (cancelado) return;
-        setEstado((s) => ({
-          ...s,
-          loading: false,
-          error: e instanceof Error ? e.message : "No se pudieron cargar los datos",
-        }));
-      }
-    }
-
-    cargar(edicion);
-    const id = setInterval(() => cargar(edicion), REFRESCO_MS);
-    return () => {
-      cancelado = true;
-      clearInterval(id);
-    };
-  }, [edicion]);
-
-  return estado;
+  return {
+    enVivo,
+    standings: tabla.datos ?? SIN_FILAS,
+    goleadores: gol.datos ?? SIN_FILAS,
+    arqueros: arq.datos ?? SIN_FILAS,
+    loading: directo.loading || tabla.loading || gol.loading || arq.loading,
+    error: directo.error ?? tabla.error ?? gol.error ?? arq.error,
+  };
 }
 
 /** Campeón de la última edición cerrada de la sede, con el marcador de su final. */

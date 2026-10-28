@@ -1,5 +1,5 @@
 import type { Evento } from "../components/anotador/types";
-import type { AnalisisEdicion, PerfilJugador } from "../types/analisis";
+import type { AnalisisEdicion, DorsalesEdicion, PerfilJugador } from "../types/analisis";
 import type {
   Edicion,
   EdicionEquipo,
@@ -17,6 +17,7 @@ import type {
   Posicion,
 } from "../types/jugador";
 import { clienteSupabase } from "./supabase";
+import { invalidar, invalidarEdicion } from "./cache";
 
 const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 const TOKEN_KEY = "ligappt_token";
@@ -256,7 +257,13 @@ export const ligasApi = {
       equipos: number;
       jugadores: number;
       creados: string[];
-    }>("/ediciones", { method: "POST", body: JSON.stringify(body) }),
+    }>("/ediciones", { method: "POST", body: JSON.stringify(body) }).then((r) => {
+      // Una liga nueva cambia la edición activa de la sede, el catálogo de
+      // ediciones y, si dio de alta a alguien, el padrón.
+      invalidar((clave) => /^(sedes|ediciones|jugadores):?/.test(clave));
+      invalidarEdicion(r.numero);
+      return r;
+    }),
 };
 
 export const plantillasApi = {
@@ -272,6 +279,10 @@ export const plantillasApi = {
     }>(`/ediciones/${edicion}/plantillas`, {
       method: "PUT",
       body: JSON.stringify({ equipos }),
+    }).then((r) => {
+      invalidarEdicion(edicion);
+      if (r.creados.length) invalidar((clave) => clave.startsWith("jugadores:"));
+      return r;
     }),
 };
 
@@ -378,6 +389,8 @@ export const edicionesApi = {
     }>(`/ediciones/${numero}/equipos`),
   /** Edición completa: tabla, jornadas, goleadores, arqueros y final. */
   historico: (numero: number) => req<HistoricoEdicion>(`/historico/${numero}`),
+  /** Quién lleva cada número del peto, con sus estadísticas de la edición. */
+  dorsales: (numero: number) => req<DorsalesEdicion>(`/ediciones/${numero}/dorsales`),
   plantillas: (numero: number) =>
     req<{
       edicion: number;
@@ -404,6 +417,18 @@ export const authApi = {
 
 // ── Partidos ──────────────────────────────────────────────────────────────────
 
+/**
+ * Tras escribir un partido, lo guardado de su edición en la caché ya no vale.
+ *
+ * Va aquí y no en cada pantalla para que ninguna escritura se olvide. Dar por
+ * viejo no cuesta red: solo se vuelve a pedir lo que alguien esté mirando, y lo
+ * demás cuando se vuelva a ello.
+ */
+function trasEscribir(p: Partido): Partido {
+  invalidarEdicion(p.temporada);
+  return p;
+}
+
 export const partidosApi = {
   create: (body: {
     temporada: number;
@@ -411,16 +436,16 @@ export const partidosApi = {
     jornada?: number;
     equipos: ApiEquipo[];
   }) =>
-    req<Partido>("/partidos", { method: "POST", body: JSON.stringify(body) }),
+    req<Partido>("/partidos", { method: "POST", body: JSON.stringify(body) }).then(trasEscribir),
 
   update: (id: string, eventos: Evento[]) =>
     req<Partido>(`/partidos/${id}`, {
       method: "PATCH",
       body: JSON.stringify({ eventos }),
-    }),
+    }).then(trasEscribir),
 
   finalizar: (id: string) =>
-    req<Partido>(`/partidos/${id}/finalizar`, { method: "PATCH" }),
+    req<Partido>(`/partidos/${id}/finalizar`, { method: "PATCH" }).then(trasEscribir),
 
   /**
    * `temporada` acota a una edición, y con ella a una ciudad. Sin el filtro la

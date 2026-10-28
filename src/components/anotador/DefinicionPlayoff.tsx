@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { statsApi, type Standing } from "../../lib/api";
+import { useState } from "react";
+import { useConsulta } from "../../lib/cache";
+import { consultas } from "../../lib/consultas";
 import { useSede } from "../../context/SedeContext";
 import { getColor, makeId } from "./utils";
 import { estadoTanda, TIROS_TANDA } from "./tandaPenales";
@@ -36,20 +37,11 @@ function Equipo({ eq, children }: { eq: EquipoEnCancha; children?: React.ReactNo
 
 function PorTabla({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo">) {
   const { edicionActual } = useSede();
-  const [standings, setStandings] = useState<Standing[] | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (edicionActual == null) return;
-    let vigente = true;
-    statsApi
-      .clasificacion(edicionActual)
-      .then(({ standings }) => vigente && setStandings(standings))
-      .catch(() => vigente && setError(true));
-    return () => {
-      vigente = false;
-    };
-  }, [edicionActual]);
+  // Fuera de la caché: tiene que ser la tabla de este momento, con el partido
+  // recién jugado dentro, no la que quedó guardada hace un minuto.
+  const consulta = edicionActual == null ? null : { ...consultas.clasificacion(edicionActual, true), frescoMs: 0 };
+  const { datos: standings = null, error: falloTabla } = useConsulta(consulta);
+  const error = !!falloTabla;
 
   const posicionDe = (id: string) => {
     const i = standings?.findIndex((s) => s.equipoId === id) ?? -1;

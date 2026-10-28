@@ -45,6 +45,9 @@ const CrearLigaPage = lazy(() =>
 const PerfilJugadorPage = lazy(() =>
   import("./pages/PerfilJugadorPage").then((m) => ({ default: m.PerfilJugadorPage }))
 );
+const DorsalesPage = lazy(() =>
+  import("./pages/DorsalesPage").then((m) => ({ default: m.DorsalesPage }))
+);
 const EnVivoPage = lazy(() =>
   import("./pages/EnVivoPage").then((m) => ({ default: m.EnVivoPage }))
 );
@@ -67,6 +70,8 @@ export const AppRouter = () => (
           <Route path="/clasificacion" element={<Clasificacion />} />
           <Route path="/historia" element={<Historia />} />
           <Route path="/jugador/:slug" element={<PerfilJugadorPage />} />
+          <Route path="/dorsales" element={<DorsalesPage />} />
+          <Route path="/dorsales/:edicion/:numero" element={<DorsalesPage />} />
           <Route path="/logros" element={<LogrosPage />} />
           <Route path="/anuncios" element={<AnunciosPage />} />
           <Route path="/patrocinadores" element={<PatrocinadoresPage />} />

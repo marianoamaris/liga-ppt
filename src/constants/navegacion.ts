@@ -7,6 +7,7 @@ import {
   FaHandshake,
   FaMedal,
   FaRankingStar,
+  FaShirt,
   FaSignal,
   FaUserPlus,
 } from "react-icons/fa6";
@@ -52,6 +53,7 @@ export const NAVEGACION: GrupoNav[] = [
     destinos: [
       { id: "historia", label: "Historia", path: "/historia", Icono: GiWhistle },
       { id: "logros", label: "Logros", path: "/logros", Icono: FaMedal },
+      { id: "dorsales", label: "Dorsales", path: "/dorsales", Icono: FaShirt },
     ],
   },
   {

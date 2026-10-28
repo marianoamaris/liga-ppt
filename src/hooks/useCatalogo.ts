@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { analisisApi, edicionesApi, jugadoresApi, palmaresApi, recordsApi } from "../lib/api";
+import { useMemo } from "react";
+import { useConsulta, type Consulta } from "../lib/cache";
+import { consultas } from "../lib/consultas";
 import type { AnalisisEdicion, PerfilJugador } from "../types/analisis";
 import {
   finalAHistorica,
@@ -21,43 +22,20 @@ import {
 } from "../types/jugador";
 import { camisetaEquipo } from "../utils/imagenesEquipos";
 
-interface Estado<T> {
-  datos: T;
-  loading: boolean;
-  error: string | null;
+/**
+ * Una consulta de la caché con un valor por defecto mientras no hay datos.
+ *
+ * `inicial` tiene que ser estable (una constante de módulo): se devuelve tal
+ * cual mientras carga, y un objeto nuevo en cada render haría recalcular todo
+ * lo que dependa de él.
+ */
+function useLectura<T>(consulta: Consulta<T> | null, inicial: T) {
+  const { datos, loading, error } = useConsulta(consulta);
+  return { datos: datos ?? inicial, loading, error };
 }
 
-/** Ejecuta una promesa y expone su estado, cancelando si el componente se desmonta. */
-function useAsync<T>(fn: () => Promise<T>, inicial: T, deps: unknown[]): Estado<T> {
-  const [estado, setEstado] = useState<Estado<T>>({
-    datos: inicial,
-    loading: true,
-    error: null,
-  });
-
-  useEffect(() => {
-    let cancelado = false;
-    setEstado((e) => ({ ...e, loading: true, error: null }));
-    fn()
-      .then((datos) => {
-        if (!cancelado) setEstado({ datos, loading: false, error: null });
-      })
-      .catch((e: unknown) => {
-        if (cancelado) return;
-        setEstado({
-          datos: inicial,
-          loading: false,
-          error: e instanceof Error ? e.message : "Error al cargar datos",
-        });
-      });
-    return () => {
-      cancelado = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-
-  return estado;
-}
+const SIN_FILAS: never[] = [];
+const SIN_GRUPOS = {} as Record<string, never[]>;
 
 /**
  * Padrón de jugadores. Por defecto solo los activos y de identidad confirmada.
@@ -70,17 +48,9 @@ export function useJugadores(
   opciones: { incluirInciertos?: boolean; sede?: string } = {}
 ) {
   const { incluirInciertos = false, sede } = opciones;
-  const { datos, loading, error } = useAsync<Jugador[]>(
-    () =>
-      jugadoresApi
-        .list({
-          activo: incluirInciertos ? "todos" : "true",
-          inciertos: incluirInciertos,
-          ...(sede ? { sede } : {}),
-        })
-        .then((r) => r.jugadores),
-    [],
-    [incluirInciertos, sede]
+  const { datos, loading, error } = useLectura<Jugador[]>(
+    consultas.jugadores({ incluirInciertos, sede }),
+    SIN_FILAS
   );
 
   /** Misma forma que el antiguo `USUARIOS_LIGA`, para las vistas aún sin migrar. */
@@ -115,27 +85,18 @@ export function useJugadores(
  * de la liga, que es lo que muestran las vistas de récords.
  */
 export function useEdiciones(sede?: string) {
-  const { datos, loading, error } = useAsync<Edicion[]>(
-    () => edicionesApi.list(sede).then((r) => r.ediciones),
-    [],
-    [sede]
-  );
+  const { datos, loading, error } = useLectura<Edicion[]>(consultas.ediciones(sede), SIN_FILAS);
   return { ediciones: datos, loading, error };
 }
 
 /** Una edición concreta con sus equipos y su final. */
+const SIN_EDICION: { edicion: Edicion | null; equipos: EdicionEquipo[]; final: EdicionFinal | null } =
+  { edicion: null, equipos: [], final: null };
+
 export function useEdicion(numero: number | null) {
-  const { datos, loading, error } = useAsync<{
-    edicion: Edicion | null;
-    equipos: EdicionEquipo[];
-    final: EdicionFinal | null;
-  }>(
-    () =>
-      numero == null
-        ? Promise.resolve({ edicion: null, equipos: [], final: null })
-        : edicionesApi.get(numero),
-    { edicion: null, equipos: [], final: null },
-    [numero]
+  const { datos, loading, error } = useLectura(
+    numero == null ? null : consultas.edicion(numero),
+    SIN_EDICION
   );
 
   return { ...datos, loading, error };
@@ -146,11 +107,7 @@ export function useEdicion(numero: number | null) {
  * Con `sede` se limita a una ciudad.
  */
 export function useFinales(sede?: string) {
-  const { datos, loading, error } = useAsync<EdicionFinal[]>(
-    () => edicionesApi.finales(sede).then((r) => r.finales),
-    [],
-    [sede]
-  );
+  const { datos, loading, error } = useLectura<EdicionFinal[]>(consultas.finales(sede), SIN_FILAS);
 
   /** Misma forma que el antiguo `FINALES_HISTORICAS`, en orden ascendente. */
   const finales: FinalHistorica[] = useMemo(
@@ -166,20 +123,18 @@ export function useFinales(sede?: string) {
  * históricos o derivándola de los partidos, y lo indica en `origen`.
  */
 export function useHistoricoEdicion(numero: number | null) {
-  const { datos, loading, error } = useAsync<HistoricoEdicion | null>(
-    () => (numero == null ? Promise.resolve(null) : edicionesApi.historico(numero)),
-    null,
-    [numero]
+  const { datos, loading, error } = useLectura<HistoricoEdicion | null>(
+    numero == null ? null : consultas.historico(numero),
+    null
   );
   return { historico: datos, loading, error };
 }
 
 /** Palmarés histórico de una sede, agrupado por tipo de récord. */
 export function usePalmares(sede?: string) {
-  const { datos, loading, error } = useAsync<Record<TipoPalmares, FilaPalmares[]>>(
-    () => palmaresApi.todo(sede).then((r) => r.palmares),
-    {} as Record<TipoPalmares, FilaPalmares[]>,
-    [sede]
+  const { datos, loading, error } = useLectura<Record<TipoPalmares, FilaPalmares[]>>(
+    consultas.palmares(sede),
+    SIN_GRUPOS
   );
 
   const de = useMemo(
@@ -192,20 +147,15 @@ export function usePalmares(sede?: string) {
 
 /** Jugadores con títulos de una sede, con el detalle de las ediciones que ganaron. */
 export function useTitulos(sede?: string) {
-  const { datos, loading, error } = useAsync<JugadorTitulos[]>(
-    () => palmaresApi.titulos(sede).then((r) => r.titulos),
-    [],
-    [sede]
-  );
+  const { datos, loading, error } = useLectura<JugadorTitulos[]>(consultas.titulos(sede), SIN_FILAS);
   return { titulos: datos, loading, error };
 }
 
 /** Récords históricos de una sede, agrupados por tipo. */
 export function useRecords(sede?: string) {
-  const { datos, loading, error } = useAsync<Record<TipoRecord, FilaRecord[]>>(
-    () => recordsApi.todo(sede).then((r) => r.records),
-    {} as Record<TipoRecord, FilaRecord[]>,
-    [sede]
+  const { datos, loading, error } = useLectura<Record<TipoRecord, FilaRecord[]>>(
+    consultas.records(sede),
+    SIN_GRUPOS
   );
 
   const de = useMemo(
@@ -217,24 +167,13 @@ export function useRecords(sede?: string) {
 }
 
 /** Equipos de una edición, con sus colores y camisetas. */
-export function useEquiposEdicion(numero: number | null) {
-  const vacio = { equipos: [] as EdicionEquipo[], sede_id: null, numero_sede: null };
+const SIN_EQUIPOS: { equipos: EdicionEquipo[]; sede_id: string | null; numero_sede: number | null } =
+  { equipos: [], sede_id: null, numero_sede: null };
 
-  const { datos, loading, error } = useAsync<{
-    equipos: EdicionEquipo[];
-    sede_id: string | null;
-    numero_sede: number | null;
-  }>(
-    () =>
-      numero == null
-        ? Promise.resolve(vacio)
-        : edicionesApi.equipos(numero).then((r) => ({
-            equipos: r.equipos,
-            sede_id: r.sede_id,
-            numero_sede: r.numero_sede,
-          })),
-    vacio,
-    [numero]
+export function useEquiposEdicion(numero: number | null) {
+  const { datos, loading, error } = useLectura(
+    numero == null ? null : consultas.equipos(numero),
+    SIN_EQUIPOS
   );
 
   const { equipos: filas, sede_id, numero_sede } = datos;
@@ -286,29 +225,21 @@ export function useEquiposEdicion(numero: number | null) {
  * `edicion`: mientras carga una edición nueva, `equipos` sigue conteniendo los
  * de la anterior, y quien pinte estos datos necesita poder distinguirlo.
  */
-export function usePlantillasEdicion(numero: number | null) {
-  const vacio = {
-    equipos: [] as EquipoConPlantilla[],
-    edicion: null as number | null,
-    sede_id: null as string | null,
-    numero_sede: null as number | null,
-  };
+const SIN_PLANTILLAS = {
+  equipos: [] as EquipoConPlantilla[],
+  edicion: null as number | null,
+  sede_id: null as string | null,
+  numero_sede: null as number | null,
+};
 
-  const { datos, loading, error } = useAsync<typeof vacio>(
-    () =>
-      numero == null
-        ? Promise.resolve(vacio)
-        : edicionesApi.plantillas(numero).then((r) => ({
-            equipos: r.equipos,
-            edicion: r.edicion,
-            sede_id: r.sede_id,
-            numero_sede: r.numero_sede,
-          })),
-    vacio,
-    [numero]
+export function usePlantillasEdicion(numero: number | null) {
+  const { datos, loading, error } = useLectura(
+    numero == null ? null : consultas.plantillas(numero),
+    SIN_PLANTILLAS
   );
 
-  return { ...datos, loading, error };
+  const { equipos, edicion, sede_id, numero_sede } = datos;
+  return { equipos, edicion, sede_id, numero_sede, loading, error };
 }
 
 /**
@@ -316,20 +247,18 @@ export function usePlantillasEdicion(numero: number | null) {
  * por jugador de una edición. Las ediciones heredadas llegan vacías.
  */
 export function useAnalisis(numero: number | null) {
-  const { datos, loading, error } = useAsync<AnalisisEdicion | null>(
-    () => (numero == null ? Promise.resolve(null) : analisisApi.edicion(numero)),
-    null,
-    [numero]
+  const { datos, loading, error } = useLectura<AnalisisEdicion | null>(
+    numero == null ? null : consultas.analisis(numero),
+    null
   );
   return { analisis: datos, loading, error };
 }
 
 /** Perfil completo de un jugador. Acepta el slug canónico o un alias. */
 export function usePerfilJugador(slug: string | undefined) {
-  const { datos, loading, error } = useAsync<PerfilJugador | null>(
-    () => (slug ? jugadoresApi.perfil(slug) : Promise.resolve(null)),
-    null,
-    [slug]
+  const { datos, loading, error } = useLectura<PerfilJugador | null>(
+    slug ? consultas.perfil(slug) : null,
+    null
   );
   return { perfil: datos, loading, error };
 }
