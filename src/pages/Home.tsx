@@ -139,7 +139,7 @@ function Ranking({
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const {
-    partidoDestacado,
+    canchas,
     standings,
     goleadores,
     arqueros,
@@ -180,14 +180,25 @@ export const Home: React.FC = () => {
           </p>
         )}
 
-        {/* Lo que se juega ahora ocupa el ancho: es el motivo por el que se abre la app */}
-        {partidoDestacado ? (
-          <div className="rounded-md border border-line bg-surface p-4 md:px-6 md:py-5">
-            <Marcador
-              partido={partidoDestacado}
-              catalogo={catalogo}
-              colorDe={colorDe}
-            />
+        {/* Lo que se juega ahora ocupa el ancho: es el motivo por el que se abre la app.
+            Una jornada se juega en tres canchas a la vez y se ven todas. */}
+        {canchas.length > 0 ? (
+          <div
+            className={`grid grid-cols-1 gap-4 ${
+              canchas.length === 2 ? "md:grid-cols-2" : canchas.length >= 3 ? "md:grid-cols-2 lg:grid-cols-3" : ""
+            }`}
+          >
+            {canchas.map((p, i) => (
+              <div key={p.id} className="rounded-md border border-line bg-surface p-4 md:px-6 md:py-5">
+                <Marcador
+                  partido={p}
+                  catalogo={catalogo}
+                  colorDe={colorDe}
+                  compacto={canchas.length > 1}
+                  cancha={canchas.length > 1 ? i + 1 : undefined}
+                />
+              </div>
+            ))}
           </div>
         ) : (
           <div className="rounded-md border border-line bg-surface px-4 py-5">

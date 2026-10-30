@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { computeScores, formatElapsed } from "../anotador/utils";
+import { computeScores } from "../anotador/utils";
+import { RelojPartido } from "../common/RelojPartido";
 import type { Partido } from "../../lib/api";
 import type { EquipoLocal } from "../../types/jugador";
 
@@ -10,39 +10,21 @@ const MODO_LABEL: Record<string, string> = {
   final: "Final",
 };
 
-/** Segundos transcurridos desde el inicio, refrescados cada segundo. */
-function useCronometro(desde: string) {
-  const [segundos, setSegundos] = useState(() =>
-    Math.max(0, Math.floor((Date.now() - new Date(desde).getTime()) / 1000))
-  );
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setSegundos(
-        Math.max(0, Math.floor((Date.now() - new Date(desde).getTime()) / 1000))
-      );
-    }, 1000);
-    return () => clearInterval(id);
-  }, [desde]);
-
-  return segundos;
-}
-
 interface Props {
   partido: Partido;
   catalogo: EquipoLocal[];
   colorDe: (id: string) => string;
   /** El Inicio lo muestra a ancho completo; en móvil se apila. */
   compacto?: boolean;
+  /** Número de cancha, por orden de inicio; solo se pinta si hay más de una. */
+  cancha?: number;
 }
 
 /**
  * Marcador del partido en curso. En modo jornada juegan tres equipos y lo que
  * cuenta son los puntos; en playoffs son dos y cuenta el marcador.
  */
-export function Marcador({ partido, catalogo, colorDe, compacto = false }: Props) {
-  const segundos = useCronometro(partido.iniciado_en);
-
+export function Marcador({ partido, catalogo, colorDe, compacto = false, cancha }: Props) {
   const equipos = partido.equipos.map((eq) => {
     const local = catalogo.find((e) => e.id === eq.equipo.id);
     return {
@@ -59,12 +41,15 @@ export function Marcador({ partido, catalogo, colorDe, compacto = false }: Props
     <div className="mb-4 flex items-baseline justify-between gap-3">
       <span className="font-cond flex items-center gap-2 text-xs text-chalk-2">
         <span className="inline-block size-1.5 shrink-0 animate-pulse rounded-full bg-vivo" />
+        {cancha != null && <span className="text-chalk">Cancha {cancha} ·</span>}
         {MODO_LABEL[partido.modo] ?? partido.modo}
         {partido.jornada ? ` ${partido.jornada}` : ""}
       </span>
-      <span className="tnum font-data text-xs text-chalk-3">
-        {formatElapsed(segundos)}
-      </span>
+      {/* El reloj del anotador, no el de pared: desde que se abrió el partido
+          cuenta pausas y entre goles, y en jornada no decía nada. */}
+      {partido.reloj && (
+        <RelojPartido reloj={partido.reloj} modo={partido.modo} className="text-sm" />
+      )}
     </div>
   );
 

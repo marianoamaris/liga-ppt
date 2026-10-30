@@ -106,9 +106,15 @@ export function useInicio() {
   const { jugadores } = useJugadores({ sede: sedeId });
   const campeonVigente = useCampeonVigente(sedeId);
 
-  /* El partido a destacar: el que lleva más tiempo abierto (la API los
-     devuelve del más reciente al más antiguo). */
-  const partidoDestacado = edicion.enVivo[edicion.enVivo.length - 1] ?? null;
+  /* Las canchas en juego, numeradas por orden de inicio como en En Vivo (la
+     API los devuelve del más reciente al más antiguo). */
+  const canchas = useMemo(
+    () =>
+      [...edicion.enVivo]
+        .sort((a, b) => new Date(a.iniciado_en).getTime() - new Date(b.iniciado_en).getTime())
+        .slice(0, 3),
+    [edicion.enVivo]
+  );
 
   const resumenLiga = useMemo(
     () => ({
@@ -119,5 +125,5 @@ export function useInicio() {
     [ediciones.length, jugadores.length, finales.length]
   );
 
-  return { ...edicion, partidoDestacado, campeonVigente, resumenLiga };
+  return { ...edicion, canchas, campeonVigente, resumenLiga };
 }
