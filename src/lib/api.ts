@@ -1,4 +1,4 @@
-import type { Evento } from "../components/anotador/types";
+import type { EstadoReloj, Evento } from "../components/anotador/types";
 import type { AnalisisEdicion, DorsalesEdicion, DorsalesHistorico, PerfilJugador } from "../types/analisis";
 import type { LogrosSede } from "../types/logros";
 import type {
@@ -162,6 +162,8 @@ export interface Partido {
   finalizado_en?: string | null;
   anotador_id?: string | null;
   anotador_nombre?: string | null;
+  /** Cronómetro del anotador; null hasta que alguien lo toca. */
+  reloj?: EstadoReloj | null;
 }
 
 export interface ApiEquipo {
@@ -447,11 +449,16 @@ export const partidosApi = {
   }) =>
     req<Partido>("/partidos", { method: "POST", body: JSON.stringify(body) }).then(trasEscribir),
 
-  update: (id: string, eventos: Evento[]) =>
+  /**
+   * Eventos, reloj o ambos en una sola escritura: en jornada cada gol reinicia
+   * el reloj, y mandarlos por separado eran dos avisos de Realtime por gol.
+   */
+  update: (id: string, cambios: { eventos?: Evento[]; reloj?: EstadoReloj }) =>
     req<Partido>(`/partidos/${id}`, {
       method: "PATCH",
-      body: JSON.stringify({ eventos }),
-    }).then(trasEscribir),
+      body: JSON.stringify(cambios),
+      // Arrancar o parar el reloj no cambia ninguna estadística.
+    }).then((p) => (cambios.eventos ? trasEscribir(p) : p)),
 
   finalizar: (id: string) =>
     req<Partido>(`/partidos/${id}/finalizar`, { method: "PATCH" }).then(trasEscribir),

@@ -8,6 +8,7 @@ import { useSede } from "../context/SedeContext";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
 import type { EquipoLocal } from "../types/jugador";
 import type {
+  EstadoReloj,
   Evento,
   EquipoEnCancha,
   PartidoConfig,
@@ -191,6 +192,39 @@ export function AnotadorPage() {
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
+  /**
+   * Cambios pendientes de subir, agrupados.
+   *
+   * En jornada cada gol añade un evento y reinicia el reloj en el mismo clic:
+   * se juntan en una microtarea y viajan en un solo PATCH, que para quien mira
+   * En Vivo es un solo aviso de Realtime. Mientras el partido aún no tiene id
+   * en el backend lo pendiente se queda aquí y sale en cuanto lo tiene, para
+   * que un reloj arrancado antes de que vuelva el POST no se pierda.
+   */
+  const pendienteRef = useRef<{ eventos?: Evento[]; reloj?: EstadoReloj }>({});
+  const programadoRef = useRef(false);
+
+  const subirPendiente = useCallback(() => {
+    programadoRef.current = false;
+    const id = backendIdRef.current;
+    const cambios = pendienteRef.current;
+    if (!id || (!cambios.eventos && !cambios.reloj)) return;
+    pendienteRef.current = {};
+    partidosApi.update(id, cambios).catch((err) =>
+      console.error("Backend: sync partido", err)
+    );
+  }, []);
+
+  const encolar = useCallback(
+    (cambio: { eventos?: Evento[]; reloj?: EstadoReloj }) => {
+      Object.assign(pendienteRef.current, cambio);
+      if (programadoRef.current) return;
+      programadoRef.current = true;
+      queueMicrotask(subirPendiente);
+    },
+    [subirPendiente]
+  );
+
   const handleIniciar = useCallback(
     async (config: PartidoConfig) => {
       if (!profile) return;
@@ -216,6 +250,7 @@ export function AnotadorPage() {
         });
         backendIdRef.current = created.id;
         saveActive(created.id, profile.id);
+        subirPendiente();
 
         // Sync iniciadoEn from server for precise elapsed-time
         const serverTs = new Date(created.iniciado_en).getTime();
@@ -226,19 +261,18 @@ export function AnotadorPage() {
     },
     // `edicionActual` cambia al cambiar de ciudad: sin él en las dependencias
     // el anotador seguiría archivando partidos en la edición de la sede anterior.
-    [profile, edicionActual, sede?.nombre]
+    [profile, edicionActual, sede?.nombre, subirPendiente]
   );
 
-  const handleUpdatePartido = useCallback((p: PartidoVivo | null) => {
-    setPartido(p);
-    const id = backendIdRef.current;
-    // Rule 1: never PATCH a finalized match (guard in PartidoEnVivo, but double-check)
-    if (p && id) {
-      partidosApi.update(id, p.eventos).catch((err) =>
-        console.error("Backend: sync eventos", err)
-      );
-    }
-  }, []);
+  const handleUpdatePartido = useCallback(
+    (p: PartidoVivo | null) => {
+      setPartido(p);
+      if (p) encolar({ eventos: p.eventos });
+    },
+    [encolar]
+  );
+
+  const handleReloj = useCallback((reloj: EstadoReloj) => encolar({ reloj }), [encolar]);
 
   const handleFinalizar = useCallback(async () => {
     const id = backendIdRef.current;
@@ -254,6 +288,7 @@ export function AnotadorPage() {
   function handleNuevoPartido() {
     setPartido(null);
     backendIdRef.current = null;
+    pendienteRef.current = {};
     clearActive();
     setPhase("setup");
   }
@@ -297,6 +332,7 @@ export function AnotadorPage() {
       <PartidoEnVivo
         partido={partido}
         onUpdatePartido={handleUpdatePartido}
+        onReloj={handleReloj}
         onFinalizar={handleFinalizar}
       />
     );

@@ -1,4 +1,4 @@
-import type { EquipoEnCancha, Evento, ModoPartido, RazonAmarilla, TeamScore } from "./types";
+import type { EquipoEnCancha, EstadoReloj, Evento, ModoPartido, RazonAmarilla, TeamScore } from "./types";
 
 /**
  * Cómo se lee cada motivo de amarilla. Vive aquí porque no lo usa solo el
@@ -44,6 +44,12 @@ export const DURACION_POR_MODO: Record<ModoPartido, number> = {
   semifinal: 50 * 60,
   final: 60 * 60,
 };
+
+/** Segundos jugados según el estado del reloj, sin pasarse de la duración. */
+export function transcurridoDe(estado: EstadoReloj, duracion: number): number {
+  const enCurso = estado.desde != null ? (Date.now() - estado.desde) / 1000 : 0;
+  return Math.min(duracion, Math.floor(estado.acumulado + enCurso));
+}
 
 export function getColor(id: string): string {
   return LIGA20_COLORES[id] ?? "#4B5563";

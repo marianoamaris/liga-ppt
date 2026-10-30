@@ -4,7 +4,14 @@ import type { Partido, Standing, Goleador, Arquero, JugadorDisciplina } from "..
 import { clienteSupabase } from "../lib/supabase";
 import { guardado, mutar, useConsulta } from "../lib/cache";
 import { consultas, invalidarDerivados } from "../lib/consultas";
-import { getTextColor, computeScores, formatElapsed } from "../components/anotador/utils";
+import {
+  getTextColor,
+  computeScores,
+  formatElapsed,
+  formatCountdown,
+  transcurridoDe,
+  DURACION_POR_MODO,
+} from "../components/anotador/utils";
 import { useSede } from "../context/SedeContext";
 import { useEdicion, useEquiposEdicion } from "../hooks/useCatalogo";
 import type { EquipoLocal, PartidoPlayoff } from "../types/jugador";
@@ -23,7 +30,7 @@ import {
   Puesto,
   Tarjeta,
 } from "../components/common/iconos";
-import type { EquipoEnCancha, Evento } from "../components/anotador/types";
+import type { EquipoEnCancha, EstadoReloj, Evento, ModoPartido } from "../components/anotador/types";
 
 /**
  * Catálogo de equipos de la edición en curso. Antes venía de `constants/liga20`
@@ -145,6 +152,47 @@ function Marcador({ partido }: { partido: Partido }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Reloj ─────────────────────────────────────────────────────────────────────
+
+/**
+ * El cronómetro del anotador, tal como lo ve él: cuenta atrás.
+ *
+ * Del partido llega solo el estado —acumulado y desde cuándo corre—, que se
+ * escribe al arrancar, parar o reiniciar. El segundo en curso se calcula aquí,
+ * y solo se repinta mientras corre: un reloj parado no programa nada.
+ */
+function RelojCancha({ reloj, modo }: { reloj: EstadoReloj; modo: string }) {
+  const duracion = DURACION_POR_MODO[modo as ModoPartido] ?? DURACION_POR_MODO.jornada;
+  const restante = Math.max(0, duracion - transcurridoDe(reloj, duracion));
+  const corriendo = reloj.desde != null && restante > 0;
+  const [, tick] = useState(0);
+
+  useEffect(() => {
+    if (!corriendo) return;
+    const i = setInterval(() => tick((n) => n + 1), 1000);
+    return () => clearInterval(i);
+  }, [corriendo]);
+
+  const agotado = restante === 0;
+  const urgente = !agotado && restante <= 60;
+  return (
+    <div className="flex items-center justify-center gap-2 pt-3 -mb-2">
+      <span
+        className={`font-mono font-black text-xl tnum leading-none ${
+          agotado ? "text-red-400" : urgente ? "text-yellow-400" : "text-chalk"
+        }`}
+      >
+        {agotado ? "Tiempo" : formatCountdown(restante)}
+      </span>
+      {!corriendo && !agotado && (
+        <span className="text-chalk-3 text-[10px] uppercase tracking-wider font-semibold">
+          {reloj.acumulado === 0 ? "Sin arrancar" : "En pausa"}
+        </span>
+      )}
     </div>
   );
 }
@@ -282,6 +330,8 @@ function CanchaCard({ partido, numero }: { partido: Partido; numero: number }) {
           </span>
         )}
       </div>
+
+      {partido.reloj && <RelojCancha reloj={partido.reloj} modo={partido.modo} />}
 
       <Marcador partido={partido} />
 

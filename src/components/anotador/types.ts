@@ -123,6 +123,18 @@ export type PartidoConfig =
       equipos: [EquipoEnCancha, EquipoEnCancha];
     };
 
+/**
+ * Estado del cronómetro. Se guarda cuándo arrancó y cuánto llevaba acumulado,
+ * no el tiempo en sí: así viaja a la base solo al arrancar, parar o reiniciar,
+ * y cada pantalla calcula el segundo en curso por su cuenta.
+ */
+export interface EstadoReloj {
+  /** Segundos jugados antes del último arranque. */
+  acumulado: number;
+  /** `Date.now()` del arranque en curso; null si el reloj está parado. */
+  desde: number | null;
+}
+
 export interface PartidoVivo {
   config: PartidoConfig;
   eventos: Evento[];

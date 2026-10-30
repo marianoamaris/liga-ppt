@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { transcurridoDe } from "./utils";
+import type { EstadoReloj } from "./types";
 
 /**
  * Reloj del partido, anclado al reloj de pared.
@@ -14,14 +16,12 @@ import { useCallback, useEffect, useState } from "react";
  * Se persiste porque el partido dura casi una hora: si la pestaña se recarga a
  * mitad, el minuto de los goles siguientes tiene que seguir siendo el del
  * partido y no el de la recarga.
+ *
+ * `onCambio` recibe cada arranque, parada o reinicio —nunca un tick—, que es lo
+ * que el anotador sube a la base para que En Vivo muestre el mismo reloj.
  */
 
-interface Estado {
-  /** Segundos jugados antes del último arranque. */
-  acumulado: number;
-  /** `Date.now()` del arranque en curso; null si el reloj está parado. */
-  desde: number | null;
-}
+type Estado = EstadoReloj;
 
 const PARADO: Estado = { acumulado: 0, desde: null };
 const PREFIJO = "ligappt_reloj_";
@@ -54,13 +54,17 @@ function guardar(partidoId: number, estado: Estado): void {
   }
 }
 
-function transcurridoDe(estado: Estado, duracion: number): number {
-  const enCurso = estado.desde != null ? (Date.now() - estado.desde) / 1000 : 0;
-  return Math.min(duracion, Math.floor(estado.acumulado + enCurso));
-}
-
-export function useReloj(partidoId: number, duracion: number) {
+export function useReloj(
+  partidoId: number,
+  duracion: number,
+  onCambio?: (estado: EstadoReloj) => void
+) {
   const [estado, setEstado] = useState<Estado>(() => leer(partidoId));
+  // En ref para que un callback nuevo en cada render no rehaga `cambiar`.
+  const onCambioRef = useRef(onCambio);
+  useEffect(() => {
+    onCambioRef.current = onCambio;
+  });
   // Repintar cada segundo mientras corre; el valor sale del reloj de pared, no
   // de contar ticks, así que perder alguno no descuadra nada.
   const [, tick] = useState(0);
@@ -73,6 +77,7 @@ export function useReloj(partidoId: number, duracion: number) {
     (siguiente: Estado) => {
       setEstado(siguiente);
       guardar(partidoId, siguiente);
+      onCambioRef.current?.(siguiente);
     },
     [partidoId]
   );

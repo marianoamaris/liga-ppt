@@ -25,6 +25,7 @@ import type {
   ModoPartido,
   RazonAmarilla,
   PartidoVivo,
+  EstadoReloj,
 } from "./types";
 
 const PAIRS: [number, number][] = [[0, 1], [0, 2], [1, 2]];
@@ -32,6 +33,8 @@ const PAIRS: [number, number][] = [[0, 1], [0, 2], [1, 2]];
 interface Props {
   partido: PartidoVivo;
   onUpdatePartido: (p: PartidoVivo) => void;
+  /** Arranque, parada o reinicio del cronómetro, para subirlo a En Vivo. */
+  onReloj?: (estado: EstadoReloj) => void;
   onFinalizar: () => void;
 }
 
@@ -133,7 +136,7 @@ function PlayerColumn({ eq, eqIdx, contrarioId, modo, scores, amarillas, onGol, 
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
-export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) {
+export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }: Props) {
   const [pairIdx, setPairIdx] = useState(0);
   const [targetAmarilla, setTargetAmarilla] = useState<TargetCard>(null);
   const [targetRoja, setTargetRoja] = useState<TargetCard>(null);
@@ -153,7 +156,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onFinalizar }: Props) 
     corriendo,
     alternar,
     reiniciar,
-  } = useReloj(partido.iniciadoEn, duracion);
+  } = useReloj(partido.iniciadoEn, duracion, onReloj);
 
   // Current pair for jornada
   const [idxA, idxB] = esPlayoff ? [0, 1] : PAIRS[pairIdx];
