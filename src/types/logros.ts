@@ -8,6 +8,8 @@ export type IdRecord =
   | "racha_marcando"
   | "gol_rapido"
   | "goles_playoffs"
+  | "goles_partido_playoff"
+  | "partidos_playoff"
   | "amarillas"
   | "rojas"
   | "puntos_liga"
@@ -19,7 +21,10 @@ export type IdRecord =
   | "racha_derrotas"
   | "racha_sin_ganar"
   | "goles_favor"
-  | "menos_goles_contra";
+  | "menos_goles_contra"
+  | "goleada_playoff"
+  | "goles_equipo_playoff"
+  | "final_mas_goles";
 
 export interface Marca {
   /** Empatados comparten puesto: 1, 1, 3. */
@@ -31,6 +36,8 @@ export interface Marca {
   numero_sede: number | null;
   jornada: number | null;
   ronda: string | null;
+  /** Marcador y rival en los récords de un partido: «11–2 a Greenworld». */
+  detalle?: string | null;
   /** Partidos jugados en esa marca, cuando sirve para desempatar. */
   partidos: number | null;
 }

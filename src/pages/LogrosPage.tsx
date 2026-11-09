@@ -53,6 +53,12 @@ const CATALOGO: Record<IdRecord, Catalogo> = {
     formato: (s) => mmss(s),
   },
   goles_playoffs: { titulo: "Más goles en playoffs", unidad: "goles", nota: "Cuartos, semis y finales · desde la edición 19" },
+  goles_partido_playoff: {
+    titulo: "Más goles en un partido de playoff",
+    unidad: "goles",
+    nota: "Desde la edición 19",
+  },
+  partidos_playoff: { titulo: "Más partidos de playoff jugados", unidad: "partidos", nota: "Desde la edición 19" },
   amarillas: { titulo: "Más amarillas", unidad: "amarillas", nota: "Desde la edición 19" },
   rojas: { titulo: "Más rojas", unidad: "rojas", nota: "Desde la edición 19" },
 
@@ -71,6 +77,18 @@ const CATALOGO: Record<IdRecord, Catalogo> = {
   menos_puntos_jornada: { titulo: "Menos puntos en una jornada", unidad: "puntos", nota: "Ligas terminadas" },
   racha_derrotas: { titulo: "Más partidos seguidos perdidos", unidad: "partidos", nota: "Desde la edición 19" },
   racha_sin_ganar: { titulo: "Más partidos seguidos sin ganar", unidad: "partidos", nota: "Desde la edición 19" },
+
+  goleada_playoff: {
+    titulo: "Mayor goleada en playoffs",
+    unidad: "de diferencia",
+    nota: "Finales desde la edición 1 · cuartos y semis desde la 19",
+  },
+  goles_equipo_playoff: {
+    titulo: "Más goles de un equipo en un partido de playoff",
+    unidad: "goles",
+    nota: "Finales desde la edición 1 · cuartos y semis desde la 19",
+  },
+  final_mas_goles: { titulo: "La final con más goles", unidad: "goles", nota: "Entre los dos equipos" },
 };
 
 /** Las secciones, en el orden en que se leen. */
@@ -84,7 +102,6 @@ const SECCIONES: { id: string; filtro: Filtro; titulo: string; records: IdRecord
       "goles_sesion",
       "racha_marcando",
       "gol_rapido",
-      "goles_playoffs",
       "menos_recibidos",
       "menos_recibidos_jornada",
       "amarillas",
@@ -103,14 +120,28 @@ const SECCIONES: { id: string; filtro: Filtro; titulo: string; records: IdRecord
     titulo: "Equipos · para olvidar",
     records: ["menos_puntos_liga", "menos_puntos_jornada", "racha_derrotas", "racha_sin_ganar"],
   },
+  {
+    id: "playoffs",
+    filtro: "playoffs",
+    titulo: "Playoffs",
+    records: [
+      "goles_playoffs",
+      "goles_partido_playoff",
+      "partidos_playoff",
+      "goleada_playoff",
+      "goles_equipo_playoff",
+      "final_mas_goles",
+    ],
+  },
 ];
 
-type Filtro = "todos" | "jugadores" | "equipos";
+type Filtro = "todos" | "jugadores" | "equipos" | "playoffs";
 
 const FILTROS: { id: Filtro; label: string }[] = [
   { id: "todos", label: "Todos" },
   { id: "jugadores", label: "Jugadores" },
   { id: "equipos", label: "Equipos" },
+  { id: "playoffs", label: "Playoffs" },
 ];
 
 const RONDA: Record<string, string> = { cuartos: "cuartos", semifinal: "semifinal", final: "final" };
@@ -162,7 +193,7 @@ function Tarjeta({ record }: { record: RecordVivo }) {
   const cuando = (m: Marca) => {
     if (m.numero_sede == null) return null;
     const ed = etiquetaEdicion({ numero_sede: m.numero_sede, sede_id: sedeId }, sedes);
-    const pj = m.partidos != null ? ` · ${m.partidos} partidos` : "";
+    const pj = m.partidos != null ? ` · ${m.partidos} partidos` : m.detalle ? ` · ${m.detalle}` : "";
     if (m.jornada != null) return `${ed} · jornada ${m.jornada}${pj}`;
     if (m.ronda) return `${ed} · ${RONDA[m.ronda] ?? m.ronda}${pj}`;
     return `${ed}${pj}`;
