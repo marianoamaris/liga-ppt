@@ -112,9 +112,13 @@ export function DorsalesPage() {
   const params = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { sedes, sedeId, edicionActual } = useSede();
+  const { sedes, sedeId, edicionActual, loading: cargandoSede } = useSede();
 
-  const vista: Vista = pathname.startsWith("/dorsales/historico") ? "historico" : "actual";
+  // Entre una edición y la siguiente no hay liga actual que mostrar: se abre
+  // el histórico y la pestaña de la liga actual desaparece hasta que haya otra.
+  const sinLigaActual = !cargandoSede && edicionActual == null && !params.edicion;
+  const vista: Vista =
+    pathname.startsWith("/dorsales/historico") || sinLigaActual ? "historico" : "actual";
   const edicion = params.edicion ? Number(params.edicion) : edicionActual;
   const pedido = params.numero ? Number(params.numero) : null;
 
@@ -200,30 +204,32 @@ export function DorsalesPage() {
           <p className="text-sm text-chalk-2">Quién lleva cada número del peto, ordenados por goles.</p>
         </header>
 
-        <div role="tablist" aria-label="Vista" className="flex w-fit gap-1 rounded-md border border-line bg-surface p-1">
-          {(
-            [
-              ["actual", "Liga actual"],
-              ["historico", "Histórico"],
-            ] as const
-          ).map(([v, etiqueta]) => (
-            <button
-              key={v}
-              type="button"
-              role="tab"
-              aria-selected={vista === v}
-              onClick={() => irA(v, numero)}
-              className={`font-cond rounded-sm px-3 py-1.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
-                vista === v ? "bg-chalk text-ink" : "text-chalk-3 hover:text-chalk"
-              }`}
-            >
-              {etiqueta}
-            </button>
-          ))}
-        </div>
+        {!sinLigaActual && (
+          <div role="tablist" aria-label="Vista" className="flex w-fit gap-1 rounded-md border border-line bg-surface p-1">
+            {(
+              [
+                ["actual", "Liga actual"],
+                ["historico", "Histórico"],
+              ] as const
+            ).map(([v, etiqueta]) => (
+              <button
+                key={v}
+                type="button"
+                role="tab"
+                aria-selected={vista === v}
+                onClick={() => irA(v, numero)}
+                className={`font-cond rounded-sm px-3 py-1.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chalk ${
+                  vista === v ? "bg-chalk text-ink" : "text-chalk-3 hover:text-chalk"
+                }`}
+              >
+                {etiqueta}
+              </button>
+            ))}
+          </div>
+        )}
 
         {vista === "actual" && edicion == null ? (
-          <p className="text-sm text-chalk-3">Esta ciudad no tiene una edición en juego.</p>
+          <p className="font-cond text-sm text-chalk-3">Cargando…</p>
         ) : error ? (
           <p className="rounded-md bg-vivo/15 px-4 py-3 text-sm text-chalk-2">
             No se pudieron cargar los dorsales: {error}
