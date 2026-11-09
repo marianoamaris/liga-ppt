@@ -314,19 +314,37 @@ function Cabecera({
 }
 
 export const Clasificacion: React.FC = () => {
-  const { sedeId, edicionActual } = useSede();
-  // Null hasta que se sepa qué edición está en curso. Cambiar de ciudad
-  // devuelve a la edición en juego de esa ciudad: mantener la anterior
-  // mostraría una edición que no pertenece a la sede seleccionada.
+  const { sedeId, edicionActual, loading: cargandoSede } = useSede();
+  const { ediciones, loading: cargandoEdiciones } = useEdiciones(sedeId);
+  // Entre una edición y la siguiente la ciudad no tiene ninguna en juego: se
+  // muestra la última jugada en vez de dejar la página en blanco.
+  const ultimaJugada = useMemo(
+    () =>
+      ediciones
+        .filter((e) => e.sede_id === sedeId)
+        .reduce<(typeof ediciones)[number] | null>(
+          (max, e) => (!max || e.numero_sede > max.numero_sede ? e : max),
+          null
+        )?.numero ?? null,
+    [ediciones, sedeId]
+  );
+  const porDefecto = edicionActual ?? ultimaJugada;
+
+  // Null hasta que se sepa qué edición mostrar. Cambiar de ciudad devuelve a
+  // la edición por defecto de esa ciudad: mantener la anterior mostraría una
+  // edición que no pertenece a la sede seleccionada.
   const [edicionElegida, setEdicionElegida] = useState<number | null>(null);
   const [selectorAbierto, setSelectorAbierto] = useState(false);
 
   useEffect(() => {
-    setEdicionElegida(edicionActual);
+    setEdicionElegida(porDefecto);
     setSelectorAbierto(false);
-  }, [sedeId, edicionActual]);
+  }, [sedeId, porDefecto]);
 
-  const { historico, loading, error } = useHistoricoEdicion(edicionElegida);
+  const sinEdiciones =
+    !cargandoSede && !cargandoEdiciones && porDefecto == null && edicionElegida == null;
+
+  const { historico, error } = useHistoricoEdicion(edicionElegida);
   const { analisis: analisisCrudo } = useAnalisis(edicionElegida);
   // Mientras llega el de la edición nueva, no se mezcla con la tabla de otra.
   const analisis =
@@ -370,7 +388,13 @@ export const Clasificacion: React.FC = () => {
           </p>
         )}
 
-        {loading && !historico && (
+        {sinEdiciones && (
+          <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
+            Esta ciudad todavía no tiene ediciones.
+          </p>
+        )}
+
+        {!historico && !sinEdiciones && !error && (
           <p className="rounded-md border border-line bg-surface px-4 py-5 text-sm text-chalk-3">
             Cargando edición…
           </p>
