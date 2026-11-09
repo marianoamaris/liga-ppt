@@ -89,6 +89,10 @@ export interface TramoTrayectoria {
   campeon: boolean;
   /** Perdió la final. Solo se sabe desde que hay plantillas (edición 19). */
   subcampeon: boolean;
+  /** Equipos que reforzó en el playoff tras quedar eliminado el suyo. */
+  refuerzos?: { slug: string; nombre: string; color_hex: string | null }[];
+  /** Refuerzo de playoff que ocupó su puesto. */
+  reemplazado_por?: { nombre: string; slug: string | null } | null;
   goles: number;
   posicion_goleo: number | null;
   /** Goles que recibió como arquero esa edición; null si no fue arquero. */

@@ -518,6 +518,28 @@ function FilaTrayectoria({
             · {t.puesto_equipo.posicion}º de {t.puesto_equipo.de}
           </span>
         )}
+        {t.refuerzos?.map((r) => (
+          <span key={r.slug} className="flex items-center gap-1.5">
+            · Refuerzo en playoff:
+            <span
+              className="size-2 rounded-full ring-1 ring-chalk-3"
+              style={{ backgroundColor: r.color_hex ?? "#4B5563" }}
+            />
+            {r.nombre}
+          </span>
+        ))}
+        {t.reemplazado_por && (
+          <span>
+            · En playoff le cedió su puesto a{" "}
+            {t.reemplazado_por.slug ? (
+              <Link to={`/jugador/${t.reemplazado_por.slug}`} className="hover:text-chalk hover:underline">
+                {t.reemplazado_por.nombre}
+              </Link>
+            ) : (
+              t.reemplazado_por.nombre
+            )}
+          </span>
+        )}
         {t.campeon && <span>· Campeón</span>}
         {t.subcampeon && <span>· Subcampeón</span>}
         {t.es_capitan && <span>· Capitán</span>}
