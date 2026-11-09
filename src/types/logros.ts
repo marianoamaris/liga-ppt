@@ -10,6 +10,8 @@ export type IdRecord =
   | "goles_playoffs"
   | "goles_partido_playoff"
   | "partidos_playoff"
+  | "penales"
+  | "penales_atajados"
   | "amarillas"
   | "rojas"
   | "puntos_liga"

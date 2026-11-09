@@ -59,6 +59,12 @@ const CATALOGO: Record<IdRecord, Catalogo> = {
     nota: "Desde la edición 19",
   },
   partidos_playoff: { titulo: "Más partidos de playoff jugados", unidad: "partidos", nota: "Desde la edición 19" },
+  penales: { titulo: "Más penales convertidos en tandas", unidad: "penales", nota: "Semis y finales · desde la edición 19" },
+  penales_atajados: {
+    titulo: "Más penales detenidos en tandas",
+    unidad: "penales",
+    nota: "Cobros fallados con él en el arco · desde la edición 19",
+  },
   amarillas: { titulo: "Más amarillas", unidad: "amarillas", nota: "Desde la edición 19" },
   rojas: { titulo: "Más rojas", unidad: "rojas", nota: "Desde la edición 19" },
 
@@ -128,6 +134,8 @@ const SECCIONES: { id: string; filtro: Filtro; titulo: string; records: IdRecord
       "goles_playoffs",
       "goles_partido_playoff",
       "partidos_playoff",
+      "penales",
+      "penales_atajados",
       "goleada_playoff",
       "goles_equipo_playoff",
       "final_mas_goles",
