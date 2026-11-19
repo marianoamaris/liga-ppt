@@ -151,6 +151,10 @@ export const CarruselEquipos: React.FC<Props> = ({
   if (!total) return null;
 
   const actual = equipos[slide];
+  // Salen de la plantilla y no de `arqueroDesignado`/`capitan`, que este
+  // endpoint no siempre rellena.
+  const arquero = actual.jugadores.find((j) => j.esArquero)?.nombre ?? actual.arqueroDesignado;
+  const capitan = actual.jugadores.find((j) => j.esCapitan)?.nombre ?? actual.capitan;
   const imagenActual = camisetaEquipo(sede_id, numero_sede, actual.color_slug, actual.color_hex);
 
   return (
@@ -192,6 +196,7 @@ export const CarruselEquipos: React.FC<Props> = ({
               <li key={j.nombre} className="font-cond text-sm text-chalk-2">
                 {j.esArquero && <span aria-hidden>🧤 </span>}
                 {j.nombre}
+                {j.esCapitan && <span className="text-chalk-3"> (C)</span>}
               </li>
             ))}
           </ul>
@@ -251,9 +256,11 @@ export const CarruselEquipos: React.FC<Props> = ({
         </button>
       </div>
 
-      {actual.arqueroDesignado && (
+      {(capitan || arquero) && (
         <p className="mt-2 text-[0.6875rem] text-chalk-3">
-          Arquero: {actual.arqueroDesignado}
+          {[capitan && `Capitán: ${capitan}`, arquero && `Arquero: ${arquero}`]
+            .filter(Boolean)
+            .join(" · ")}
         </p>
       )}
     </section>
