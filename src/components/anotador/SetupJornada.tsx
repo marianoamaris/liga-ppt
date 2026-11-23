@@ -3,6 +3,7 @@ import { JORNADAS_TOTALES } from "../../constants/ANOTADOR_CONFIG";
 import { useSede } from "../../context/SedeContext";
 import { usePlantillasEdicion } from "../../hooks/useCatalogo";
 import { camisetaEquipo } from "../../utils/imagenesEquipos";
+import { nombreDeColor } from "./utils";
 import type { EquipoConPlantilla } from "../../types/jugador";
 import type { EquipoEnCancha, ModoPartido, PartidoConfig } from "./types";
 
@@ -82,7 +83,7 @@ function TeamSlot({ slot, equipoId, ocupados, onChange, equipos }: SlotProps) {
             value={eq.slug}
             disabled={ocupados.includes(eq.slug) && equipoId !== eq.slug}
           >
-            {eq.nombre}
+            {eq.color_slug ? nombreDeColor(eq.color_slug) : eq.nombre}
           </option>
         ))}
       </select>

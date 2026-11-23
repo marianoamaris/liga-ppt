@@ -2,10 +2,12 @@ import { useState } from "react";
 import { MarcadorVivo } from "./MarcadorVivo";
 import { AmarillaModal } from "./AmarillaModal";
 import { RojaModal } from "./RojaModal";
+import { ConfirmarModal } from "./ConfirmarModal";
 import { useReloj } from "./useReloj";
 import { DefinicionPlayoff } from "./DefinicionPlayoff";
 import {
   getColor,
+  etiquetaEquipo,
   formatElapsed,
   makeId,
   computeScores,
@@ -40,6 +42,15 @@ interface Props {
 
 type TargetCard = { jugador: string; equipoIdx: number } | null;
 
+/**
+ * Evento a la espera de confirmación. El minuto se toma al tocar, no al
+ * confirmar: el reloj sigue corriendo mientras el modal está abierto.
+ */
+type Pendiente =
+  | { tipo: "gol"; goleador: string; equipoGoleadorId: string; equipoArqueroId: string; tiempo: number }
+  | { tipo: "autogol"; equipoAutogolId: string; equipoGanadorId: string; tiempo: number }
+  | { tipo: "empate"; tiempo: number };
+
 // ── Player column ─────────────────────────────────────────────────────────────
 interface ColProps {
   eq: EquipoEnCancha;
@@ -67,7 +78,7 @@ function PlayerColumn({ eq, eqIdx, contrarioId, modo, scores, amarillas, onGol, 
         style={{ background: `${color}18`, border: `1px solid ${color}40` }}
       >
         <div className="font-bold text-sm leading-tight truncate" style={{ color }}>
-          {eq.equipo.nombre}
+          {etiquetaEquipo(eq.equipo)}
         </div>
         {!esPlayoff && (
           <>
@@ -142,6 +153,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
   const [targetRoja, setTargetRoja] = useState<TargetCard>(null);
   const [logAbierto, setLogAbierto] = useState(false);
   const [confirmFinalizar, setConfirmFinalizar] = useState(false);
+  const [pendiente, setPendiente] = useState<Pendiente | null>(null);
 
   const { config, eventos } = partido;
   const { modo, equipos } = config;
@@ -166,6 +178,10 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
   const colorB = getColor(equipoB.equipo.id);
 
   const scores = computeScores(equipos, eventos);
+  const etiquetaDe = (id: string) => {
+    const eq = equipos.find((e) => e.equipo.id === id);
+    return eq ? etiquetaEquipo(eq.equipo) : "";
+  };
   const amarillas = amarillasPorJugador(eventos);
 
   // El playoff se define cuando el reloj llega a cero con el marcador igualado:
@@ -188,10 +204,10 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
     onUpdatePartido({ ...partido, eventos: [...eventos, ev] });
   }
 
-  function handleGol(goleador: string, equipoGoleadorId: string, equipoArqueroId: string) {
+  function handleGol(goleador: string, equipoGoleadorId: string, equipoArqueroId: string, tiempo: number) {
     const data: EventoGol = {
       id: makeId(), goleador, equipoGoleadorId, equipoArqueroId,
-      tiempoEnMarcador: elapsedSec(),
+      tiempoEnMarcador: tiempo,
     };
     pushEvento({ tipo: "gol", data });
 
@@ -213,10 +229,10 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
     }
   }
 
-  function handleAutogol(equipoAutogolId: string, equipoGanadorId: string) {
+  function handleAutogol(equipoAutogolId: string, equipoGanadorId: string, tiempo: number) {
     const data: EventoAutogol = {
       id: makeId(), equipoAutogolId, equipoGanadorId,
-      tiempoEnMarcador: elapsedSec(),
+      tiempoEnMarcador: tiempo,
     };
     pushEvento({ tipo: "autogol", data });
 
@@ -236,12 +252,12 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
     }
   }
 
-  function handleEmpate() {
+  function handleEmpate(tiempo: number) {
     const data: EventoEmpate = {
       id: makeId(),
       equipoAId: equipoA.equipo.id,
       equipoBId: equipoB.equipo.id,
-      tiempoEnMarcador: elapsedSec(),
+      tiempoEnMarcador: tiempo,
     };
     pushEvento({ tipo: "empate", data });
   }
@@ -271,6 +287,18 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
     };
     pushEvento({ tipo: "roja", data });
     setTargetRoja(null);
+  }
+
+  function confirmarPendiente() {
+    if (!pendiente) return;
+    if (pendiente.tipo === "gol") {
+      handleGol(pendiente.goleador, pendiente.equipoGoleadorId, pendiente.equipoArqueroId, pendiente.tiempo);
+    } else if (pendiente.tipo === "autogol") {
+      handleAutogol(pendiente.equipoAutogolId, pendiente.equipoGanadorId, pendiente.tiempo);
+    } else {
+      handleEmpate(pendiente.tiempo);
+    }
+    setPendiente(null);
   }
 
   function handleDeshacer() {
@@ -319,7 +347,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                   className="font-bold"
                   style={{ color: getColor(definicion.ganadorId) }}
                 >
-                  {equipos.find((e) => e.equipo.id === definicion.ganadorId)?.equipo.nombre}
+                  {etiquetaDe(definicion.ganadorId)}
                 </span>{" "}
                 {definicion.metodo === "tabla"
                   ? "por posición en la tabla"
@@ -344,7 +372,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                   <div className="flex items-center justify-center gap-3">
                     <div>
                       <div className="font-bold text-base leading-tight" style={{ color: colorA }}>
-                        {equipoA.equipo.nombre}
+                        {etiquetaEquipo(equipoA.equipo)}
                       </div>
                       <div className="text-gray-600 text-[11px]">
                         {scores.get(equipoA.equipo.id)?.puntos ?? 0} pts
@@ -353,7 +381,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                     <span className="text-gray-700 text-sm font-light">vs</span>
                     <div>
                       <div className="font-bold text-base leading-tight" style={{ color: colorB }}>
-                        {equipoB.equipo.nombre}
+                        {etiquetaEquipo(equipoB.equipo)}
                       </div>
                       <div className="text-gray-600 text-[11px]">
                         {scores.get(equipoB.equipo.id)?.puntos ?? 0} pts
@@ -386,16 +414,24 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
             <PlayerColumn
               eq={equipoA} eqIdx={idxA} contrarioId={equipoB.equipo.id}
               modo={modo} scores={scores} amarillas={amarillas}
-              onGol={handleGol}
-              onAutogol={handleAutogol}
+              onGol={(goleador, equipoGoleadorId, equipoArqueroId) =>
+                setPendiente({ tipo: "gol", goleador, equipoGoleadorId, equipoArqueroId, tiempo: elapsedSec() })
+              }
+              onAutogol={(equipoAutogolId, equipoGanadorId) =>
+                setPendiente({ tipo: "autogol", equipoAutogolId, equipoGanadorId, tiempo: elapsedSec() })
+              }
               onAmarilla={(jugador, eqIdx) => setTargetAmarilla({ jugador, equipoIdx: eqIdx })}
               onRoja={(jugador, eqIdx) => setTargetRoja({ jugador, equipoIdx: eqIdx })}
             />
             <PlayerColumn
               eq={equipoB} eqIdx={idxB} contrarioId={equipoA.equipo.id}
               modo={modo} scores={scores} amarillas={amarillas}
-              onGol={handleGol}
-              onAutogol={handleAutogol}
+              onGol={(goleador, equipoGoleadorId, equipoArqueroId) =>
+                setPendiente({ tipo: "gol", goleador, equipoGoleadorId, equipoArqueroId, tiempo: elapsedSec() })
+              }
+              onAutogol={(equipoAutogolId, equipoGanadorId) =>
+                setPendiente({ tipo: "autogol", equipoAutogolId, equipoGanadorId, tiempo: elapsedSec() })
+              }
               onAmarilla={(jugador, eqIdx) => setTargetAmarilla({ jugador, equipoIdx: eqIdx })}
               onRoja={(jugador, eqIdx) => setTargetRoja({ jugador, equipoIdx: eqIdx })}
             />
@@ -404,13 +440,13 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
           {/* ── Empate (jornada only) ── */}
           {!esPlayoff && (
             <button
-              onClick={handleEmpate}
+              onClick={() => setPendiente({ tipo: "empate", tiempo: elapsedSec() })}
               className="w-full min-h-[52px] py-3 rounded-2xl font-bold text-yellow-400 text-sm border border-yellow-600/30 bg-yellow-600/10 hover:bg-yellow-600/18 active:bg-yellow-600/25 active:scale-[0.98] transition-all"
             >
               🤝 Empate —{" "}
-              <span style={{ color: colorA }}>{equipoA.equipo.nombre}</span>
+              <span style={{ color: colorA }}>{etiquetaEquipo(equipoA.equipo)}</span>
               <span className="text-gray-600 mx-1">vs</span>
-              <span style={{ color: colorB }}>{equipoB.equipo.nombre}</span>
+              <span style={{ color: colorB }}>{etiquetaEquipo(equipoB.equipo)}</span>
             </button>
           )}
 
@@ -459,7 +495,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                             <span className="font-semibold text-sm" style={{ color }}>
                               {ev.data.goleador}
                             </span>
-                            <span className="text-gray-600 text-xs"> · {eqGol?.equipo.nombre}</span>
+                            <span className="text-gray-600 text-xs"> · {eqGol && etiquetaEquipo(eqGol.equipo)}</span>
                           </div>
                         </div>
                       );
@@ -476,7 +512,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                             <span className="font-semibold text-sm" style={{ color }}>
                               Autogol
                             </span>
-                            <span className="text-gray-600 text-xs"> · {eqAuto?.equipo.nombre}</span>
+                            <span className="text-gray-600 text-xs"> · {eqAuto && etiquetaEquipo(eqAuto.equipo)}</span>
                           </div>
                         </div>
                       );
@@ -490,7 +526,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                           </span>
                           <span className="text-base shrink-0">🤝</span>
                           <span className="text-yellow-500 text-sm">
-                            {eqA?.equipo.nombre} vs {eqB?.equipo.nombre}
+                            {eqA && etiquetaEquipo(eqA.equipo)} vs {eqB && etiquetaEquipo(eqB.equipo)}
                           </span>
                         </div>
                       );
@@ -507,7 +543,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                             <span className="font-semibold text-sm" style={{ color }}>
                               {ev.data.jugador}
                             </span>
-                            <span className="text-gray-600 text-xs"> · {eqAm?.equipo.nombre}</span>
+                            <span className="text-gray-600 text-xs"> · {eqAm && etiquetaEquipo(eqAm.equipo)}</span>
                             <div className="text-gray-600 text-xs">{RAZON_LABEL[ev.data.razon]}</div>
                           </div>
                         </div>
@@ -525,7 +561,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                             <span className="font-semibold text-sm" style={{ color }}>
                               {ev.data.jugador}
                             </span>
-                            <span className="text-gray-600 text-xs"> · {eqRoja?.equipo.nombre}</span>
+                            <span className="text-gray-600 text-xs"> · {eqRoja && etiquetaEquipo(eqRoja.equipo)}</span>
                             <div className="text-red-500 text-xs font-semibold">Expulsión</div>
                           </div>
                         </div>
@@ -544,7 +580,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
                               className="font-semibold text-sm"
                               style={{ color: getColor(ev.data.ganadorId) }}
                             >
-                              {eqGana?.equipo.nombre}
+                              {eqGana && etiquetaEquipo(eqGana.equipo)}
                             </span>
                             <div className="text-gray-600 text-xs">
                               {ev.data.metodo === "tabla"
@@ -591,11 +627,71 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
         </div>
       </div>
 
+      {pendiente?.tipo === "gol" && (
+        <ConfirmarModal
+          icono="⚽"
+          titulo="¿Gol?"
+          textoConfirmar="Sí, gol"
+          claseConfirmar="bg-green-600 hover:bg-green-500 active:bg-green-700"
+          onConfirmar={confirmarPendiente}
+          onCancelar={() => setPendiente(null)}
+        >
+          <p className="text-base font-bold" style={{ color: getColor(pendiente.equipoGoleadorId) }}>
+            {pendiente.goleador}
+          </p>
+          <p className="text-gray-400 text-sm">
+            {etiquetaDe(pendiente.equipoGoleadorId)} le marca a{" "}
+            <span className="font-semibold" style={{ color: getColor(pendiente.equipoArqueroId) }}>
+              {etiquetaDe(pendiente.equipoArqueroId)}
+            </span>
+          </p>
+        </ConfirmarModal>
+      )}
+
+      {pendiente?.tipo === "autogol" && (
+        <ConfirmarModal
+          icono="🥅"
+          titulo="¿Autogol?"
+          textoConfirmar="Sí, autogol"
+          claseConfirmar="bg-red-600 hover:bg-red-500 active:bg-red-700"
+          onConfirmar={confirmarPendiente}
+          onCancelar={() => setPendiente(null)}
+        >
+          <p className="text-gray-400 text-sm">
+            En contra de{" "}
+            <span className="font-bold" style={{ color: getColor(pendiente.equipoAutogolId) }}>
+              {etiquetaDe(pendiente.equipoAutogolId)}
+            </span>
+            . Gana{" "}
+            <span className="font-bold" style={{ color: getColor(pendiente.equipoGanadorId) }}>
+              {etiquetaDe(pendiente.equipoGanadorId)}
+            </span>
+          </p>
+        </ConfirmarModal>
+      )}
+
+      {pendiente?.tipo === "empate" && (
+        <ConfirmarModal
+          icono="🤝"
+          titulo="¿Empate?"
+          textoConfirmar="Sí, empate"
+          claseConfirmar="bg-yellow-600 hover:bg-yellow-500 active:bg-yellow-700"
+          onConfirmar={confirmarPendiente}
+          onCancelar={() => setPendiente(null)}
+        >
+          <p className="text-gray-400 text-sm">
+            <span className="font-bold" style={{ color: colorA }}>{etiquetaEquipo(equipoA.equipo)}</span>
+            {" vs "}
+            <span className="font-bold" style={{ color: colorB }}>{etiquetaEquipo(equipoB.equipo)}</span>
+          </p>
+        </ConfirmarModal>
+      )}
+
       {targetAmarilla && (
         <AmarillaModal
           jugador={targetAmarilla.jugador}
           equipoId={equipos[targetAmarilla.equipoIdx].equipo.id}
-          equipoNombre={equipos[targetAmarilla.equipoIdx].equipo.nombre}
+          equipoNombre={etiquetaEquipo(equipos[targetAmarilla.equipoIdx].equipo)}
           onConfirmar={handleAmarilla}
           onCancelar={() => setTargetAmarilla(null)}
         />
@@ -605,7 +701,7 @@ export function PartidoEnVivo({ partido, onUpdatePartido, onReloj, onFinalizar }
         <RojaModal
           jugador={targetRoja.jugador}
           equipoId={equipos[targetRoja.equipoIdx].equipo.id}
-          equipoNombre={equipos[targetRoja.equipoIdx].equipo.nombre}
+          equipoNombre={etiquetaEquipo(equipos[targetRoja.equipoIdx].equipo)}
           onConfirmar={handleRoja}
           onCancelar={() => setTargetRoja(null)}
         />

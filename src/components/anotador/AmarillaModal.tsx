@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { RazonAmarilla } from "./types";
 import { getColor } from "./utils";
 
@@ -25,6 +26,9 @@ export function AmarillaModal({
   onCancelar,
 }: Props) {
   const color = getColor(equipoId);
+  // El motivo se elige y luego se confirma: un toque solo ya no registra la
+  // tarjeta, que es lo que pasaba al apuntar al motivo con prisa.
+  const [razon, setRazon] = useState<RazonAmarilla | null>(null);
 
   return (
     <div
@@ -52,8 +56,13 @@ export function AmarillaModal({
           {RAZONES.map(({ key, label, icon }) => (
             <button
               key={key}
-              onClick={() => onConfirmar(key)}
-              className="w-full py-3.5 px-4 bg-yellow-600/20 hover:bg-yellow-600/35 active:bg-yellow-600/50 border border-yellow-600/30 text-yellow-300 rounded-xl font-medium text-sm transition-colors flex items-center gap-3"
+              onClick={() => setRazon(key)}
+              aria-pressed={razon === key}
+              className={`w-full py-3.5 px-4 border rounded-xl font-medium text-sm transition-colors flex items-center gap-3 ${
+                razon === key
+                  ? "bg-yellow-500 border-yellow-400 text-gray-950"
+                  : "bg-yellow-600/20 hover:bg-yellow-600/35 border-yellow-600/30 text-yellow-300"
+              }`}
             >
               <span className="text-xl">{icon}</span>
               {label}
@@ -61,12 +70,21 @@ export function AmarillaModal({
           ))}
         </div>
 
-        <button
-          onClick={onCancelar}
-          className="w-full py-3 bg-gray-800 hover:bg-gray-700 text-gray-400 rounded-xl font-medium transition-colors"
-        >
-          Cancelar
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancelar}
+            className="flex-1 min-h-[52px] bg-gray-800 hover:bg-gray-700 text-gray-400 rounded-xl font-medium transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => razon && onConfirmar(razon)}
+            disabled={!razon}
+            className="flex-1 min-h-[52px] bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 disabled:bg-gray-800 disabled:text-gray-600 text-gray-950 rounded-xl font-bold transition-colors"
+          >
+            Confirmar
+          </button>
+        </div>
       </div>
     </div>
   );

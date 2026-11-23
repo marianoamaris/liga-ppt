@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSede } from "../../context/SedeContext";
-import { getColor, computeScores, formatElapsed, RAZON_LABEL } from "./utils";
+import { getColor, etiquetaEquipo, computeScores, formatElapsed, RAZON_LABEL } from "./utils";
 import type { ModoPartido, PartidoVivo, RazonAmarilla } from "./types";
 
 const MODO_LABEL: Record<ModoPartido, string> = {
@@ -95,7 +95,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
       return [{
         id: ev.data.id,
         minuto: formatElapsed(ev.data.tiempoEnMarcador),
-        quien: `Autogol · ${eq?.equipo.nombre ?? ""}`,
+        quien: `Autogol · ${eq ? etiquetaEquipo(eq.equipo) : ""}`,
         equipoId: ev.data.equipoGanadorId,
         esAutogol: true,
       }];
@@ -127,7 +127,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
             <div className="flex items-center justify-center gap-4">
               <div className="flex-1 text-right min-w-0">
                 <div className="font-bold text-xl leading-tight truncate" style={{ color: colorA }}>
-                  {eqA.equipo.nombre}
+                  {etiquetaEquipo(eqA.equipo)}
                 </div>
               </div>
               <div className="flex items-center gap-3 shrink-0">
@@ -141,7 +141,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
               </div>
               <div className="flex-1 text-left min-w-0">
                 <div className="font-bold text-xl leading-tight truncate" style={{ color: colorB }}>
-                  {eqB.equipo.nombre}
+                  {etiquetaEquipo(eqB.equipo)}
                 </div>
               </div>
             </div>
@@ -329,7 +329,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
                 style={{ border: `1px solid ${color}40` }}
               >
                 <div className="text-xs font-bold mb-2 truncate" style={{ color }}>
-                  {eq.equipo.nombre}
+                  {etiquetaEquipo(eq.equipo)}
                 </div>
                 <div className="text-white text-3xl font-black tabular-nums">{s.puntos}</div>
                 <div className="text-gray-500 text-xs mt-0.5">puntos</div>
@@ -406,7 +406,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
                       </span>
                       <div className="text-gray-600 text-xs">{RAZON_LABEL[a.razon]}</div>
                     </div>
-                    <span className="text-gray-500 text-xs shrink-0 ml-2">{a.equipo}</span>
+                    <span className="text-gray-500 text-xs shrink-0 ml-2">{eq ? etiquetaEquipo(eq.equipo) : a.equipo}</span>
                   </div>
                 );
               })}
@@ -432,7 +432,7 @@ export function ResumenPartido({ partido, onNuevoPartido }: Props) {
                       </span>
                       <div className="text-red-500 text-xs font-semibold">Expulsión</div>
                     </div>
-                    <span className="text-gray-500 text-xs shrink-0 ml-2">{r.equipo}</span>
+                    <span className="text-gray-500 text-xs shrink-0 ml-2">{eq ? etiquetaEquipo(eq.equipo) : r.equipo}</span>
                   </div>
                 );
               })}

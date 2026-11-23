@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { partidosApi, type ApiEquipo, type Partido } from "../lib/api";
 import { useSede } from "../context/SedeContext";
 import { useEquiposEdicion } from "../hooks/useCatalogo";
+import { registrarColores } from "../components/anotador/utils";
 import type { EquipoLocal } from "../types/jugador";
 import type {
   EstadoReloj,
@@ -150,7 +151,9 @@ export function AnotadorPage() {
   const [partido, setPartido] = useState<PartidoVivo | null>(null);
   const backendIdRef = useRef<string | null>(null);
   const { sede, edicionActual } = useSede();
-  const { locales: catalogo } = useEquiposEdicion(edicionActual);
+  const { equipos: equiposEdicion, locales: catalogo } = useEquiposEdicion(edicionActual);
+  // Antes de pintar a los hijos: todos leen el color y la etiqueta de aquí.
+  registrarColores(equiposEdicion);
 
   // ── Restore session on mount ─────────────────────────────────────────────────
   useEffect(() => {

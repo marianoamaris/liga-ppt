@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useConsulta } from "../../lib/cache";
 import { consultas } from "../../lib/consultas";
 import { useSede } from "../../context/SedeContext";
-import { getColor, makeId } from "./utils";
+import { getColor, etiquetaEquipo, makeId } from "./utils";
 import { estadoTanda, TIROS_TANDA } from "./tandaPenales";
 import type { EquipoEnCancha, EventoDefinicion, ModoPartido, TiroPenal } from "./types";
 
@@ -29,7 +29,7 @@ interface Props {
 function Equipo({ eq, children }: { eq: EquipoEnCancha; children?: React.ReactNode }) {
   return (
     <span className="font-bold" style={{ color: getColor(eq.equipo.id) }}>
-      {eq.equipo.nombre}
+      {etiquetaEquipo(eq.equipo)}
       {children}
     </span>
   );
@@ -84,7 +84,7 @@ function PorTabla({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo">)
             onClick={() => confirmar(mejor)}
             className="w-full min-h-[52px] bg-green-600 hover:bg-green-500 active:bg-green-700 text-white font-bold rounded-2xl transition-colors"
           >
-            Pasa {mejor.equipo.nombre}
+            Pasa {etiquetaEquipo(mejor.equipo)}
           </button>
         </>
       ) : (
@@ -102,7 +102,7 @@ function PorTabla({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo">)
                   onClick={() => confirmar(eq)}
                   className="min-h-[52px] bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-white font-bold rounded-2xl transition-colors px-2"
                 >
-                  Pasa {eq.equipo.nombre}
+                  Pasa {etiquetaEquipo(eq.equipo)}
                 </button>
               ))}
             </div>
@@ -187,7 +187,7 @@ function PorPenales({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo"
                 className="text-sm font-bold truncate flex-1 min-w-0"
                 style={{ color }}
               >
-                {eq.equipo.nombre}
+                {etiquetaEquipo(eq.equipo)}
               </span>
               <Marcas tiros={suyos} color={color} />
               <span className="text-white text-xl font-black tabular-nums w-5 text-right">
@@ -206,7 +206,7 @@ function PorPenales({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo"
               ? "Muerte súbita · cobra"
               : `Tiro ${estado.numeroDelTurno} de ${TIROS_TANDA} · cobra`}{" "}
             <span style={{ color: getColor(equipoDelTurno.equipo.id) }}>
-              {equipoDelTurno.equipo.nombre}
+              {etiquetaEquipo(equipoDelTurno.equipo)}
             </span>
           </p>
 
@@ -249,7 +249,7 @@ function PorPenales({ equipos, tiempoEnMarcador, onDefinir }: Omit<Props, "modo"
         className="w-full min-h-[52px] bg-green-600 hover:bg-green-500 active:bg-green-700 disabled:bg-gray-800 disabled:text-gray-600 text-white font-bold rounded-2xl transition-colors"
       >
         {ganador
-          ? `Pasa ${ganador.equipo.nombre} · ${estado.golesA}–${estado.golesB}`
+          ? `Pasa ${etiquetaEquipo(ganador.equipo)} · ${estado.golesA}–${estado.golesB}`
           : "La tanda sigue abierta"}
       </button>
     </div>

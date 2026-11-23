@@ -1,4 +1,4 @@
-import { getColor, computeScores, formatCountdown, DURACION_PARTIDO } from "./utils";
+import { getColor, etiquetaEquipo, computeScores, formatCountdown, DURACION_PARTIDO } from "./utils";
 import type { EquipoEnCancha, Evento, ModoPartido } from "./types";
 
 interface Props {
@@ -111,7 +111,7 @@ export function MarcadorVivo({
           {/* Team A */}
           <div className="flex-1 text-right">
             <div className="font-bold text-lg leading-tight" style={{ color: colorA }}>
-              {eqA.equipo.nombre}
+              {etiquetaEquipo(eqA.equipo)}
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export function MarcadorVivo({
           {/* Team B */}
           <div className="flex-1 text-left">
             <div className="font-bold text-lg leading-tight" style={{ color: colorB }}>
-              {eqB.equipo.nombre}
+              {etiquetaEquipo(eqB.equipo)}
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export function MarcadorVivo({
           return (
             <div key={eq.equipo.id} className="flex-1 text-center min-w-0">
               <div className="text-[10px] font-bold truncate leading-none" style={{ color }}>
-                {eq.equipo.nombre}
+                {etiquetaEquipo(eq.equipo)}
               </div>
               <div className="text-white text-2xl font-black leading-tight tabular-nums">
                 {s.puntos}

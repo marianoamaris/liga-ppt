@@ -51,8 +51,47 @@ export function transcurridoDe(estado: EstadoReloj, duracion: number): number {
   return Math.min(duracion, Math.floor(estado.acumulado + enCurso));
 }
 
+/**
+ * Color de cada equipo de la edición en curso, por id.
+ *
+ * Lo registra AnotadorPage al cargar los equipos, antes de pintar nada. Vive a
+ * nivel de módulo porque `getColor` se llama desde quince sitios que solo
+ * conocen el id del equipo, y pasarles un mapa a todos no aportaba nada.
+ */
+const COLORES_EDICION = new Map<string, { hex: string | null; nombre: string | null }>();
+
+export function registrarColores(
+  equipos: { slug: string; color_hex: string | null; color_slug?: string | null }[]
+): void {
+  COLORES_EDICION.clear();
+  for (const e of equipos) {
+    COLORES_EDICION.set(e.slug, {
+      hex: e.color_hex,
+      nombre: e.color_slug ? nombreDeColor(e.color_slug) : null,
+    });
+  }
+}
+
+/** «rosado» → «Rosado». */
+export function nombreDeColor(colorSlug: string): string {
+  const limpio = colorSlug.replace(/-/g, " ");
+  return limpio.charAt(0).toUpperCase() + limpio.slice(1);
+}
+
 export function getColor(id: string): string {
-  return LIGA20_COLORES[id] ?? "#4B5563";
+  return COLORES_EDICION.get(id)?.hex ?? LIGA20_COLORES[id] ?? "#4B5563";
+}
+
+/**
+ * Cómo se nombra un equipo en el anotador: por el color del peto, no por el
+ * club. En la cancha nadie dice «Sassuolo», dice «el verde», y con nueve
+ * nombres de la Serie A los anotadores se equivocaban de equipo.
+ *
+ * Solo es lo que se ve: lo que se guarda en el partido sigue llevando el
+ * nombre del club, que es lo que leen En Vivo y la clasificación.
+ */
+export function etiquetaEquipo(equipo: { id: string; nombre: string }): string {
+  return COLORES_EDICION.get(equipo.id)?.nombre ?? equipo.nombre;
 }
 
 /**
